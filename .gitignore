@@ -1,0 +1,27 @@
+__pycache__/
+*.pyc
+.venv/
+env/
+venv/
+.env
+variables.env
+.DS_Store
+
+# Generated package and test artifacts
+*.egg-info/
+.pytest_cache/
+build/
+dist/
+
+# Local credentials and secret-file backups
+.env
+.env.*
+*.env
+*.env.*
+*.env~
+.streamlit/secrets.toml
+.streamlit/secrets.toml.*
+
+# Safe examples can be committed; keep their values blank.
+!.env.example
+!*.env.example
