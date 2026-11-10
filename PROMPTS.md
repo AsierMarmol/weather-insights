@@ -71,7 +71,7 @@ Copy this template for a new substantial task. Replace the placeholders with act
 
 The Asked fields below are professional summaries of the original requests and their context, not verbatim quotations. The chronological records retain the actual outputs, checks, decisions, and review status. Every entry uses the same eight fields shown in the template.
 
-Historical status: the seven original entries dated 2026-11-05 retain their review and publication status at the time they were recorded. Their setup changes were subsequently included in [initial commit 0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). The later records below connect the completed manual steps and verification evidence to that real commit; they do not retroactively claim peer approval.
+Historical status: the seven original entries dated 2026-11-05 retain their review and publication status at the time they were recorded. Their setup changes were subsequently included in [initial commit 0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). The later records below connect the completed manual steps and verification evidence to that real commit; they do not retroactively claim peer approval. Later entries also retain their status at the time of recording; the latest handoff entry contains the current publication references.
 
 ---
 
@@ -263,7 +263,7 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Asked:** Finish Phase 1 - **Team and Environment Setup** by moving PHASE1_SETUP.md back beside the repository README, then commit and publish the documentation on `asier/feature`, open a PR into `dev`, and request Gabriel's review. Keep Step 17 pending while Asier obtains teammate confirmations, and prepare Phase 2 - **Ideation and Project Flexibility** using the same ordered steps and completion checks.
 
-**Got:** Relocated PHASE1_SETUP.md into the repository and updated its current location policy, checklist, and handoff status. Added PHASE2_SCOPE.md as a planning draft, linked both plans from README.md, and retained the existing documentation updates and historical AI records. Confirmed Gabriel's account as `gabrielstec` with repository write access. Prepared the user-authorized documentation publication and review request; no approval, merge, or teammate confirmation is invented.
+**Got:** Relocated PHASE1_SETUP.md into the repository and updated its current location policy, checklist, and handoff status. Added PHASE2_SCOPE.md as a planning draft, linked both plans from README.md, and retained the existing documentation updates and historical AI records. Confirmed Gabriel's account as `gabrielstec` with repository write access. Committed and published the authorized four-file documentation snapshot as `a81d470` and opened [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) from `asier/feature` into `dev`. Gabriel is the selected reviewer; no approval, merge, or teammate confirmation is invented.
 
 **Checked:** Compared the plans with the authoritative assignment and supporting summary. Verified the preserved historical AI entries, uniform eight-field task records, repository-local Markdown links, unchanged install/run command blocks, code fences, whitespace, and the four-file documentation scope. Reviewed staged candidates for credentials and confirmed that source, dependencies, the lockfile, and instructor references are unchanged. Checked the selected no-reply Git identity and Codex trailer. Application tests were not rerun for these documentation-only changes. The actual PR will provide review-state evidence; individual teammate checks remain Asier's pending confirmations.
 
@@ -271,6 +271,6 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Human review:** Asier explicitly authorized the move, commit, publication, and Gabriel review request. Gabriel's peer review is pending. Asier is collecting the Step 17 confirmations; none are recorded as received by this entry.
 
-**Commit / PR:** Authorized publication is being prepared on `asier/feature` for a PR into `dev`; actual commit/PR links will be recorded after creation. The initial baseline remains [0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). This record does not claim a merge or review approval.
+**Commit / PR:** Published documentation snapshot: [a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc](https://github.com/AsierMarmol/weather-insights/commit/a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc). Review: [PR #1, asier/feature into dev](https://github.com/AsierMarmol/weather-insights/pull/1), with Gabriel (`gabrielstec`) selected for review. The snapshot and this reference update use AsierMarmol's configured no-reply identity and the Codex trailer. Peer approval, merging, and Step 17 confirmations remain pending.
 
 ---

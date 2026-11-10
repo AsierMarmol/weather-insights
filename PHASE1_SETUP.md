@@ -8,7 +8,7 @@ Complete one step, verify its finish condition, and review the result before mov
 
 Checkpoint: 10 November 2026. The environment, initial publication, and seven team/shared branches are in place. GitHub marks main/dev protected; prior screenshots show the selected review options. The first real PR still needs to exercise those requirements. The shared branches and asier/feature start from baseline 0223991; teammate branches can advance independently.
 
-Asier reports that all four teammates have access and completed onboarding. He is collecting the individual Step 17 confirmations now; they are not yet recorded as received. Step 16 is in progress: publish this documentation change from asier/feature, open a PR into dev, and request Gabriel (gabrielstec) as reviewer. Approval, merge into dev, reviewed promotion into main, and final confirmations remain pending. Phase 2 is drafted but has not begun.
+Asier reports that all four teammates have access and completed onboarding. He is collecting the individual Step 17 confirmations now; they are not yet recorded as received. Step 16 is in progress: [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) is open from asier/feature into dev, publishing [documentation commit a81d470](https://github.com/AsierMarmol/weather-insights/commit/a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc). Gabriel (gabrielstec) is the intended reviewer; his review remains pending. Approval, merge into dev, reviewed promotion into main, and final confirmations remain pending. Phase 2 is drafted but has not begun.
 
 The latest user request explicitly authorizes moving this plan into the repository, committing/publishing the documentation, and requesting Gabriel's review. It supersedes the earlier external-plan location and manual-only publication preference for this change. It does not authorize bypassing review or declaring a phase complete.
 
@@ -48,7 +48,7 @@ Historical verification sections below describe the locations, files, and review
 | 13 | Configure the branch and review rules. | GitHub marks main/dev protected; prior screenshots show the agreed review settings. Validate that an actual PR requires a peer approval and resolved conversations before merging. | Configured - protection flags verified; enforcement check in Step 16 |
 | 14 | Invite the other four members and record the five-person team. | The user reports all four have access. Four teammate personal branches are published. Exact collaborator identities and initial responsibilities can be recorded when confirmed. | Done - access reported by user |
 | 15 | Onboard all four teammates. | All four personal branches are published and onboarding is reported complete. Asier is collecting each person's starter-app, identity, and collaboration-rule confirmation under Step 17. | Reported complete - confirmations being collected |
-| 16 | Exercise the PR process with a useful setup change. | Publish README, PROMPTS, the relocated Phase 1 checklist, and the Phase 2 draft on asier/feature; request Gabriel's review on a PR into dev. Verify review enforcement, merge after approval, and promote reviewed dev into main. | In progress - publication authorized; review pending |
+| 16 | Exercise the PR process with a useful setup change. | [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) publishes the four documentation files from asier/feature into dev. Gabriel's review, protection enforcement check, merge into dev, and reviewed promotion into main remain pending. | PR open - awaiting Gabriel's review |
 | 17 | Close Phase 1 together. | Asier confirms that all five can run the starter and understand branch, credential, and AI-record rules. Finish the reviewed setup PR workflow before closing the phase and starting Phase 2. | Pending - Asier is collecting confirmations |
 
 ## Alignment with the assignment and technical reference
@@ -225,7 +225,7 @@ Reference for the collaboration practices: [GitHub flow](https://docs.github.com
 
 ## Next action only
 
-Publish the authorized documentation commit on asier/feature, open the PR into dev, and request Gabriel (gabrielstec) to review it. Do not merge before the required review. Asier is collecting Step 17 confirmations in parallel. After the approved change is merged into dev, promote reviewed dev into main through another reviewed PR. Close Phase 1 only when that workflow and the confirmations are complete, then start Phase 2 using PHASE2_SCOPE.md.
+Request and await Gabriel's review of [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1). Do not merge before the required review. Asier is collecting Step 17 confirmations in parallel. After the approved change is merged into dev, promote reviewed dev into main through another reviewed PR. Close Phase 1 only when that workflow and the confirmations are complete, then start Phase 2 using PHASE2_SCOPE.md.
 
 ## Team onboarding checkpoint - 10 November 2026
 
@@ -249,4 +249,4 @@ Publish the authorized documentation commit on asier/feature, open the PR into d
 - Gabriel's account is gabrielstec; connected GitHub checks confirm write access. A review request is authorized. Approval, merge, and Step 17 confirmations are not claimed by this preparation record.
 - PHASE2_SCOPE.md uses the same ordered-checklist/finish-condition structure. It is a draft for ideation and project flexibility, including minimum scope, real-history planning, meaningful OOP, analytics/UI decisions, optional enrichment, and five-person responsibilities.
 - Asier is collecting the team confirmations. Phase 1 remains open until review/promotion and confirmations are complete; no weather feature is implemented by this documentation change.
-- Publication links will be recorded once the commit and PR exist. No credentials or instructor reference files are included in the publication.
+- Publication: [documentation commit a81d470](https://github.com/AsierMarmol/weather-insights/commit/a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc) and [PR #1 into dev](https://github.com/AsierMarmol/weather-insights/pull/1). Gabriel's review and Step 17 confirmations remain pending. No credentials or instructor reference files are included in the publication.
