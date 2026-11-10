@@ -71,6 +71,8 @@ Copy this template for a new substantial task. Replace the placeholders with act
 
 The Asked fields below are professional summaries of the original requests and their context, not verbatim quotations. The chronological records retain the actual outputs, checks, decisions, and review status. Every entry uses the same eight fields shown in the template.
 
+Historical status: the seven original entries dated 2026-11-05 retain their review and publication status at the time they were recorded. Their setup changes were subsequently included in [initial commit 0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). The later records below connect the completed manual steps and verification evidence to that real commit; they do not retroactively claim peer approval. Later entries also retain their status at the time of recording; the latest handoff entry contains the current publication references.
+
 ---
 
 ## Setup: Phase 1 - Team and Environment Setup (2026-11-05)
@@ -210,5 +212,65 @@ The Asked fields below are professional summaries of the original requests and t
 **Human review:** Pending user review and explicit authorization of the proposed initial commit. Successful technical checks do not imply commit approval.
 
 **Commit / PR:** Not created for this task; nothing was staged, committed, or pushed.
+
+---
+
+## Setup: Phase 1 baseline publication and team collaboration (2026-11-10)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Continue Phase 1 - **Team and Environment Setup**, Steps 9-15: guide the initial commit and publication, the `main`, `dev`, and personal branch setup, branch protection, collaborator invitations, and local onboarding. Keep commits, pushes, and GitHub configuration under manual user control, and verify the completed setup against the assignment before proceeding. Consolidate the already-recorded outcomes and evidence in the repository's AI log.
+
+**Got:** Asier manually created the initial commit, amended it to include the agreed Codex co-author trailer, published `main`, and created/published `dev` and `asier/feature`. The assistant guided the manual protection and invitation steps and checked the published setup. The shared repository now contains the five personal branches listed in README.md, and GitHub marks `main` and `dev` protected. Asier reports that all four teammates have access and have completed onboarding. This entry brings those existing session/checklist records into the ongoing repository log.
+
+**Checked:** The earlier 5 November audit verified the actual GitHub clone: locked installation, dependency consistency, package import, the one arithmetic placeholder test, both starter views, safe credential-file copying with dummy values, and published author/co-author metadata passed. On 10 November, the connected GitHub branch listing confirmed all seven branches and protection enabled for `main`/`dev`; those shared branches and published `asier/feature` still reference initial commit `0223991`. Before the Step 16 documentation edits, local `asier/feature` was clean and tracked `origin/asier/feature` at that commit. The protection-option screenshots show the selected review rules; the first real PR must still exercise their enforcement. Individual teammate installation checks, Git identities, and app operation are reported rather than independently verified. No private credential file was read and no new live API or application test was run for this record update.
+
+**Kept / changed / rejected:** Kept the published starter baseline, the user's personal-branch-to-`dev`-to-`main` flow, individual human authorship, and the agreed AI trailer. Preserved the seven historical entries and their actual earlier review states. Used recorded checks and live branch metadata to add completed outcomes without inventing teammate contributions, review approvals, or per-machine test results. Branch publication and onboarding do not replace the course requirement for meaningful contributions from all five students.
+
+**Human review:** Asier performed the initial commit/publication and GitHub setup manually and provided the protection-setting screenshots. No peer review of the initial direct publication is claimed. Individual onboarding confirmations and the first reviewed documentation PR remain pending.
+
+**Commit / PR:** Published initial baseline: [0223991f05005d0420c7be2c760c2c6850fbfd88](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88), authored by AsierMarmol with `Co-Authored-By: Codex <noreply@openai.com>`. This reference identifies the initial setup changes; the new log record itself is part of the pending Step 16 documentation change. No PR reference exists for that change yet.
+
+---
+
+## Setup: Phase 1 first reviewed documentation change (2026-11-10)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Continue Phase 1 - **Team and Environment Setup**, Step 16: prepare the first useful documentation change on `asier/feature`. Update README.md to reflect the published branches and current collaboration process, and update PROMPTS.md with completed manual setup outcomes and actual commit references. Leave the commit, push, PR creation, and merge for the user to perform manually.
+
+**Got:** Removed the README's obsolete empty-repository instruction and replaced future branch-setup wording with the current shared/personal branches, selected review policy, PR sequence, and onboarding status. Added historical-status context and the preceding evidence-based publication record to PROMPTS.md. Kept this entry ready for the upcoming peer review and actual commit/PR references.
+
+**Checked:** Compared the changes with the assignment's README/AI-record requirements, the existing setup evidence, current branch metadata, and the user's reported onboarding status. Verified that the seven historical entries and all README command blocks remain unchanged, each of the nine task entries has the same eight fields, local Markdown links resolve, and only README.md and PROMPTS.md differ in the checkout. `git diff --check` passed; HEAD and the index were unchanged. Application code, dependency versions, and credential files were not edited, so application tests were not rerun for this documentation-only change. Branch-protection enforcement remains for the real PR.
+
+**Kept / changed / rejected:** Kept the install/run commands, secure credential guidance, honest starter limitations, and original historical records. Replaced stale setup status with verified facts and clearly labeled user reports. Left CI, PR templates, feature development, and any claimed review approval outside this change so the first PR stays focused and understandable.
+
+**Human review:** Pending peer review of the documentation diff. Asier requested preparation; this entry does not claim a teammate's approval or completion of the PR workflow.
+
+**Commit / PR:** Pending. The assistant has not staged, committed, pushed, opened a PR, or merged these changes. Add the actual commit/PR reference after the user creates it; `0223991` above refers only to the already-published initial baseline.
+
+---
+
+## Setup: Phase 1 publication and Phase 2 planning handoff (2026-11-10)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Finish Phase 1 - **Team and Environment Setup** by moving PHASE1_SETUP.md back beside the repository README, then commit and publish the documentation on `asier/feature`, open a PR into `dev`, and request Gabriel's review. Keep Step 17 pending while Asier obtains teammate confirmations, and prepare Phase 2 - **Ideation and Project Flexibility** using the same ordered steps and completion checks.
+
+**Got:** Relocated PHASE1_SETUP.md into the repository and updated its current location policy, checklist, and handoff status. Added PHASE2_SCOPE.md as a planning draft, linked both plans from README.md, and retained the existing documentation updates and historical AI records. Confirmed Gabriel's account as `gabrielstec` with repository write access. Committed and published the authorized four-file documentation snapshot as `a81d470` and opened [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) from `asier/feature` into `dev`. Gabriel is the selected reviewer; no approval, merge, or teammate confirmation is invented.
+
+**Checked:** Compared the plans with the authoritative assignment and supporting summary. Verified the preserved historical AI entries, uniform eight-field task records, repository-local Markdown links, unchanged install/run command blocks, code fences, whitespace, and the four-file documentation scope. Reviewed staged candidates for credentials and confirmed that source, dependencies, the lockfile, and instructor references are unchanged. Checked the selected no-reply Git identity and Codex trailer. Application tests were not rerun for these documentation-only changes. The actual PR will provide review-state evidence; individual teammate checks remain Asier's pending confirmations.
+
+**Kept / changed / rejected:** Kept the tested package/environment, real-data and credential rules, five-person workflow, and honest starter limitations. Applied Asier's updated root-level phase-plan organization and explicit publication authorization in place of the earlier preferences. Phase 2 remains a draft with unapproved decisions; feature development, bypassing review, and claiming Phase 1 complete are outside this change.
+
+**Human review:** Asier explicitly authorized the move, commit, publication, and Gabriel review request. Gabriel's peer review is pending. Asier is collecting the Step 17 confirmations; none are recorded as received by this entry.
+
+**Commit / PR:** Published documentation snapshot: [a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc](https://github.com/AsierMarmol/weather-insights/commit/a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc). Review: [PR #1, asier/feature into dev](https://github.com/AsierMarmol/weather-insights/pull/1), with Gabriel (`gabrielstec`) selected for review. The snapshot and this reference update use AsierMarmol's configured no-reply identity and the Codex trailer. Peer approval, merging, and Step 17 confirmations remain pending.
 
 ---
