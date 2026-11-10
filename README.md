@@ -35,8 +35,6 @@ Set-Location -LiteralPath .\weather-insights
 uv sync --locked
 ```
 
-If GitHub still shows an empty repository, wait for the initial source files to be published before following the clone instructions.
-
 If you already have the project open, run only `uv sync --locked` from the directory containing `pyproject.toml` and `uv.lock`.
 
 This creates `.venv`, installs the local `weather-app` package and its dependencies, and includes the development tools such as pytest. `--locked` uses the checked-in dependency resolution and reports an error if it no longer matches `pyproject.toml`. Share `.python-version` and `uv.lock` with the team; each person creates their own `.venv`.
@@ -125,14 +123,33 @@ weather-insights/
 |       |-- storage.py       # Observation persistence placeholder
 |       `-- analytics.py     # Analytics placeholder
 |-- tests/                   # Currently one starter placeholder test
+|-- PHASE1_SETUP.md          # Team/environment checklist and evidence
+|-- PHASE2_SCOPE.md          # Ideation and project-flexibility draft
 `-- PROMPTS.md               # Ongoing AI collaboration record
 ```
+
+## Project phases
+
+Shared phase plans live beside this README and are reviewed with the repository:
+
+- [Phase 1 - Team and Environment Setup](PHASE1_SETUP.md): final review and team confirmations are in progress.
+- [Phase 2 - Ideation and Project Flexibility](PHASE2_SCOPE.md): an ordered draft for agreeing on the product, scope, data/history, OOP, analytics, optional enrichment, and team responsibilities. It begins after Phase 1 closes.
 
 ## Team collaboration
 
 The team has five members. Names and contribution summaries will be recorded as responsibilities and work are agreed.
 
-The agreed branch flow is `<member>/feature` -> `dev` -> `main`; Asier's branch will be `asier/feature`. Branch creation and repository review rules are still being set up. Once established, start personal work from `dev`, open a pull request into `dev`, and promote reviewed changes from `dev` into `main`.
+The agreed branch flow is `<member>/feature` -> `dev` -> `main`. `main` holds the stable shared version; `dev` brings together reviewed team changes. Both branches are published and protected.
+
+The five published personal branches are `Alejandra/feature`, `asier/feature`, `christian/feature`, `gabrielstec/feature`, and `selin/feature`. Use the exact branch names, including capitalization. Personal branches remain available for normal commits and pushes.
+
+The team's selected protection settings require a pull request, one approving teammate, fresh approval after new commits, and resolved review conversations before changes enter `dev` or `main`. The selected settings also apply to the repository owner and keep force pushes and branch deletion disabled. The first reviewed PR will verify that these requirements are enforced; protection is enabled, but the complete review-and-merge workflow has not yet been exercised.
+
+1. Start personal work from the latest `dev` and make a focused change on your own branch.
+2. Push your branch, open a PR with `dev` as the base, and ask another teammate to review it. Address feedback before merging and preserve the relevant author/co-author attribution.
+3. Promote reviewed changes from `dev` to `main` through another reviewed PR.
+
+Asier reports that all four teammates have repository access and have completed local onboarding. Published personal branches are verified. Asier is collecting each person's confirmation that the starter app runs and that they understand the branch, credential, and AI-record rules. The documentation PR and these confirmations are the remaining Phase 1 checkpoints.
 
 Use your own Git identity and make meaningful contributions. Follow the [AI collaboration convention and reusable entry template in PROMPTS.md](PROMPTS.md). Log substantial AI-assisted work while it happens, including actual checks and what was kept, changed, or rejected. Use `Co-Authored-By: Codex <noreply@openai.com>` on commits containing substantial Codex-authored code, setup, or documentation, and preserve attribution when merging. Other AI tools must be credited accurately. AI credit does not replace the five members' own meaningful contributions.
 
