@@ -71,7 +71,7 @@ Copy this template for a new substantial task. Replace the placeholders with act
 
 The Asked fields below are professional summaries of the original requests and their context, not verbatim quotations. The chronological records retain the actual outputs, checks, decisions, and review status. Every entry uses the same eight fields shown in the template.
 
-Historical status: the seven original entries dated 2026-11-05 retain their review and publication status at the time they were recorded. Their setup changes were subsequently included in [initial commit 0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). The later records below connect the completed manual steps and verification evidence to that real commit; they do not retroactively claim peer approval. Later entries also retain their status at the time of recording; the latest handoff entry contains the current publication references.
+Historical status: the seven original entries dated 2026-11-05 retain their review and publication status at the time they were recorded. Their setup changes were subsequently included in [initial commit 0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). The later records below connect the completed manual steps and verification evidence to that real commit; they do not retroactively claim peer approval. Later entries also retain their status at the time of recording; the publication entry records the corresponding commit and PR references.
 
 ---
 
@@ -255,7 +255,7 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 ---
 
-## Setup: Phase 1 publication and Phase 2 planning handoff (2026-11-10)
+## Setup: Phase 1 publication and Phase 2 plannings (2026-11-10)
 
 **Requested by:** AsierMarmol.
 
@@ -263,7 +263,7 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Asked:** Finish Phase 1 - **Team and Environment Setup** by moving PHASE1_SETUP.md back beside the repository README, then commit and publish the documentation on `asier/feature`, open a PR into `dev`, and request Gabriel's review. Keep Step 17 pending while Asier obtains teammate confirmations, and prepare Phase 2 - **Ideation and Project Flexibility** using the same ordered steps and completion checks.
 
-**Got:** Relocated PHASE1_SETUP.md into the repository and updated its current location policy, checklist, and handoff status. Added PHASE2_SCOPE.md as a planning draft, linked both plans from README.md, and retained the existing documentation updates and historical AI records. Confirmed Gabriel's account as `gabrielstec` with repository write access. Committed and published the authorized four-file documentation snapshot as `a81d470` and opened [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) from `asier/feature` into `dev`. Gabriel is the selected reviewer; no approval, merge, or teammate confirmation is invented.
+**Got:** Relocated PHASE1_SETUP.md into the repository and updated its current location policy, checklist, and next-phase status. Added PHASE2_SCOPE.md as a planning draft, linked both plans from README.md, and retained the existing documentation updates and historical AI records. Confirmed Gabriel's account as `gabrielstec` with repository write access. Committed and published the authorized four-file documentation snapshot as `a81d470` and opened [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) from `asier/feature` into `dev`. Gabriel is the selected reviewer; no approval, merge, or teammate confirmation is invented.
 
 **Checked:** Compared the plans with the authoritative assignment and supporting summary. Verified the preserved historical AI entries, uniform eight-field task records, repository-local Markdown links, unchanged install/run command blocks, code fences, whitespace, and the four-file documentation scope. Reviewed staged candidates for credentials and confirmed that source, dependencies, the lockfile, and instructor references are unchanged. Checked the selected no-reply Git identity and Codex trailer. Application tests were not rerun for these documentation-only changes. The actual PR will provide review-state evidence; individual teammate checks remain Asier's pending confirmations.
 
@@ -305,7 +305,7 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Asked:** Review the current project state and carry out the next phase task. For P2.1, prepare the scope-to-rubric checklist and unresolved-proposal register for the agreed mainland-Spain weather getaway application. Assigned task owner: Asier; assigned peer reviewer: Gabriel (gabrielstec).
 
-**Got:** Added the P2.1 deliverable inside PHASE2_SCOPE.md, separating agreed scope, sixteen assignment-requirement mappings, unresolved decisions with authors/reviewers, and Gabriel's review checklist. Updated PROJECT_PHASES.md to show the deliverable awaiting review and the subsequent P2.2/P2.3 handoffs.
+**Got:** Added the P2.1 deliverable inside PHASE2_SCOPE.md, separating agreed scope, sixteen assignment-requirement mappings, unresolved decisions with authors/reviewers, and Gabriel's review checklist. Updated PROJECT_PHASES.md to show the deliverable awaiting review and the subsequent P2.2/P2.3 next steps.
 
 **Checked:** Read the instructor assignment and supporting summary, checked the actual branch/status and starter files, verified referenced task IDs, local document links, Markdown structure/whitespace, preserved earlier log entries, and confirmed unrelated files and Git HEAD/index were unchanged. No application tests or live API requests were run: this is a specification task, and the existing arithmetic placeholder is not feature coverage.
 
@@ -314,3 +314,45 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Pending Gabriel's actual review. No review request was sent, and no teammate approval or group walkthrough was fabricated.
 
 **Commit / PR:** Not created; the deliverable and prior planning changes remain local and uncommitted. No push or merge was performed.
+
+
+---
+
+## Phase 2: P2.1 finalized product decisions and aligned project plans (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Apply the agreed product decisions across the project and update every affected current specification, phase, role, reference/default and verification file. Use rolling 1-5-day windows from use, default 3 days; editable seasonal temperature defaults in Europe/Madrid (winter 10-18 C, spring 18-26 C, summer 22-30 C, autumn 16-24 C), rain <=30%, wind <=25 km/h and visible All activity/size selections. Preserve manual preferences. Keep any-selected activity matching, five leading recommendations plus the full ranking, stable tie-breaks and two interactive Searcher/Dashboard views. Replace the required historical-trend feature and separate collector with ranking, weather comparison, all-preferences-period metrics and automatic timestamped saving on fresh successful fetches. Record actual changes/checks professionally, preserve historical evidence and mark unbuilt features pending. Do not commit, push or merge.
+
+**Got:** Finalized the P2.1 product specification, two-view outline and rubric checklist. Added data/reference/product_defaults.json as the shared initial-value reference. Updated PROJECT_PHASES.md, Phases 2-6, TEAMROLES.MD, WEATHER_API_CONTRACT.md and the project/reference/weather READMEs. P2.5 is now the initial bounded fetch-and-save foundation, not a scheduler or user collection routine. P2.4 retains technical schemas/function examples and component briefs, resolving the former P2.1/P2.4 overlap. Updated the diagnostic to check 24/48/72/96/120-hour windows, added fifth-day/clock-change regression checks, and checked an offline five-day coverage snapshot (later removed as a derived report). Renamed the existing starter headings/navigation to Searcher and Dashboard and updated placeholder comments; no later-phase controls, charts, scoring engine or production persistence were implemented.
+
+**Checked:** Ran pytest: 14 passed. Streamlit AppTest opened both renamed starter views without exceptions. Replayed the retained genuine forecasts at their original common search time: all 83 cities passed each 1-5-day daytime window; no new live requests or current-freshness claim. Checked five season/default/filter settings against the approved specification, all 12 month assignments, phase task IDs/dependencies/owners, local document targets, source syntax and Git whitespace. Verified unchanged CSV/provider overrides, original raw response/run evidence, completed Phase 1, unrelated implementation/configuration files, dependency files and instructor references. Preserved previous PROMPTS entries and historical phase results.
+
+**Kept / changed / rejected:** Kept the nine-column/83-city catalog, API naming/Lugo exception, three equal weather checks and capped driving-time deduction. The simultaneous-all-preferences percentage is explanatory, not a new score weight. Corrected the earlier claim that the teacher mandates a historical-trend chart: timestamped logging remains mandatory and actual records must accumulate through normal use and be submitted, while the chosen analyses span comparison and derived metrics. Removed required continuous/manual collection and forecast-versus-reality work. Defaults are product preferences, not climate averages; seasonal initialization must never silently overwrite user edits. Shared defaults exist as reference configuration; runtime preference loading and application features remain assigned future work.
+
+**Human review:** The user approved the product choices. Gabriel's specification/API peer review and Christian's independent catalog content/source review remain pending. No teammate approval or completed application behavior is claimed.
+
+**Commit / PR:** Not created for this task. Changes remain local; no commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.4 shared data and calculation specification (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Define a simple shared data and calculation specification for the agreed project, with clear component boundaries and independently checked examples. Align the phases with the actual shared files, retain the corrected nine-column catalog, remove unused categories and duplicated implementation work, and keep production components assigned to their owners.
+
+**Got:** Documented P2.4 directly in PHASE2_SCOPE.md: domain fields, normalized weather CSV schema, shared component inputs/outputs, units, time/save/error rules and a small worked scoring example. Aligned phase dependencies and roles so P2.5 verifies the actual shared API/store after P3.1/P3.2 rather than building a second implementation. Simplified current READMEs/provider notes and retained the established product decisions. Configuration now reads credentials only when requested, and the diagnostic handles malformed location payloads and storage failures safely. Removed the arithmetic placeholder; actual production classes and UI features remain pending.
+
+**Checked:** Worked examples were independently checked: Toledo ranks before Segovia and Seville; equal weather scores can have different simultaneous-suitability percentages. The earlier baseline had 14 passing tests including one arithmetic placeholder. Verification after these revisions: 25 offline tests passed; both starter views passed AppTest. Python/TOML/JSON parsing, local document links and Git whitespace checks passed. The catalog, defaults, dependency files, .gitignore and instructor references remained unchanged. No live requests or peer approvals are claimed.
+
+**Kept / changed / rejected:** Kept the catalog's corrected values, provider request override, timestamped real-data requirement, seasonal preferences, three analyses and component ownership. Removed duplicated specification/status text and unsupported size options. Retained accurate Asier/Codex attribution and separated planned interfaces from implemented behavior.
+
+**Human review:** User approved the simplification and data-investigation removal. Christian's P2.4/catalog review and Gabriel's specification/API reviews remain pending.
+
+**Commit / PR:** Not created. Changes remain local; no commit, push or merge was performed.

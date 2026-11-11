@@ -10,7 +10,7 @@ This is the setup reference for the project, not a new round of onboarding work.
 
 The active work is [Phase 2](PHASE2_SCOPE.md). Future responsibilities are in [TEAMROLES.MD](TEAMROLES.MD); navigation and plan-maintenance rules are in [PROJECT_PHASES.md](PROJECT_PHASES.md). No commit, push or merge is authorized by this planning check.
 
-## Handoff to Phase 2
+## Next phase
 
 Preserve the existing repository and environment; no setup restart is needed. Begin the approved scope/candidate-catalog review. Feature development remains pending. The application is still the starter, so completed setup is not evidence of functional rubric completion.
 
@@ -18,13 +18,13 @@ Preserve the existing repository and environment; no setup restart is needed. Be
 
 The task owner records the change and reason before dependent work continues. Check all six phase plans for impact, then update every affected step, dependency, finish condition and acceptance check in the same change. Also update the Phase 2 specification, TEAMROLES.MD, PROJECT_PHASES.md and application README when affected. Do not rewrite unaffected history or invent completion evidence.
 
-Keep task IDs stable. Split a broad task into linked subtasks before starting if it has more than one independently reviewable outcome. If a previously completed check is invalidated, retain its old evidence and mark the affected task Needs recheck with a named owner; do not leave it silently Done. Distinguish Pending, In progress, Blocked (with reason), Needs recheck and Done (with evidence).
+Keep task IDs stable and assign one owner per broad deliverable, including its tests and documentation. If a previously completed check is invalidated, retain its old evidence and mark the affected task Needs recheck with a named owner; do not leave it silently Done. Distinguish Pending, In progress, Blocked (with reason), Needs recheck and Done (with evidence).
 
-The named peer reviewer checks both the technical change and consistency across affected phases. Asier coordinates the impact review, not every implementation fix. Record the change and its affected task IDs in the change register in [PROJECT_PHASES.md](PROJECT_PHASES.md). Full maintenance procedure: that file's Plan maintenance section.
+The implementation owner updates affected steps and records the change in the active phase's progress log. The named peer reviewer checks technical and documentation consistency. Follow [Plan maintenance](PROJECT_PHASES.md#plan-maintenance); no separate change register is required.
 
 ## Historical setup checklist and verification records
 
-The following is the previous detailed setup record, retained verbatim apart from heading depth. Its dates, former locations, authorizations, branch snapshots and pending statements apply at the time they were recorded; they are not new actions or current publication authorization.
+The following is the previous detailed setup record, retained with heading/navigation wording updated. Its dates, former locations, authorizations, branch snapshots and pending statements apply at the time they were recorded; they are not new actions or current publication authorization.
 
 Updated: 10 November 2026.
 
@@ -269,7 +269,7 @@ Request and await Gabriel's review of [PR #1](https://github.com/AsierMarmol/wea
 - Live branch metadata still shows main/dev protected and the five personal branches published. Teammate branches may advance independently; the latest check showed gabrielstec/feature ahead of the initial baseline. No claim about its contents or authorship is made here.
 - User review, manual commit/push, peer-reviewed PRs, protection enforcement, and per-person onboarding confirmations remain open. Phase 1 is not closed yet.
 
-### Authorized publication and Phase 2 handoff - 10 November 2026
+### Authorized publication and Phase 2 planning - 10 November 2026
 
 - Asier explicitly requested that this phase plan return to the repository root beside README.md and that the documentation be committed/published from asier/feature for Gabriel's review into dev. This supersedes the earlier location/manual-publication preference for this task.
 - Gabriel's account is gabrielstec; connected GitHub checks confirm write access. A review request is authorized. Approval, merge, and Step 17 confirmations are not claimed by this preparation record.
