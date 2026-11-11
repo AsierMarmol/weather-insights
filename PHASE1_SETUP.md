@@ -1,10 +1,36 @@
 # Phase 1 - Team and Environment Setup
 
+Updated: 11 November 2026.
+
+## Current checkpoint
+
+**Completed setup - carried out by Asier**, as explicitly confirmed by Asier. Keep this phase closed and retain the existing repository, Python/uv environment, package, credential protection and collaboration setup. Later role allocations do not reassign or imply authorship of the completed setup.
+
+This is the setup reference for the project, not a new round of onboarding work. Historical evidence remains below with its original dates and observations. No new teammate-machine tests or remote merges are claimed by this documentation update.
+
+The active work is [Phase 2](PHASE2_SCOPE.md). Future responsibilities are in [TEAMROLES.MD](TEAMROLES.MD); navigation and plan-maintenance rules are in [PROJECT_PHASES.md](PROJECT_PHASES.md). No commit, push or merge is authorized by this planning check.
+
+## Handoff to Phase 2
+
+Preserve the existing repository and environment; no setup restart is needed. Begin the approved scope/candidate-catalog review. Feature development remains pending. The application is still the starter, so completed setup is not evidence of functional rubric completion.
+
+## Updating this phase when something changes
+
+The task owner records the change and reason before dependent work continues. Check all six phase plans for impact, then update every affected step, dependency, finish condition and acceptance check in the same change. Also update the Phase 2 specification, TEAMROLES.MD, PROJECT_PHASES.md and application README when affected. Do not rewrite unaffected history or invent completion evidence.
+
+Keep task IDs stable. Split a broad task into linked subtasks before starting if it has more than one independently reviewable outcome. If a previously completed check is invalidated, retain its old evidence and mark the affected task Needs recheck with a named owner; do not leave it silently Done. Distinguish Pending, In progress, Blocked (with reason), Needs recheck and Done (with evidence).
+
+The named peer reviewer checks both the technical change and consistency across affected phases. Asier coordinates the impact review, not every implementation fix. Record the change and its affected task IDs in the change register in [PROJECT_PHASES.md](PROJECT_PHASES.md). Full maintenance procedure: that file's Plan maintenance section.
+
+## Historical setup checklist and verification records
+
+The following is the previous detailed setup record, retained verbatim apart from heading depth. Its dates, former locations, authorizations, branch snapshots and pending statements apply at the time they were recorded; they are not new actions or current publication authorization.
+
 Updated: 10 November 2026.
 
 Complete one step, verify its finish condition, and review the result before moving to the next step. Application design, API features, analytics, and data enrichment belong to later phases.
 
-## Current checkpoint
+### Current checkpoint
 
 Checkpoint: 10 November 2026. The environment, initial publication, and seven team/shared branches are in place. GitHub marks main/dev protected; prior screenshots show the selected review options. The first real PR still needs to exercise those requirements. The shared branches and asier/feature start from baseline 0223991; teammate branches can advance independently.
 
@@ -12,7 +38,7 @@ Asier reports that all four teammates have access and completed onboarding. He i
 
 The latest user request explicitly authorizes moving this plan into the repository, committing/publishing the documentation, and requesting Gabriel's review. It supersedes the earlier external-plan location and manual-only publication preference for this change. It does not authorize bypassing review or declaring a phase complete.
 
-## Where phase plans belong
+### Where phase plans belong
 
 Keep PHASE1_SETUP.md, PHASE2_SCOPE.md, and future phase plans at the repository root beside the application README.md. These are shared team documents and are included in GitHub review. This placement follows Asier's updated instruction of 10 November 2026.
 
@@ -20,7 +46,7 @@ The instructor's assignment README.md and supporting summary.md remain external 
 
 Historical verification sections below describe the locations, files, and review status at the time of each check. Earlier references to an external phase plan document the former arrangement; the current location policy is the one in this section.
 
-## Project locations
+### Project locations
 
 - Shared repository: <https://github.com/AsierMarmol/weather-insights>.
 - Application setup and run instructions: [README.md](README.md).
@@ -29,7 +55,7 @@ Historical verification sections below describe the locations, files, and review
 - Ongoing AI record: [PROMPTS.md](PROMPTS.md).
 - External reference files available locally: the instructor's README.md and summary.md in the parent directory. They are not dependencies needed to install or run the app.
 
-## Ordered checklist
+### Ordered checklist
 
 | Step | Small action | Finish condition | Status |
 | --- | --- | --- | --- |
@@ -51,7 +77,7 @@ Historical verification sections below describe the locations, files, and review
 | 16 | Exercise the PR process with a useful setup change. | [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) publishes the four documentation files from asier/feature into dev. Gabriel's review, protection enforcement check, merge into dev, and reviewed promotion into main remain pending. | PR open - awaiting Gabriel's review |
 | 17 | Close Phase 1 together. | Asier confirms that all five can run the starter and understand branch, credential, and AI-record rules. Finish the reviewed setup PR workflow before closing the phase and starting Phase 2. | Pending - Asier is collecting confirmations |
 
-## Alignment with the assignment and technical reference
+### Alignment with the assignment and technical reference
 
 Validated on 5 November 2026 against the complete instructor assignment README.md and technical summary.md, kept outside this repository. The instructor's assignment README is authoritative. The summary provides implementation patterns rather than extra deliverables.
 
@@ -66,7 +92,7 @@ Validated on 5 November 2026 against the complete instructor assignment README.m
 | Assignment sections 1-4 and summary sections 1-3, 5-7: meaningful inheritance, encapsulation, a special method, a computed property, robust multi-location API calls, three analytical views across at least two categories, and two Streamlit views with interaction and two labeled charts. | The starter layout is retained and dependencies are ready. Phase 1 deliberately prepares the environment without implementing these features. | Design and implement these requirements in later phases. Empty starter pages and one arithmetic test do not establish compliance with these functional rubric rows. |
 | Assignment submission rules: submit the repository URL; public is acceptable, or a private repository needs instructor access. | The selected repository is public. Step 14 covers the five team members' collaboration access. | Confirm the submission channel with the instructor and perform the final submission review later. |
 
-### Course requirements versus our setup choices
+#### Course requirements versus our setup choices
 
 - **Required by the course:** the package/GitHub structure, root README and AI log, credential protection, individual contribution history, real logged data, and the functional requirements mapped above.
 - **Chosen by this team:** Python 3.14, uv and its lockfile, VS Code, the `asier/feature` -> `dev` -> `main` branch flow, and working one small step at a time. The instructor starter allows Python 3.11 or newer; the assignment does not mandate Python 3.14 or particular branch names.
@@ -75,7 +101,7 @@ Validated on 5 November 2026 against the complete instructor assignment README.m
 
 **Validation result:** the Phase 1 plan aligns with both reference documents as a setup phase. Credential protection, package installation, the published GitHub baseline, and the actual clean-clone setup checks are verified. The reviewed PR workflow and Asier's individual onboarding confirmations remain open; the completed ten-point functional rubric is not claimed by setup.
 
-## Verified environment
+### Verified environment
 
 - Interpreter: Python 3.14.7 in this project's `.venv`.
 - Team version selection: `.python-version` contains `3.14`.
@@ -90,7 +116,7 @@ Validated on 5 November 2026 against the complete instructor assignment README.m
 
 This setup created no commits, pushed nothing, and implemented no weather features. Step 3 is complete: the user screenshot confirms VS Code invoked the project-local `.venv\Scripts\python.exe`. The visible Streamlit ScriptRunContext warnings occurred because `app.py` was launched as an ordinary Python script. To open the web app from the project terminal, use `uv run --locked streamlit run app.py`.
 
-## Credential protection verification
+### Credential protection verification
 
 - The local `variables.env` file is ignored by Git. It was created blank; no real key was required or supplied.
 - `variables.env.example` has a blank key and is eligible for tracking.
@@ -100,7 +126,7 @@ This setup created no commits, pushed nothing, and implemented no weather featur
 - CSV and SQLite observation history remain eligible for Git tracking, as required by the assignment. Actual history collection belongs to later API/storage work.
 - A personal API key still needs to be added locally before real API testing. Credential protection is complete; live authentication has not been tested.
 
-## Application README verification
+### Application README verification
 
 - The application README includes portable PowerShell setup commands, safe credential-file creation, the correct Streamlit launch command, installation checks, troubleshooting, project structure, and honest starter status.
 - Nine verification checks passed in a fresh local source copy with its own environment. The existing `.venv`, real `variables.env`, Git metadata, and external phase plans were not copied.
@@ -109,7 +135,7 @@ This setup created no commits, pushed nothing, and implemented no weather featur
 - GitHub clone instructions remain conditional on publishing the baseline. Repeat verification with an actual remote clone after the first authorized push and during teammate onboarding.
 - The application README and AI log remain inside the repository; this phase checklist remains outside it.
 
-## AI collaboration convention verification
+### AI collaboration convention verification
 
 - Root PROMPTS.md uses the same eight fields for all substantive entries: Requested by, AI collaborator, Asked, Got, Checked, Kept / changed / rejected, Human review, and Commit / PR.
 - Asked fields are professional summaries of the actual requests, including phase/step context; they are explicitly not verbatim quotations. Short chat navigation messages are expanded only using their established task context.
@@ -118,7 +144,7 @@ This setup created no commits, pushed nothing, and implemented no weather featur
 - The Codex trailer remains `Co-Authored-By: Codex <noreply@openai.com>`; its example was previously validated by Git's trailer parser without creating a commit. The README still links to the convention.
 - The course attribution requirement covers substantial AI-authored code; the team also credits substantial AI-authored setup and documentation. Human authorship and the five-member contribution requirement are preserved.
 
-## Initial snapshot review
+### Initial snapshot review
 
 Reviewed 15 untracked files on `main` for the new repository. The configured remote matches `AsierMarmol/weather-insights`; there are no existing commits, tracked files, or staged changes.
 
@@ -147,14 +173,14 @@ variables.env.example
 - The baseline is still a scaffold: no weather fetch, history logging, or analytic charts have been implemented, and the existing test is only a placeholder.
 - The previously missing author identity is now configured: local name `AsierMarmol` and the exact GitHub no-reply email supplied by the user are verified. The file review and identity settings do not authorize a commit or push; human review and explicit commit approval remain pending.
 
-## Git identity verification
+### Git identity verification
 
 - Step 7 is complete: local name `AsierMarmol` and the exact no-reply email shown in the user's GitHub settings are configured and effective.
 - Both author and committer identity checks resolved to the selected account alias. Global Git name/email settings, HEAD, and the index were unchanged.
 - No account-wide GitHub privacy settings were changed. The setting verified here applies to commits created through this local repository.
 - The existing identity log entry was updated using the agreed eight-field structure. No separate screenshot or administrative entry was added.
 
-## Step 8 verification rerun
+### Step 8 verification rerun
 
 The current 15-file baseline was freshly reverified after Git identity setup. The user's exact no-reply address is configured and effective for author and committer identities. All candidate checks, 24 ignore cases, blank example, source/TOML parsing, log structure, and proposed co-author trailer passed.
 
@@ -176,22 +202,22 @@ and the AI collaboration record.
 Co-Authored-By: Codex <noreply@openai.com>
 ```
 
-## Initial local commit verification
+### Initial local commit verification
 
 - The user manually created and amended commit `0223991f05005d0420c7be2c760c2c6850fbfd88` on `main`.
 - Read-only verification confirmed the 15 reviewed files, the correct no-reply author and committer, a clean working tree, and the exact trailer `Co-Authored-By: Codex <noreply@openai.com>`.
 - The original local commit was replaced by the user's amendment to add the trailer. The current subject is `initialize Weather Insights starter`; the optional conventional prefix is not an assignment requirement.
 - The repository's tracked files were not edited during this verification. The assistant did not stage, amend, commit, or push anything. An update to the AI log can record this commit in a subsequent approved documentation change.
 
-## First push confirmation
+### First push confirmation
 
 The user performed Step 10 manually. Their GitHub screenshot shows the public weather-insights repository on `main`, one commit with short ID `0223991`, the reviewed source/configuration/documentation files, and AsierMarmol plus Codex attribution. One branch is shown; `dev` and `asier/feature` are still pending. This confirmation is based on the screenshot, not a new clone test. A clean-clone verification remains part of onboarding/final validation.
 
-## Development branch verification
+### Development branch verification
 
 Step 11 is complete. Read-only local branch/status checks and `git ls-remote` confirm `main` and `dev` are both published at commit `0223991f05005d0420c7be2c760c2c6850fbfd88`. The current local branch is `dev`, its upstream is `origin/dev`, and the working tree is clean. The assistant did not create or push branches.
 
-## Audit against the assignment and best practices
+### Audit against the assignment and best practices
 
 Completed on 5 November 2026 against the authoritative assignment README and technical summary beside this plan, the live local/remote branch state, the published commit, and an actual temporary GitHub clone. GitHub metadata also confirms a public repository, default branch `main`, and owner administration permission. No repository files, commits, branches, GitHub permissions, or private credentials were changed during this audit.
 
@@ -205,13 +231,13 @@ Completed on 5 November 2026 against the authoritative assignment README and tec
 | Team contribution evidence | Only Asier has a human-authored commit so far. Codex attribution is AI assistance, not a second student contributor. | All five students must eventually make meaningful contributions and understand any part of the code; onboarding alone is not final grading evidence. |
 | Functional rubric | API/OOP classes, robust real requests, persistent timestamped observations, analytical calculations, interaction, and real charts are still placeholders or unimplemented. | Expected later-phase work: these requirements are not claimed complete by Phase 1 setup. |
 
-### Documentation follow-up identified at the 5 November audit
+#### Documentation follow-up identified at the 5 November audit
 
 1. Update the application README's branch-status wording: all three branches are now published, while protection/review settings remain to be configured.
 2. Update the AI record with the real initial commit reference and the user's completed manual commit, push, and branch outcomes. Preserve historical verification and do not invent PRs or approvals.
 3. Keep these as a focused documentation change on the personal branch, reviewed into dev and then promoted to main through the agreed process after review rules and collaborator access are ready. This is a useful first PR exercise; it is not a reason to rewrite the published baseline.
 
-### Remaining work at the 5 November audit
+#### Remaining work at the 5 November audit
 
 - Step 13: configure and verify main/dev protection and PR rules. A peer approval and resolved review conversations are the selected team policy. GitHub's documentation supports protected branches for public repositories; no existing enforcement was assumed by this audit.
 - Step 14: invite the other four intended teammates and verify acceptance.
@@ -223,11 +249,11 @@ Reference for the collaboration practices: [GitHub flow](https://docs.github.com
 
 **Audit conclusion:** completed setup is technically sound and aligned with the teacher's setup requirements. The real clean-clone check now passes. No blocking setup defect was found before Step 13. Documentation status needs a normal follow-up PR, and the team/functional grading requirements remain work in progress.
 
-## Next action only
+### Next action only
 
 Request and await Gabriel's review of [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1). Do not merge before the required review. Asier is collecting Step 17 confirmations in parallel. After the approved change is merged into dev, promote reviewed dev into main through another reviewed PR. Close Phase 1 only when that workflow and the confirmations are complete, then start Phase 2 using PHASE2_SCOPE.md.
 
-## Team onboarding checkpoint - 10 November 2026
+### Team onboarding checkpoint - 10 November 2026
 
 - User report: all four teammates have access and supposedly completed the local setup steps. Treat individual machine checks as reported until confirmed; do not rerun or claim tests on their behalf.
 - GitHub evidence: Alejandra/feature, christian/feature, gabrielstec/feature, selin/feature, and asier/feature are published alongside main/dev. All seven branches resolve to 0223991f05005d0420c7be2c760c2c6850fbfd88.
@@ -235,7 +261,7 @@ Request and await Gabriel's review of [PR #1](https://github.com/AsierMarmol/wea
 - Local evidence: asier/feature is clean at the initial commit and tracks origin/asier/feature. The local shell could not reach GitHub; the connected GitHub API supplied the live remote evidence instead.
 - No application tests were rerun for this tracking-only update. Repository source, README, PROMPTS, Git state, GitHub settings, and private credentials were unchanged.
 
-## Step 16 documentation preparation - 10 November 2026
+### Step 16 documentation preparation - 10 November 2026
 
 - Updated the repository README's stale branch/publication status, exact personal branch names, selected review policy, PR sequence, and reported onboarding status.
 - Preserved the seven historical PROMPTS entries and added two eight-field records covering the documented manual setup/publication outcomes and this first documentation change. Linked the real initial commit 0223991 and left actual review/publication of the new documentation pending.
@@ -243,7 +269,7 @@ Request and await Gabriel's review of [PR #1](https://github.com/AsierMarmol/wea
 - Live branch metadata still shows main/dev protected and the five personal branches published. Teammate branches may advance independently; the latest check showed gabrielstec/feature ahead of the initial baseline. No claim about its contents or authorship is made here.
 - User review, manual commit/push, peer-reviewed PRs, protection enforcement, and per-person onboarding confirmations remain open. Phase 1 is not closed yet.
 
-## Authorized publication and Phase 2 handoff - 10 November 2026
+### Authorized publication and Phase 2 handoff - 10 November 2026
 
 - Asier explicitly requested that this phase plan return to the repository root beside README.md and that the documentation be committed/published from asier/feature for Gabriel's review into dev. This supersedes the earlier location/manual-publication preference for this task.
 - Gabriel's account is gabrielstec; connected GitHub checks confirm write access. A review request is authorized. Approval, merge, and Step 17 confirmations are not claimed by this preparation record.

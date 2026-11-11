@@ -274,3 +274,43 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Commit / PR:** Published documentation snapshot: [a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc](https://github.com/AsierMarmol/weather-insights/commit/a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc). Review: [PR #1, asier/feature into dev](https://github.com/AsierMarmol/weather-insights/pull/1), with Gabriel (`gabrielstec`) selected for review. The snapshot and this reference update use AsierMarmol's configured no-reply identity and the Codex trailer. Peer approval, merging, and Step 17 confirmations remain pending.
 
 ---
+
+---
+
+## Planning: Separate phase-plan templates (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Create separate Markdown templates for every project phase, following the detailed structure of PHASE1_SETUP.md and PHASE2_SCOPE.md, ready to fill and update after the group agrees on the business idea. The follow-up clarified that a single overview was insufficient.
+
+**Got:** Added PHASE3_CORE_DATA.md, PHASE4_ANALYTICS_UI.md, PHASE5_QUALITY_REVIEW.md, and PHASE6_DELIVERY.md with ordered steps, finish conditions, phase-specific specification tables, responsibilities, decisions, risks, and completion evidence. Converted PROJECT_PHASES.md into the navigation index and updated its README link.
+
+**Checked:** Verified ten ordered steps and the common planning sections in each new phase, checked local Markdown links and whitespace, and confirmed the existing Phase 1 and Phase 2 files were unchanged. Application tests were not run because this task changes documentation only.
+
+**Kept / changed / rejected:** Preserved existing setup evidence and the Phase 2 draft. Replaced the single detailed overview with separate maintainable plans. Product choices, assignments, reviews, and completion evidence remain pending; no business idea or feature implementation is introduced.
+
+**Human review:** Pending team review; these templates do not establish an approved product scope or completed phase.
+
+**Commit / PR:** Not created; these documentation changes remain local and uncommitted.
+
+---
+
+## Phase 2: P2.1 scope-to-rubric review (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Review the current project state and carry out the next phase task. For P2.1, prepare the scope-to-rubric checklist and unresolved-proposal register for the agreed mainland-Spain weather getaway application. Assigned task owner: Asier; assigned peer reviewer: Gabriel (gabrielstec).
+
+**Got:** Added the P2.1 deliverable inside PHASE2_SCOPE.md, separating agreed scope, sixteen assignment-requirement mappings, unresolved decisions with authors/reviewers, and Gabriel's review checklist. Updated PROJECT_PHASES.md to show the deliverable awaiting review and the subsequent P2.2/P2.3 handoffs.
+
+**Checked:** Read the instructor assignment and supporting summary, checked the actual branch/status and starter files, verified referenced task IDs, local document links, Markdown structure/whitespace, preserved earlier log entries, and confirmed unrelated files and Git HEAD/index were unchanged. No application tests or live API requests were run: this is a specification task, and the existing arithmetic placeholder is not feature coverage.
+
+**Kept / changed / rejected:** Kept the agreed Madrid/mainland-Spain, Car/Train, activity, 24/48/72-hour and three-component weather-scoring scope with a one-point-per-hour penalty capped at five. Kept unverified catalog/API/storage/UI defaults pending their named tasks. Marked the deliverable prepared, not peer-approved; no Claude contribution or other student's authorship is claimed for this Codex-assisted work requested by Asier.
+
+**Human review:** Pending Gabriel's actual review. No review request was sent, and no teammate approval or group walkthrough was fabricated.
+
+**Commit / PR:** Not created; the deliverable and prior planning changes remain local and uncommitted. No push or merge was performed.

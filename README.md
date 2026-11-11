@@ -4,7 +4,7 @@ A Python weather analytics project using OpenWeatherMap and Streamlit, developed
 
 ## Current status
 
-The project is at the setup stage. The starter app opens two views, **Live Conditions** and **Analytics**, with headings and sidebar navigation. Weather requests, saved observations, analytical calculations, and charts are still to be implemented.
+Phase 1 is complete according to the team report; Phase 2 planning is in progress. The starter app opens two views, **Live Conditions** and **Analytics**, with headings and sidebar navigation. Weather requests, saved observations, analytical calculations, and charts are still to be implemented.
 
 You can run the starter interface without an API key. Importing the API configuration requires a configured key; live authentication has not been tested yet.
 
@@ -130,26 +130,28 @@ weather-insights/
 
 ## Project phases
 
-Shared phase plans live beside this README and are reviewed with the repository:
+The planned product helps a traveler departing from Madrid compare 20-30 curated mainland-Spain tourist cities using weather preferences, activity filters and sourced Car or Train reference times. The weather-match score earns points for temperature, precipitation and wind; the selected mode's one-way travel time deducts one point per hour, capped at five. This is the agreed direction, not implemented functionality.
 
-- [Phase 1 - Team and Environment Setup](PHASE1_SETUP.md): final review and team confirmations are in progress.
-- [Phase 2 - Ideation and Project Flexibility](PHASE2_SCOPE.md): an ordered draft for agreeing on the product, scope, data/history, OOP, analytics, optional enrichment, and team responsibilities. It begins after Phase 1 closes.
+- [All six phase plans and status](PROJECT_PHASES.md).
+- [Phase 1 - completed setup and historical evidence](PHASE1_SETUP.md).
+- [Phase 2 - product, scoring and data specification](PHASE2_SCOPE.md).
+- [Team roles, coding responsibilities and reviews](TEAMROLES.MD).
 
 ## Team collaboration
 
-The team has five members. Names and contribution summaries will be recorded as responsibilities and work are agreed.
+The five members have defined coding, testing, documentation and review responsibilities in [TEAMROLES.MD](TEAMROLES.MD). Assignments describe work to perform; actual contributions and approvals are recorded as they happen.
 
 The agreed branch flow is `<member>/feature` -> `dev` -> `main`. `main` holds the stable shared version; `dev` brings together reviewed team changes. Both branches are published and protected.
 
 The five published personal branches are `Alejandra/feature`, `asier/feature`, `christian/feature`, `gabrielstec/feature`, and `selin/feature`. Use the exact branch names, including capitalization. Personal branches remain available for normal commits and pushes.
 
-The team's selected protection settings require a pull request, one approving teammate, fresh approval after new commits, and resolved review conversations before changes enter `dev` or `main`. The selected settings also apply to the repository owner and keep force pushes and branch deletion disabled. The first reviewed PR will verify that these requirements are enforced; protection is enabled, but the complete review-and-merge workflow has not yet been exercised.
+The team's selected protection settings require a pull request, one approving teammate, fresh approval after new commits, and resolved review conversations before changes enter `dev` or `main`. The selected settings also apply to the repository owner and keep force pushes and branch deletion disabled. Check current GitHub enforcement during review; historical setup evidence and the reported Phase 1 closure are retained in PHASE1_SETUP.md.
 
 1. Start personal work from the latest `dev` and make a focused change on your own branch.
 2. Push your branch, open a PR with `dev` as the base, and ask another teammate to review it. Address feedback before merging and preserve the relevant author/co-author attribution.
 3. Promote reviewed changes from `dev` to `main` through another reviewed PR.
 
-Asier reports that all four teammates have repository access and have completed local onboarding. Published personal branches are verified. Asier is collecting each person's confirmation that the starter app runs and that they understand the branch, credential, and AI-record rules. The documentation PR and these confirmations are the remaining Phase 1 checkpoints.
+Phase 1 is complete according to the user confirmation. This planning update does not independently retest teammate machines or assert new GitHub merges. Follow the phase plans for current work and retain historical evidence separately.
 
 Use your own Git identity and make meaningful contributions. Follow the [AI collaboration convention and reusable entry template in PROMPTS.md](PROMPTS.md). Log substantial AI-assisted work while it happens, including actual checks and what was kept, changed, or rejected. Use `Co-Authored-By: Codex <noreply@openai.com>` on commits containing substantial Codex-authored code, setup, or documentation, and preserve attribution when merging. Other AI tools must be credited accurately. AI credit does not replace the five members' own meaningful contributions.
 
