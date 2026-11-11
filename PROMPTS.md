@@ -318,6 +318,90 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 ---
 
+## Phase 2: destination CSV categories and size integration (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex
+
+**Asked:** I manually selected and confirmed the destination categories and the separate size classification in our discussion. Integrate the destination CSV into the project's data/reference folder, update its activities to Coast, Nature, History and heritage, Food and gastronomy, and Urban experiences, add destination_size, and align the affected documentation. This is my P2.2 catalog task, using ChatGPT/Codex to help integrate it into the repository.
+
+**Got:** Updated data/reference/destinations.csv in its existing project location. Retained all 83 destinations and their identifiers, regions, driving estimates and coordinates. Replaced mixed activity/size labels with five experience categories and a separate size value derived from the previously retained GeoNames reference populations. Updated both project READMEs and directly affected phase/role schema references. No weather feature was implemented.
+
+**Checked:** Parsed the saved CSV; verified 83 unique records, nine exact columns, allowed nonempty activity tags, one valid size per row, preserved original non-category values, and classifications against the source population bands. Result: 14 large cities, 26 medium cities and 43 small cities or towns. Inspected before/after table previews, checked local Markdown targets and Git whitespace, and preserved application code, dependency files, Phase 1 and instructor references. Application tests were not rerun because this changes reference data/documentation and no catalog loader exists yet.
+
+**Kept / changed / rejected:** Kept the car-only scope, catalog ownership and route/source limitations. Adopted the group-approved activity/size separation. Size is a project population convention and does not change scores. Activity labels remain proposals pending source and Christian's peer review. Preserved the earlier CSV draft's actual AI-assisted provenance; this entry records Asier's manual category choice and Codex's integration, not a claim that the full dataset was manually authored.
+
+**Human review:** Asier confirmed the taxonomy and separate size field. Final catalog-content and peer review remain pending; no approval from Christian is claimed.
+
+**Commit / PR:** Not created for this task. No commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.3 weather-source verification and usage contract (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Proceed with P2.3 of Phase 2: verify the OpenWeatherMap data source and prepare its usage contract for the car-only mainland-Spain getaway application. Safely test current conditions and the five-day forecast using catalog coordinates and my local ignored API credential. Confirm fields, units, timestamps, 24/48/72-hour daytime coverage, expected failures and request/refresh rules. Preserve every successful genuine fetch with a retrieval timestamp, update the affected phase records and READMEs, and record actual verification results. Keep production features and the ongoing collector for their assigned later tasks. Do not expose credentials, commit, push or merge.
+
+**Got:** Added WEATHER_API_CONTRACT.md, the bounded scripts/verify_weather_access.py diagnostic, eight offline diagnostic tests, and genuine verification data plus a README under data/weather. Updated current P2.3 status and relevant README/index/Phase 3 input references. Defined provider field conversions and proposed project defaults for common forecast windows, freshness, request budgets and failure handling; production implementation remains pending.
+
+**Checked:** Read official OpenWeather current/forecast, FAQ and pricing documentation. Six actual requests: Toledo/Segovia current and forecast all returned 200; deliberately invalid key returned 401; unknown city returned 404. Each forecast had 40 unique consecutive three-hour periods and complete 24/48/72-hour daytime coverage with 3/6/9 relevant periods in this run. Appended four genuine responses with UTC retrieval and provider times, including two observations and 80 prediction periods. Ran pytest: 9 passed, comprising eight offline diagnostic checks and the original placeholder. Checked redaction, missing probability/coverage, failure/timeout sanitization, local documentation targets and whitespace. Confirmed the key was absent from new artifacts without printing it. No live quota/outage was induced; account billing settings and full 83-city behavior were not verified.
+
+**Kept / changed / rejected:** Kept existing application modules, credentials, catalog and completed setup unchanged. Adopted coordinate requests with metric units, explicit wind/probability conversions, separate retrieval and valid times, and native three-hour forecast sampling. Kept predictions separate from observed history. Rejected treating four verification fetches as an ongoing collector, a historical trend, or proof that application features work. P2.4 still owns final shared schemas and independently checked examples; P2.5 starts ongoing collection.
+
+**Human review:** Pending Gabriel's actual review of the prepared P2.3 contract and evidence. No review request or teammate approval was fabricated.
+
+**Commit / PR:** Not created for this task. All changes remain local; no commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.3 full-catalog access and city-name audit (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Extend P2.3 verification to every destination in the current 83-city CSV. Test current conditions and the full forecast using each catalog coordinate pair, and verify that returned location names correspond to the intended city. Compare country and coordinate proximity as well as spelling. Preserve authentic timestamped successes and existing data, protect credentials, and bring ambiguous names or possible location matches to me for confirmation before changing the catalog.
+
+**Got:** Added an --all-cities diagnostic mode with safe pacing and early authentication/quota stops. Added separate normalized-name, country and 10 km review-threshold checks, two relevant offline tests, a complete city-location review report (later consolidated into the catalog source notes) table and a derived JSON audit snapshot under data/weather. Updated affected README/contract/phase evidence. All 83 CSV destinations remain unchanged.
+
+**Checked:** 166 actual current/forecast requests; 166 successful responses appended; 83/83 cities passed access, required fields and complete 24/48/72-hour daytime coverage. 6 cities require name/location confirmation. Six supplemental official direct-geocoding requests returned 200 and were saved separately: five support language/bilingual variants; Lugo remains a distinct label/location question, not an approved Puente alias. Ran the offline suite: 11 passed. Country/proximity checks are separate from label matching; returned coordinates alone cannot prove municipal identity. Checked preserved catalog hash, prior fetch-log prefix, credential absence from artifacts, local document targets and Git whitespace.
+
+**Kept / changed / rejected:** Kept car-only scope, existing CSV values and original fetch evidence. Retained all successful real responses, separating predictions from observed conditions. Did not silently approve translations/bilingual variants or substitute nearby cities. The earlier deliberate 401/404 tests are not catalog failures and were not repeated in the full-catalog mode. This audit does not create a production app, final storage schema or ongoing collector.
+
+**Human review:** 6 city-name/location flags await Asier's confirmation; Gabriel's P2.3 peer review remains pending. No teammate approval is claimed.
+
+**Commit / PR:** Not created for this task. No commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.2/P2.3 API-standard city names and Lugo identity (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Standardize the catalog against the weather API as our source of truth so city names remain consistent across the CSV and weather data. Update the CSV names to the provider standard, resolve Lugo's actual city coordinates, and keep its driving reference consistent with any coordinate change. Verify the result, preserve genuine raw responses, document provider inconsistencies and update the affected project records without committing or pushing.
+
+**Got:** Aligned eight CSV city labels to the actual forecast labels, including accent/spelling changes, while preserving all 83 IDs, rows, regions, activities and sizes. Added a small provider-overrides reference for two current/forecast label variants and Lugo city ID 3117814. Updated Lugo to API city reference coordinates 43, -7.5667 and refreshed its route to 498 km / 329 minutes. The diagnostic now consumes the explicit aliases and city-ID override. Preserved original audit evidence, added candidate dispositions and reconciled the latest name/coverage snapshot. Updated the relevant READMEs, API contract and phase inputs/statuses.
+
+**Checked:** City-ID requests for Lugo returned 200 and name Lugo in both products. Geocoding and coordinate trials revealed that coordinate weather requests label this area Puente, while generic Lugo lookup resolves province ID 3117813; those were not silently accepted as the city. Province trials were explicitly excluded from city-history migration. Refreshed OSRM driving distance/time from the original fixed approximate Madrid Km0 origin. Reconciled existing all-city responses and actual Lugo city-ID evidence: 83 exact forecast names, 81 exact current names plus two documented aliases, valid country/proximity/required fields/24-48-72h coverage, no unresolved identity flags. Ran pytest: 12 passed. Checked exact nine-column schema, intended cell changes only, preserved raw history, prior AI-log entries, secret absence, document targets and whitespace. No new complete 166-call run is claimed.
+
+**Kept / changed / rejected:** Kept INE-based city IDs and all unrelated catalog/application fields. Adopted forecast names as the canonical CSV/UI display convention; preserved raw current labels as explicit aliases. Rejected the misleading province-level Lugo point and avoided renaming Lugo to Puente. Used the actual legacy city-ID path only for the documented Lugo exception; an unavailable ID must fail clearly rather than fall back to a different location. The coordinate is a coarse weather-product reference, not a surveyed tourist centre. Kept genuine diagnostic fetches for audit while identifying rejected candidates separately.
+
+**Human review:** Asier authorized API-based naming and the Lugo correction. Gabriel's technical peer review and separate catalog activity/source review remain pending; no teammate approval is claimed.
+
+**Commit / PR:** Not created for this task. No commit, push or merge was performed.
+
+
+---
+
 ## Phase 2: P2.1 finalized product decisions and aligned project plans (2026-11-11)
 
 **Requested by:** AsierMarmol.
