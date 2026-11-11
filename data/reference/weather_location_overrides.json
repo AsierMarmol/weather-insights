@@ -1,0 +1,32 @@
+{
+  "canonical_name_source": "OpenWeather forecast city.name (lang=en)",
+  "locations": {
+    "ES-01059": {
+      "canonical_name": "Gasteiz / Vitoria",
+      "accepted_names": [
+        "Gasteiz / Vitoria",
+        "Vitoria-Gasteiz"
+      ],
+      "reason": "Forecast and current products use different bilingual labels"
+    },
+    "ES-25120": {
+      "canonical_name": "Lérida",
+      "accepted_names": [
+        "Lérida",
+        "Lleida"
+      ],
+      "reason": "Forecast uses Lérida; current uses Lleida"
+    },
+    "ES-27028": {
+      "canonical_name": "Lugo",
+      "request_parameters": {
+        "id": 3117814
+      },
+      "expected_provider_id": 3117814,
+      "accepted_names": [
+        "Lugo"
+      ],
+      "reason": "Use verified city ID 3117814; coordinate requests do not identify the intended city reliably."
+    }
+  }
+}

@@ -2,6 +2,17 @@
 
 Keep this file at the repository root and update it while work happens. Record each substantial AI-assisted feature, class, or setup task. A brief explanation or routine command does not need its own entry unless it changes a meaningful decision or result. Routine file moves and editorial housekeeping do not need separate entries; keep the record focused on substantive planning, setup, and development.
 
+## Local commit checkpoint (2026-11-11)
+
+The reviewed working tree is being recorded in three batches: documentation in
+`00acc3a`, catalog and saved evidence in `5f73bc6`, and configuration, diagnostic
+scripts, tests and starter-view alignment in the commit containing this checkpoint.
+The final code changes are described in the existing P2.3/P2.4 entries below.
+The pre-commit review passed 25 offline tests, both starter-view AppTests,
+dependency/lock checks and the P2.4 catalog, defaults and saved-evidence audit.
+Peer reviews remain pending. Earlier Commit / PR statements describe their
+original recording time, not the current batch status. No merge is claimed.
+
 ## How the five-person team uses this log
 
 1. Append an entry for the task before its changes are committed. Record the requesting teammate and AI tool; include a model name only when it is known.
@@ -71,7 +82,7 @@ Copy this template for a new substantial task. Replace the placeholders with act
 
 The Asked fields below are professional summaries of the original requests and their context, not verbatim quotations. The chronological records retain the actual outputs, checks, decisions, and review status. Every entry uses the same eight fields shown in the template.
 
-Historical status: the seven original entries dated 2026-11-05 retain their review and publication status at the time they were recorded. Their setup changes were subsequently included in [initial commit 0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). The later records below connect the completed manual steps and verification evidence to that real commit; they do not retroactively claim peer approval. Later entries also retain their status at the time of recording; the latest handoff entry contains the current publication references.
+Historical status: the seven original entries dated 2026-11-05 retain their review and publication status at the time they were recorded. Their setup changes were subsequently included in [initial commit 0223991](https://github.com/AsierMarmol/weather-insights/commit/0223991f05005d0420c7be2c760c2c6850fbfd88). The later records below connect the completed manual steps and verification evidence to that real commit; they do not retroactively claim peer approval. Later entries also retain their status at the time of recording; the publication entry records the corresponding commit and PR references.
 
 ---
 
@@ -255,7 +266,7 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 ---
 
-## Setup: Phase 1 publication and Phase 2 planning handoff (2026-11-10)
+## Setup: Phase 1 publication and Phase 2 plannings (2026-11-10)
 
 **Requested by:** AsierMarmol.
 
@@ -263,7 +274,7 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Asked:** Finish Phase 1 - **Team and Environment Setup** by moving PHASE1_SETUP.md back beside the repository README, then commit and publish the documentation on `asier/feature`, open a PR into `dev`, and request Gabriel's review. Keep Step 17 pending while Asier obtains teammate confirmations, and prepare Phase 2 - **Ideation and Project Flexibility** using the same ordered steps and completion checks.
 
-**Got:** Relocated PHASE1_SETUP.md into the repository and updated its current location policy, checklist, and handoff status. Added PHASE2_SCOPE.md as a planning draft, linked both plans from README.md, and retained the existing documentation updates and historical AI records. Confirmed Gabriel's account as `gabrielstec` with repository write access. Committed and published the authorized four-file documentation snapshot as `a81d470` and opened [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) from `asier/feature` into `dev`. Gabriel is the selected reviewer; no approval, merge, or teammate confirmation is invented.
+**Got:** Relocated PHASE1_SETUP.md into the repository and updated its current location policy, checklist, and next-phase status. Added PHASE2_SCOPE.md as a planning draft, linked both plans from README.md, and retained the existing documentation updates and historical AI records. Confirmed Gabriel's account as `gabrielstec` with repository write access. Committed and published the authorized four-file documentation snapshot as `a81d470` and opened [PR #1](https://github.com/AsierMarmol/weather-insights/pull/1) from `asier/feature` into `dev`. Gabriel is the selected reviewer; no approval, merge, or teammate confirmation is invented.
 
 **Checked:** Compared the plans with the authoritative assignment and supporting summary. Verified the preserved historical AI entries, uniform eight-field task records, repository-local Markdown links, unchanged install/run command blocks, code fences, whitespace, and the four-file documentation scope. Reviewed staged candidates for credentials and confirmed that source, dependencies, the lockfile, and instructor references are unchanged. Checked the selected no-reply Git identity and Codex trailer. Application tests were not rerun for these documentation-only changes. The actual PR will provide review-state evidence; individual teammate checks remain Asier's pending confirmations.
 
@@ -274,3 +285,169 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Commit / PR:** Published documentation snapshot: [a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc](https://github.com/AsierMarmol/weather-insights/commit/a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc). Review: [PR #1, asier/feature into dev](https://github.com/AsierMarmol/weather-insights/pull/1), with Gabriel (`gabrielstec`) selected for review. The snapshot and this reference update use AsierMarmol's configured no-reply identity and the Codex trailer. Peer approval, merging, and Step 17 confirmations remain pending.
 
 ---
+
+---
+
+## Planning: Separate phase-plan templates (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Create separate Markdown templates for every project phase, following the detailed structure of PHASE1_SETUP.md and PHASE2_SCOPE.md, ready to fill and update after the group agrees on the business idea. The follow-up clarified that a single overview was insufficient.
+
+**Got:** Added PHASE3_CORE_DATA.md, PHASE4_ANALYTICS_UI.md, PHASE5_QUALITY_REVIEW.md, and PHASE6_DELIVERY.md with ordered steps, finish conditions, phase-specific specification tables, responsibilities, decisions, risks, and completion evidence. Converted PROJECT_PHASES.md into the navigation index and updated its README link.
+
+**Checked:** Verified ten ordered steps and the common planning sections in each new phase, checked local Markdown links and whitespace, and confirmed the existing Phase 1 and Phase 2 files were unchanged. Application tests were not run because this task changes documentation only.
+
+**Kept / changed / rejected:** Preserved existing setup evidence and the Phase 2 draft. Replaced the single detailed overview with separate maintainable plans. Product choices, assignments, reviews, and completion evidence remain pending; no business idea or feature implementation is introduced.
+
+**Human review:** Pending team review; these templates do not establish an approved product scope or completed phase.
+
+**Commit / PR:** Not created; these documentation changes remain local and uncommitted.
+
+---
+
+## Phase 2: P2.1 scope-to-rubric review (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Review the current project state and carry out the next phase task. For P2.1, prepare the scope-to-rubric checklist and unresolved-proposal register for the agreed mainland-Spain weather getaway application. Assigned task owner: Asier; assigned peer reviewer: Gabriel (gabrielstec).
+
+**Got:** Added the P2.1 deliverable inside PHASE2_SCOPE.md, separating agreed scope, sixteen assignment-requirement mappings, unresolved decisions with authors/reviewers, and Gabriel's review checklist. Updated PROJECT_PHASES.md to show the deliverable awaiting review and the subsequent P2.2/P2.3 next steps.
+
+**Checked:** Read the instructor assignment and supporting summary, checked the actual branch/status and starter files, verified referenced task IDs, local document links, Markdown structure/whitespace, preserved earlier log entries, and confirmed unrelated files and Git HEAD/index were unchanged. No application tests or live API requests were run: this is a specification task, and the existing arithmetic placeholder is not feature coverage.
+
+**Kept / changed / rejected:** Kept the agreed Madrid/mainland-Spain, Car/Train, activity, 24/48/72-hour and three-component weather-scoring scope with a one-point-per-hour penalty capped at five. Kept unverified catalog/API/storage/UI defaults pending their named tasks. Marked the deliverable prepared, not peer-approved; no Claude contribution or other student's authorship is claimed for this Codex-assisted work requested by Asier.
+
+**Human review:** Pending Gabriel's actual review. No review request was sent, and no teammate approval or group walkthrough was fabricated.
+
+**Commit / PR:** Not created; the deliverable and prior planning changes remain local and uncommitted. No push or merge was performed.
+
+
+---
+
+## Phase 2: destination CSV categories and size integration (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex
+
+**Asked:** I manually selected and confirmed the destination categories and the separate size classification in our discussion. Integrate the destination CSV into the project's data/reference folder, update its activities to Coast, Nature, History and heritage, Food and gastronomy, and Urban experiences, add destination_size, and align the affected documentation. This is my P2.2 catalog task, using ChatGPT/Codex to help integrate it into the repository.
+
+**Got:** Updated data/reference/destinations.csv in its existing project location. Retained all 83 destinations and their identifiers, regions, driving estimates and coordinates. Replaced mixed activity/size labels with five experience categories and a separate size value derived from the previously retained GeoNames reference populations. Updated both project READMEs and directly affected phase/role schema references. No weather feature was implemented.
+
+**Checked:** Parsed the saved CSV; verified 83 unique records, nine exact columns, allowed nonempty activity tags, one valid size per row, preserved original non-category values, and classifications against the source population bands. Result: 14 large cities, 26 medium cities and 43 small cities or towns. Inspected before/after table previews, checked local Markdown targets and Git whitespace, and preserved application code, dependency files, Phase 1 and instructor references. Application tests were not rerun because this changes reference data/documentation and no catalog loader exists yet.
+
+**Kept / changed / rejected:** Kept the car-only scope, catalog ownership and route/source limitations. Adopted the group-approved activity/size separation. Size is a project population convention and does not change scores. Activity labels remain proposals pending source and Christian's peer review. Preserved the earlier CSV draft's actual AI-assisted provenance; this entry records Asier's manual category choice and Codex's integration, not a claim that the full dataset was manually authored.
+
+**Human review:** Asier confirmed the taxonomy and separate size field. Final catalog-content and peer review remain pending; no approval from Christian is claimed.
+
+**Commit / PR:** Not created for this task. No commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.3 weather-source verification and usage contract (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Proceed with P2.3 of Phase 2: verify the OpenWeatherMap data source and prepare its usage contract for the car-only mainland-Spain getaway application. Safely test current conditions and the five-day forecast using catalog coordinates and my local ignored API credential. Confirm fields, units, timestamps, 24/48/72-hour daytime coverage, expected failures and request/refresh rules. Preserve every successful genuine fetch with a retrieval timestamp, update the affected phase records and READMEs, and record actual verification results. Keep production features and the ongoing collector for their assigned later tasks. Do not expose credentials, commit, push or merge.
+
+**Got:** Added WEATHER_API_CONTRACT.md, the bounded scripts/verify_weather_access.py diagnostic, eight offline diagnostic tests, and genuine verification data plus a README under data/weather. Updated current P2.3 status and relevant README/index/Phase 3 input references. Defined provider field conversions and proposed project defaults for common forecast windows, freshness, request budgets and failure handling; production implementation remains pending.
+
+**Checked:** Read official OpenWeather current/forecast, FAQ and pricing documentation. Six actual requests: Toledo/Segovia current and forecast all returned 200; deliberately invalid key returned 401; unknown city returned 404. Each forecast had 40 unique consecutive three-hour periods and complete 24/48/72-hour daytime coverage with 3/6/9 relevant periods in this run. Appended four genuine responses with UTC retrieval and provider times, including two observations and 80 prediction periods. Ran pytest: 9 passed, comprising eight offline diagnostic checks and the original placeholder. Checked redaction, missing probability/coverage, failure/timeout sanitization, local documentation targets and whitespace. Confirmed the key was absent from new artifacts without printing it. No live quota/outage was induced; account billing settings and full 83-city behavior were not verified.
+
+**Kept / changed / rejected:** Kept existing application modules, credentials, catalog and completed setup unchanged. Adopted coordinate requests with metric units, explicit wind/probability conversions, separate retrieval and valid times, and native three-hour forecast sampling. Kept predictions separate from observed history. Rejected treating four verification fetches as an ongoing collector, a historical trend, or proof that application features work. P2.4 still owns final shared schemas and independently checked examples; P2.5 starts ongoing collection.
+
+**Human review:** Pending Gabriel's actual review of the prepared P2.3 contract and evidence. No review request or teammate approval was fabricated.
+
+**Commit / PR:** Not created for this task. All changes remain local; no commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.3 full-catalog access and city-name audit (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Extend P2.3 verification to every destination in the current 83-city CSV. Test current conditions and the full forecast using each catalog coordinate pair, and verify that returned location names correspond to the intended city. Compare country and coordinate proximity as well as spelling. Preserve authentic timestamped successes and existing data, protect credentials, and bring ambiguous names or possible location matches to me for confirmation before changing the catalog.
+
+**Got:** Added an --all-cities diagnostic mode with safe pacing and early authentication/quota stops. Added separate normalized-name, country and 10 km review-threshold checks, two relevant offline tests, a complete city-location review report (later consolidated into the catalog source notes) table and a derived JSON audit snapshot under data/weather. Updated affected README/contract/phase evidence. All 83 CSV destinations remain unchanged.
+
+**Checked:** 166 actual current/forecast requests; 166 successful responses appended; 83/83 cities passed access, required fields and complete 24/48/72-hour daytime coverage. 6 cities require name/location confirmation. Six supplemental official direct-geocoding requests returned 200 and were saved separately: five support language/bilingual variants; Lugo remains a distinct label/location question, not an approved Puente alias. Ran the offline suite: 11 passed. Country/proximity checks are separate from label matching; returned coordinates alone cannot prove municipal identity. Checked preserved catalog hash, prior fetch-log prefix, credential absence from artifacts, local document targets and Git whitespace.
+
+**Kept / changed / rejected:** Kept car-only scope, existing CSV values and original fetch evidence. Retained all successful real responses, separating predictions from observed conditions. Did not silently approve translations/bilingual variants or substitute nearby cities. The earlier deliberate 401/404 tests are not catalog failures and were not repeated in the full-catalog mode. This audit does not create a production app, final storage schema or ongoing collector.
+
+**Human review:** 6 city-name/location flags await Asier's confirmation; Gabriel's P2.3 peer review remains pending. No teammate approval is claimed.
+
+**Commit / PR:** Not created for this task. No commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.2/P2.3 API-standard city names and Lugo identity (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Standardize the catalog against the weather API as our source of truth so city names remain consistent across the CSV and weather data. Update the CSV names to the provider standard, resolve Lugo's actual city coordinates, and keep its driving reference consistent with any coordinate change. Verify the result, preserve genuine raw responses, document provider inconsistencies and update the affected project records without committing or pushing.
+
+**Got:** Aligned eight CSV city labels to the actual forecast labels, including accent/spelling changes, while preserving all 83 IDs, rows, regions, activities and sizes. Added a small provider-overrides reference for two current/forecast label variants and Lugo city ID 3117814. Updated Lugo to API city reference coordinates 43, -7.5667 and refreshed its route to 498 km / 329 minutes. The diagnostic now consumes the explicit aliases and city-ID override. Preserved original audit evidence, added candidate dispositions and reconciled the latest name/coverage snapshot. Updated the relevant READMEs, API contract and phase inputs/statuses.
+
+**Checked:** City-ID requests for Lugo returned 200 and name Lugo in both products. Geocoding and coordinate trials revealed that coordinate weather requests label this area Puente, while generic Lugo lookup resolves province ID 3117813; those were not silently accepted as the city. Province trials were explicitly excluded from city-history migration. Refreshed OSRM driving distance/time from the original fixed approximate Madrid Km0 origin. Reconciled existing all-city responses and actual Lugo city-ID evidence: 83 exact forecast names, 81 exact current names plus two documented aliases, valid country/proximity/required fields/24-48-72h coverage, no unresolved identity flags. Ran pytest: 12 passed. Checked exact nine-column schema, intended cell changes only, preserved raw history, prior AI-log entries, secret absence, document targets and whitespace. No new complete 166-call run is claimed.
+
+**Kept / changed / rejected:** Kept INE-based city IDs and all unrelated catalog/application fields. Adopted forecast names as the canonical CSV/UI display convention; preserved raw current labels as explicit aliases. Rejected the misleading province-level Lugo point and avoided renaming Lugo to Puente. Used the actual legacy city-ID path only for the documented Lugo exception; an unavailable ID must fail clearly rather than fall back to a different location. The coordinate is a coarse weather-product reference, not a surveyed tourist centre. Kept genuine diagnostic fetches for audit while identifying rejected candidates separately.
+
+**Human review:** Asier authorized API-based naming and the Lugo correction. Gabriel's technical peer review and separate catalog activity/source review remain pending; no teammate approval is claimed.
+
+**Commit / PR:** Not created for this task. No commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.1 finalized product decisions and aligned project plans (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Apply the agreed product decisions across the project and update every affected current specification, phase, role, reference/default and verification file. Use rolling 1-5-day windows from use, default 3 days; editable seasonal temperature defaults in Europe/Madrid (winter 10-18 C, spring 18-26 C, summer 22-30 C, autumn 16-24 C), rain <=30%, wind <=25 km/h and visible All activity/size selections. Preserve manual preferences. Keep any-selected activity matching, five leading recommendations plus the full ranking, stable tie-breaks and two interactive Searcher/Dashboard views. Replace the required historical-trend feature and separate collector with ranking, weather comparison, all-preferences-period metrics and automatic timestamped saving on fresh successful fetches. Record actual changes/checks professionally, preserve historical evidence and mark unbuilt features pending. Do not commit, push or merge.
+
+**Got:** Finalized the P2.1 product specification, two-view outline and rubric checklist. Added data/reference/product_defaults.json as the shared initial-value reference. Updated PROJECT_PHASES.md, Phases 2-6, TEAMROLES.MD, WEATHER_API_CONTRACT.md and the project/reference/weather READMEs. P2.5 is now the initial bounded fetch-and-save foundation, not a scheduler or user collection routine. P2.4 retains technical schemas/function examples and component briefs, resolving the former P2.1/P2.4 overlap. Updated the diagnostic to check 24/48/72/96/120-hour windows, added fifth-day/clock-change regression checks, and checked an offline five-day coverage snapshot (later removed as a derived report). Renamed the existing starter headings/navigation to Searcher and Dashboard and updated placeholder comments; no later-phase controls, charts, scoring engine or production persistence were implemented.
+
+**Checked:** Ran pytest: 14 passed. Streamlit AppTest opened both renamed starter views without exceptions. Replayed the retained genuine forecasts at their original common search time: all 83 cities passed each 1-5-day daytime window; no new live requests or current-freshness claim. Checked five season/default/filter settings against the approved specification, all 12 month assignments, phase task IDs/dependencies/owners, local document targets, source syntax and Git whitespace. Verified unchanged CSV/provider overrides, original raw response/run evidence, completed Phase 1, unrelated implementation/configuration files, dependency files and instructor references. Preserved previous PROMPTS entries and historical phase results.
+
+**Kept / changed / rejected:** Kept the nine-column/83-city catalog, API naming/Lugo exception, three equal weather checks and capped driving-time deduction. The simultaneous-all-preferences percentage is explanatory, not a new score weight. Corrected the earlier claim that the teacher mandates a historical-trend chart: timestamped logging remains mandatory and actual records must accumulate through normal use and be submitted, while the chosen analyses span comparison and derived metrics. Removed required continuous/manual collection and forecast-versus-reality work. Defaults are product preferences, not climate averages; seasonal initialization must never silently overwrite user edits. Shared defaults exist as reference configuration; runtime preference loading and application features remain assigned future work.
+
+**Human review:** The user approved the product choices. Gabriel's specification/API peer review and Christian's independent catalog content/source review remain pending. No teammate approval or completed application behavior is claimed.
+
+**Commit / PR:** Not created for this task. Changes remain local; no commit, push or merge was performed.
+
+
+---
+
+## Phase 2: P2.4 shared data and calculation specification (2026-11-11)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Define a simple shared data and calculation specification for the agreed project, with clear component boundaries and independently checked examples. Align the phases with the actual shared files, retain the corrected nine-column catalog, remove unused categories and duplicated implementation work, and keep production components assigned to their owners.
+
+**Got:** Documented P2.4 directly in PHASE2_SCOPE.md: domain fields, normalized weather CSV schema, shared component inputs/outputs, units, time/save/error rules and a small worked scoring example. Aligned phase dependencies and roles so P2.5 verifies the actual shared API/store after P3.1/P3.2 rather than building a second implementation. Simplified current READMEs/provider notes and retained the established product decisions. Configuration now reads credentials only when requested, and the diagnostic handles malformed location payloads and storage failures safely. Removed the arithmetic placeholder; actual production classes and UI features remain pending.
+
+**Checked:** Worked examples were independently checked: Toledo ranks before Segovia and Seville; equal weather scores can have different simultaneous-suitability percentages. The earlier baseline had 14 passing tests including one arithmetic placeholder. Verification after these revisions: 25 offline tests passed; both starter views passed AppTest. Python/TOML/JSON parsing, local document links and Git whitespace checks passed. The catalog, defaults, dependency files, .gitignore and instructor references remained unchanged. No live requests or peer approvals are claimed.
+
+**Kept / changed / rejected:** Kept the catalog's corrected values, provider request override, timestamped real-data requirement, seasonal preferences, three analyses and component ownership. Removed duplicated specification/status text and unsupported size options. Retained accurate Asier/Codex attribution and separated planned interfaces from implemented behavior.
+
+**Human review:** User approved the simplification and data-investigation removal. Christian's P2.4/catalog review and Gabriel's specification/API reviews remain pending.
+
+**Commit / PR:** Not created. Changes remain local; no commit, push or merge was performed.

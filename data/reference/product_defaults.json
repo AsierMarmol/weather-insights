@@ -1,0 +1,54 @@
+{
+  "timezone": "Europe/Madrid",
+  "supported_forecast_days": [
+    1,
+    2,
+    3,
+    4,
+    5
+  ],
+  "default_forecast_days": 3,
+  "seasonal_temperature_c": {
+    "Winter": {
+      "months": [
+        12,
+        1,
+        2
+      ],
+      "min": 10,
+      "max": 18
+    },
+    "Spring": {
+      "months": [
+        3,
+        4,
+        5
+      ],
+      "min": 18,
+      "max": 26
+    },
+    "Summer": {
+      "months": [
+        6,
+        7,
+        8
+      ],
+      "min": 22,
+      "max": 30
+    },
+    "Autumn": {
+      "months": [
+        9,
+        10,
+        11
+      ],
+      "min": 16,
+      "max": 24
+    }
+  },
+  "max_precipitation_probability_percent": 30,
+  "max_wind_kmh": 25,
+  "default_activities": "All",
+  "default_destination_sizes": "All",
+  "recommendation_count": 5
+}

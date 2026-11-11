@@ -1,16 +1,20 @@
-"""Environment configuration. Boilerplate — no need to change this."""
+"""Load private credentials only when an API operation needs them."""
 
 import os
 from pathlib import Path
 
 from dotenv import load_dotenv
 
-load_dotenv(Path(__file__).resolve().parents[2] / "variables.env")
+ENV_FILE = Path(__file__).resolve().parents[2] / "variables.env"
 
-API_KEY = os.getenv("OPENWEATHER_API_KEY")
 
-if not API_KEY:
-    raise RuntimeError(
-        "OPENWEATHER_API_KEY is not set. Copy variables.env.example to variables.env "
-        "and fill in your own key."
-    )
+def get_api_key() -> str:
+    """Respect process environment precedence; never include a key in errors."""
+    load_dotenv(ENV_FILE, override=False)
+    key = os.getenv("OPENWEATHER_API_KEY", "").strip()
+    if not key:
+        raise ValueError(
+            "OPENWEATHER_API_KEY is not set. Copy variables.env.example to "
+            "variables.env and fill in your own key."
+        )
+    return key

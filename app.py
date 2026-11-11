@@ -4,12 +4,12 @@ st.set_page_config(page_title="Weather Insights", page_icon="\U0001F324️")
 
 st.title("Weather Insights")
 
-page = st.sidebar.radio("View", ["Live Conditions", "Analytics"])
+page = st.sidebar.radio("View", ["Searcher", "Dashboard"])
 
-if page == "Live Conditions":
-    st.header("Live Conditions")
-    # TODO: let the user add/select locations and display current conditions.
+if page == "Searcher":
+    st.header("Searcher")
+    # TODO P4.1: rolling 1-5 days, editable seasonal defaults, All filters, top five + full ranking.
 
-elif page == "Analytics":
-    st.header("Analytics")
-    # TODO: at least 2 charts built from your logged history (see src/weather_app/analytics.py).
+elif page == "Dashboard":
+    st.header("Dashboard")
+    # TODO P4.2: interactive ranking/weather comparison/all-preferences-period analysis; >=2 real-data charts.
