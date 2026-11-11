@@ -1,5 +1,5 @@
-# Your API client classes go here.
-# README "1. Object-oriented design": a generic base class + an OpenWeatherMap-specific subclass.
-# summary.md section 1 has a starting pattern — build your own version, don't copy it verbatim.
+"""P3.2: implement the reusable JSON API base and OpenWeatherMap subclass.
 
-from .config import API_KEY  # noqa: F401
+Use config.get_api_key() at the API boundary, never during module import.
+Provider mapping and error rules are in WEATHER_API_CONTRACT.md.
+"""

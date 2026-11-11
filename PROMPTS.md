@@ -2,6 +2,17 @@
 
 Keep this file at the repository root and update it while work happens. Record each substantial AI-assisted feature, class, or setup task. A brief explanation or routine command does not need its own entry unless it changes a meaningful decision or result. Routine file moves and editorial housekeeping do not need separate entries; keep the record focused on substantive planning, setup, and development.
 
+## Local commit checkpoint (2026-11-11)
+
+The reviewed working tree is being recorded in three batches: documentation in
+`00acc3a`, catalog and saved evidence in `5f73bc6`, and configuration, diagnostic
+scripts, tests and starter-view alignment in the commit containing this checkpoint.
+The final code changes are described in the existing P2.3/P2.4 entries below.
+The pre-commit review passed 25 offline tests, both starter-view AppTests,
+dependency/lock checks and the P2.4 catalog, defaults and saved-evidence audit.
+Peer reviews remain pending. Earlier Commit / PR statements describe their
+original recording time, not the current batch status. No merge is claimed.
+
 ## How the five-person team uses this log
 
 1. Append an entry for the task before its changes are committed. Record the requesting teammate and AI tool; include a model name only when it is known.
