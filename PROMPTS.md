@@ -717,7 +717,7 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Human review:** Selin directed the work. Asier's P4.4 review is pending; no approval is claimed. P5.4 acceptance follows P4.4.
 
-**Commit / PR:** Pending Selin's authorization.
+**Commit / PR:** Pending Selin's authorization. *(Later: commit 8018165 authorized by Selin; [PR #15](https://github.com/AsierMarmol/weather-insights/pull/15) approved by Asier and merged into dev `1e43be3`.)*
 
 
 ---
@@ -750,3 +750,49 @@ Updated the P5.3 phase record and status lines.
 **Human review:** Christian directed the work. Selin's review of P5.3 is pending; no approval is claimed.
 
 **Commit / PR:** Pending.
+
+---
+
+## Phase 5: P5.4 Dashboard/chart acceptance (2026-11-12)
+
+**Requested by:** Selin Atalar (selin-atalar).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Check the GitHub state of Christian's P5.3 and PR #16 and review P5.3 against the approved analytics rules. Then, from the merged P5.3, accept the independent Dashboard: all 83 markers and coordinates, hover values, neutral unavailable markers, the 1-5-day window and seasonal criteria, weather-only ranks and ties, filters, chart/table agreement, slot wording, separate state, no extra requests or saves, and safe error states. Fix actual Dashboard gaps only, with automated and visual checks and updated records.
+
+**Got:** Found PR #16 and PR #17 (P5.3) already merged (P5.3 approved by Selin), and fast-forwarded `dev` and `selin/feature` to `bfd9fd7`. Reviewed the P5.3 tests post-merge (rerun, read and mutation-checked; no analytical defect). Fixed four gaps in `src/weather_app/dashboard.py`:
+
+- map centred on the catalog coordinates instead of Plotly's `fitbounds`, which sat about 3° north;
+- mouse-wheel zoom turned off on the map, so page scrolling cannot zoom it away from Spain;
+- the comparison limit or seasonal range named in the chart title instead of a label hidden behind a bar;
+- "slot" added to the comparison-table headings.
+
+In `tests/test_dashboard.py`:
+
+- added a genuine 82-destination replay checked against an independent raw-CSV tally, a chart-versus-table agreement test and the two empty-filter states;
+- strengthened the map, page and comparison-chart tests;
+- limited the P2.5 replay to its 164 rows;
+- gave the two large-store loads a longer AppTest limit.
+
+Updated PHASE5, PHASE4, PROJECT_PHASES and README.
+
+**Checked:** On macOS: 407 passed at `bfd9fd7`; after the change, 410 passed, 0 skipped, with Flake8 zero findings. The genuine CSV checksum is unchanged, and no live request was made. For the visual check, the real app ran in a throwaway harness outside the repository with live HTTP blocked:
+
+- a historical replay of a temporary copy of the genuine CSV at 12 Nov 2026 12:37:35 UTC, not a fresh forecast;
+- a no-key setup for the error state;
+- what was viewed: map, hover, charts, filters, navigation and phone width.
+
+**Kept / changed / rejected:**
+
+- **Kept:** the shared request, save and analysis path, and all analytics, storage and service code.
+- **Not changed, reported instead:**
+  - the storage per-city CSV re-read reported in P5.3, which belongs to Alejandra/Gabriel;
+  - the Searcher-path slot-crossing risk, which belongs to Asier.
+- **Rejected:**
+  - making the test timeouts the fix for that storage cost;
+  - redesigning the Dashboard.
+
+**Human review:** Selin directed the work. Asier's P5.4 review is pending; no approval is claimed. P5.5 and final delivery are not claimed.
+
+**Commit / PR:** Committed and pushed to `selin/feature` on Selin's instruction; the PR into dev and Asier's review are pending.

@@ -46,6 +46,10 @@ MADRID = ZoneInfo("Europe/Madrid")
 ALL = "All"
 DAY_OPTIONS = (1, 2, 3, 4, 5)
 NO_DATA_COLOUR = "#9e9e9e"
+# Mercator zoom that keeps every mainland catalog destination in view with
+# a small margin (checked visually at desktop and phone widths).
+MAP_SCALE = 22
+MAP_CONFIG = {"scrollZoom": False}
 
 DAYS_KEY = "dashboard_days"
 LOAD_KEY = "dashboard_load"
@@ -454,9 +458,17 @@ def map_figure(
             },
         )
     )
+    # Centre on the middle of the catalog coordinates and zoom to mainland
+    # Spain. (Plotly's fitbounds="locations" centred this map about 3° too
+    # far north and left the markers in a small part of the frame.)
+    lats = [p["latitude"] for p in points] or [40.0]
+    lons = [p["longitude"] for p in points] or [-3.7]
     figure.update_geos(
-        # Zoom to the catalog coordinates themselves (mainland Spain).
-        fitbounds="locations",
+        center={
+            "lat": (min(lats) + max(lats)) / 2,
+            "lon": (min(lons) + max(lons)) / 2,
+        },
+        projection_scale=MAP_SCALE,
         projection_type="mercator",
         resolution=50,
         showcountries=True,
@@ -560,17 +572,21 @@ def comparison_chart(
         )
     )
     low, high = _limits(preferences, metric)
+    # The limit is named in the title: an annotation inside the plot was
+    # hidden behind the first bar.
+    heading = f"{title} across destinations"
     if low is not None and high is not None:
         figure.add_vrect(
             x0=low, x1=high, fillcolor="green", opacity=0.12, line_width=0,
-            annotation_text="Seasonal range", annotation_position="top left",
         )
+        heading += f" (seasonal range {low:g}-{high:g} °C shaded)"
     elif high is not None:
-        figure.add_vline(
-            x=high, line_dash="dash", annotation_text="Limit",
-            annotation_position="top right",
+        figure.add_vline(x=high, line_dash="dash")
+        unit = "%" if metric == "max_precipitation_probability_pct" else (
+            " km/h"
         )
-    _bar_layout(figure, f"{title} across destinations", axis, len(rows))
+        heading += f" (limit {high:g}{unit} dashed)"
+    _bar_layout(figure, heading, axis, len(rows))
     return figure
 
 
@@ -806,10 +822,10 @@ def _comparison_table(rows: pd.DataFrame) -> pd.DataFrame:
         "Weather rank": rows["rank"].astype(int),
         "Destination": rows["destination"],
         "Average daytime temperature (°C)": rows["mean_temperature_c"],
-        "Highest precipitation probability (%)": rows[
+        "Highest slot precipitation probability (%)": rows[
             "max_precipitation_probability_pct"
         ],
-        "Highest wind speed (km/h)": rows["max_wind_kmh"],
+        "Highest slot wind speed (km/h)": rows["max_wind_kmh"],
     })
 
 
@@ -879,8 +895,8 @@ def _render_tabs(available: pd.DataFrame, preferences) -> None:
             _comparison_table(available), hide_index=True,
             column_config=_number_columns([
                 "Average daytime temperature (°C)",
-                "Highest precipitation probability (%)",
-                "Highest wind speed (km/h)",
+                "Highest slot precipitation probability (%)",
+                "Highest slot wind speed (km/h)",
             ]),
         )
     with all_tab:
@@ -968,7 +984,10 @@ def render_dashboard_page() -> None:
                    row["destination_size"], *chosen)
     ]
     st.plotly_chart(
-        map_figure(map_points(catalog_rows, frame, errors), highlighted)
+        map_figure(map_points(catalog_rows, frame, errors), highlighted),
+        # Scrolling the page over the map must not zoom it out of Spain;
+        # the map's +/- buttons still zoom.
+        config=MAP_CONFIG,
     )
     st.caption(
         f"All {len(catalog)} destinations stay on the map. Grey markers "
