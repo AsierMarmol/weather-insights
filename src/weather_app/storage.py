@@ -138,6 +138,8 @@ class WeatherStore:
 
     def __init__(self, path: Path = WEATHER_RECORDS_PATH) -> None:
         self._path = Path(path).resolve()
+        self.__validated_raw: bytes | None = None
+        self.__validated_records: tuple[WeatherRecord, ...] = ()
         with WeatherStore.__locks_guard:
             self.__lock = WeatherStore.__locks.setdefault(
                 self._path, threading.Lock()
@@ -178,8 +180,10 @@ class WeatherStore:
             return 0
 
         with self.__lock:
-            existing = {record.key: record for record in self._read_all()}
+            saved = self._read_all()
+            existing = {record.key: record for record in saved}
             new_rows = []
+            new_records = []
             for key, record in batch.items():
                 if key in existing:
                     if existing[key] != record:
@@ -189,8 +193,19 @@ class WeatherStore:
                         )
                     continue
                 new_rows.append(record.to_csv_row())
+                new_records.append(record)
             if new_rows:
                 self._write_with_new_rows(new_rows)
+                # Publish the validated snapshot only after the atomic save.
+                # The next read still compares actual bytes, so changes made
+                # by another store/editor are never hidden by this cache.
+                prefix = self.__validated_raw
+                if prefix is None:
+                    prefix = _csv_text([
+                        dict(zip(RECORD_FIELDS, RECORD_FIELDS))
+                    ])
+                self.__validated_raw = prefix + _csv_text(new_rows)
+                self.__validated_records = tuple(saved + new_records)
         return len(new_rows)
 
     def _write_with_new_rows(self, rows: list[dict[str, str]]) -> None:
@@ -289,11 +304,18 @@ class WeatherStore:
         try:
             raw = self._path.read_bytes()
         except FileNotFoundError:
+            self.__validated_raw = None
+            self.__validated_records = ()
             return []
         except OSError as error:
             raise StorageError(
                 f"Could not read {self._path.name}: {error.strerror or error}"
             ) from None
+        # WeatherRecord values are frozen. Return a fresh list so callers
+        # cannot mutate the validated sequence. Compare contents, not mtime:
+        # even same-size edits or a restored timestamp must be revalidated.
+        if raw == self.__validated_raw:
+            return list(self.__validated_records)
         try:
             text = raw.decode("utf-8")
         except UnicodeDecodeError:
@@ -339,6 +361,8 @@ class WeatherStore:
                     f" {record.fetch_id}); resolve the file manually before"
                     " using it"
                 )
+        self.__validated_raw = raw
+        self.__validated_records = tuple(records)
         return records
 
 

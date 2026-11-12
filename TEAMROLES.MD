@@ -16,7 +16,7 @@ Asier supplies the simple nine-column catalog and [P2.4 specification](PHASE2_SC
 
 After review, independent component work can use isolated synthetic test inputs. Live integration requires models/storage -> API/service -> analytical results -> UI. Asier's P2.5 uses the completed shared storage/service to verify a genuine fetch/save/readback; it creates no competing implementation. His foundation ownership remains, while the other members own real coding work.
 
-Asier owns shared preferences/search state and application wiring. Selin's Dashboard (P4.4) keeps its own window/results state but uses the same service, cache, save path and analytical engine; neither UI duplicates scoring. Component defects return to their owner. Component tests/docs are written with the component; Phase 5 checks the integrated result rather than repeating all construction work.
+Asier owns shared preferences/search state and application wiring. Selin's Dashboard (P4.4) keeps its own window/results state but uses the same service, cache, save path and analytical engine; neither UI duplicates scoring. Component defects normally return to their owner. For the authorized P5.5 integrated walkthrough, Asier implemented the shared-storage performance, configuration robustness and small UI fixes with OpenAI Codex; Gabriel reviews these cross-component changes. Original component ownership and authorship remain unchanged. Component tests/docs are written with the component; Phase 5 checks the integrated result rather than repeating all construction work.
 
 ## Working convention
 

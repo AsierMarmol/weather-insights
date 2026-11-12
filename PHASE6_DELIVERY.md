@@ -1,6 +1,6 @@
 # Phase 6 - Documentation and Delivery
 
-Updated: 11 November 2026. **Not started.**
+Updated: 12 November 2026. **Not started:** P5.5 is implemented/tested locally but awaits Gabriel review. Packaging checks and the successful P5.5 isolated-install rehearsal do not substitute for P6.2 clean-clone acceptance of a reviewed commit. Include the [remaining cross-platform and visual checks](PHASE5_QUALITY_REVIEW.md#remaining-cross-platform-and-visual-checks) in the review evidence.
 
 ## Purpose and dependencies
 
@@ -42,7 +42,7 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-After Phase 5, assemble the package, verify a clean clone and obtain the required publication/submission authorization.
+After Gabriel accepts P5.5, Asier completes P6.1 (Gabriel reviews), Selin verifies a clean clone in P6.2 (Christian reviews), then Asier completes P6.3 (Gabriel reviews). Retain the repository-based install instructions: standalone wheel installation does not include the app entry point or external reference/weather data. Confirm source redistribution terms, each member's understanding, instructor access and submission channel before delivery.
 
 ## P4.4 delivery dependency
 

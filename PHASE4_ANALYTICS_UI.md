@@ -1,6 +1,6 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-Updated: 12 November 2026. **Implemented and reviewed:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12). P4.4 independent Dashboard approved by Asier and merged in PR #15 (dev 1e43be3). Phase 5 acceptance remains pending.
+Updated: 12 November 2026. **Implemented and reviewed:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12). P4.4 independent Dashboard approved by Asier and merged in PR #15 (dev 1e43be3). P5.1-P5.4 are merged; P5.5 is implemented/tested locally and awaiting Gabriel review.
 
 ## Purpose and dependencies
 
@@ -17,7 +17,7 @@ Deliver Searcher and Dashboard on the same data and calculations, then connect t
 
 ## Implementation and acceptance
 
-Asier owns app.py/searcher.py and shared preferences/state. Selin owns dashboard.py/charts. Both consume the same analytical results without a second scoring or fetching path. Use product_defaults.json only on initial load/reset; preserve user edits. Build size/activity options from real catalog values and show All explicitly. Display units, valid dates and data age. Keep synthetic UI tests separate from real demonstrations. Use native Streamlit controls and headless AppTest for interaction checks.
+Asier owns app.py/searcher.py and Searcher preferences/state. Selin owns dashboard.py/charts and its independent overview state. Both use the same analytical engine and service/save path; they evaluate their own windows and criteria. Searcher applies product_defaults.json on initial load or explicit reset and preserves manual edits. Dashboard takes seasonal criteria for each explicit overview load, with its own selected day window. Build size/activity options from real catalog values and show All explicitly. Display units, valid dates and data age. Keep synthetic UI tests separate from real demonstrations. Use native Streamlit controls and headless AppTest for interaction checks.
 
 Read [Phase 2](PHASE2_SCOPE.md) for product rules, shared schema and the worked example; [API contract](WEATHER_API_CONTRACT.md) for provider behavior; [roles](TEAMROLES.MD) for ownership. Each owner includes tests/docs/fixes. Follow [plan maintenance](PROJECT_PHASES.md#plan-maintenance) when decisions change. The instructor README governs final acceptance; plans are not proof of completed functionality.
 
@@ -45,7 +45,7 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-P4.1-P4.4 are approved and merged. Christian completes P5.3 analytical acceptance and Selin completes P5.4 Dashboard/chart acceptance; Asier then performs P5.5 after both are accepted. Passing implementation tests does not complete those acceptance steps.
+P4.1-P4.4 and P5.1-P5.4 are approved and merged. Gabriel reviews Asier's P5.5 integration fixes and evidence next; then Phase 6 prepares delivery. Dated implementation records below retain their original submission state; later approvals supersede their pending notes. P5.5 moves the map heading outside Plotly and adds a slot-boundary explanation to both views without changing their ranking rules.
 
 
 ### P4.1 implementation and state contract

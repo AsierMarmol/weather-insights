@@ -8,6 +8,7 @@ import streamlit as st
 from weather_app.analytics import (
     analyse_destinations,
     forecasts_from_service,
+    expected_period_times,
     is_eligible,
 )
 from weather_app.client import APIError
@@ -118,6 +119,22 @@ def search_destinations(catalog, preferences, service, run_at, progress=None):
         "cached": sum(r["from_cache"] for r in results.values()),
         "eligible": len(eligible),
     }
+
+
+def forecast_boundary_crossed(rows, run_at, days):
+    """Explain missing coverage when a load crosses a required daytime slot.
+
+    Preserve the requested window and never fabricate or drop its slots.
+    An explicit new search can evaluate the saved forecasts at a new time.
+    """
+    slots = expected_period_times(run_at, days)
+    return bool(slots) and any(
+        row.get("reason") == "missing_periods"
+        and row.get("forecast_retrieved_at_utc")
+        and datetime.fromisoformat(row["forecast_retrieved_at_utc"])
+        >= slots[0]
+        for row in rows
+    )
 
 
 def _seed_widgets(preferences, overwrite=False):
@@ -318,6 +335,12 @@ def _render_results(catalog, current_preferences, defaults):
                 "These saved results are now over three hours old. "
                 "Search again before choosing a destination."
             )
+    if forecast_boundary_crossed(rows, run_at, searched.days):
+        st.warning(
+            "This load crossed a daytime forecast-slot boundary. Some "
+            "forecasts cannot cover the original window. Search again "
+            "to start a new window; suitable saved data will be reused."
+        )
     table = ranking_table(rows, catalog, state.search_errors)
     places = {d.city_id: d for d in catalog}
     if available:

@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher was approved by Gabriel and merged in PR #10. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12. P4.4 (independent Spain weather Dashboard) was approved by Asier and merged in PR #15. Phase 5 is in progress: P5.1 merged in PR #13 (Christian's approval), P5.2 merged in PR #14 (Selin's approval) and P5.3 merged in PR #17 (Selin's approval; current dev `bfd9fd7`). P5.4 is completed on `selin/feature` and awaits Asier's review; P5.5 and Phase 6 remain pending.
+Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher was approved by Gabriel and merged in PR #10. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12. P4.4 (independent Spain weather Dashboard) was approved by Asier and merged in PR #15. Phase 5 is in progress: P5.1 merged in PR #13 (Christian's approval), P5.2 merged in PR #14 (Selin's approval) and P5.3 merged in PR #17 (Selin's approval) and P5.4 merged in PR #18 (Asier's approval; current dev `1784b8c`). P5.5 is implemented and tested locally, awaiting Gabriel review; Phase 6 remains pending.
 
 | Phase | Outcome | Status |
 | --- | --- | --- |
@@ -10,7 +10,7 @@ Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core 
 | [2 - Scope and data](PHASE2_SCOPE.md) | Product rules, catalog, API rules and shared specification | Foundation and P2.5 approved/merged |
 | [3 - Core data](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Core accepted for Phase 4; final integration checks in Phase 5 |
 | [4 - Interface](PHASE4_ANALYTICS_UI.md) | Searcher, Dashboard and connected user journey | P4.1-P4.3 approved and merged (PR #10-#12); P4.4 approved and merged in PR #15 |
-| [5 - Quality](PHASE5_QUALITY_REVIEW.md) | Integrated acceptance and rubric evidence | In progress: P5.1-P5.3 merged; P5.4 awaiting Asier's review; P5.5 pending |
+| [5 - Quality](PHASE5_QUALITY_REVIEW.md) | Integrated acceptance and rubric evidence | In progress: P5.1-P5.4 merged; P5.5 implemented/tested locally; awaiting Gabriel review |
 | [6 - Delivery](PHASE6_DELIVERY.md) | Documentation, clean-clone verification and submission | Not started |
 
 ## Work order
@@ -29,4 +29,4 @@ Substantial AI assistance is recorded truthfully in [PROMPTS.md](PROMPTS.md); or
 
 ## Next action
 
-P4.4 and P5.3 are merged. Asier reviews Selin's P5.4; after P5.4 is accepted, Asier performs the P5.5 integrated rubric walkthrough with Gabriel reviewing. The rubric mapping is in Phase 2 and final acceptance is in Phase 5. Saved observations/forecasts must accumulate through normal use and be submitted; no continuous collection process or historical-trend chart is required.
+P5.1-P5.4 are merged. P5.5 has local implementation and automated acceptance evidence; Gabriel reviews the changes and performs the outstanding browser layout check. Storage parsing performance and slot-boundary messaging have been addressed. After acceptance, Asier starts P6.1, Selin performs P6.2 with Christian reviewing, then Asier handles P6.3 with Gabriel reviewing. The rubric mapping is in Phase 2 and final acceptance is in Phase 5. Saved observations/forecasts must accumulate through normal use and be submitted; no continuous collection process or historical-trend chart is required.

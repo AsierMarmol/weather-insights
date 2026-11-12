@@ -6,7 +6,7 @@
 | api_verification_runs.jsonl | Safe summaries of the original verification runs |
 | weather_records.csv | Normalized records saved automatically by the application service (P2.4 schema version 1) |
 
-The retained initial dataset has **168 responses for 82 cities**: 84 current observations and 84 forecasts containing 3,360 prediction periods. Repeated cities are genuine separate fetches. These are dated development records, not currently fresh forecasts or an implemented application store.
+The retained initial dataset has **168 responses for 82 cities**: 84 current observations and 84 forecasts containing 3,360 prediction periods. Repeated cities are genuine separate fetches. These are dated development records, not currently fresh forecasts; the application uses the separate normalized CSV described below.
 
 At the user's request, city-specific investigation files and all 12 Lugo trial responses were removed. Its corrected reference remains in the destination catalog and provider override; there is no retained weather response for that city in this initial dataset. Every other raw response is preserved unchanged. Run summaries retain original request counts and explicitly identify filtered retained counts; they do not imply another live run.
 
@@ -18,6 +18,13 @@ The optional [verification script](../../scripts/verify_weather_access.py) still
 
 ## Accumulated application forecasts - 12 November 2026
 
-The saved application CSV now contains **3,324 records across 82 catalog destinations**. The additional 3,160 forecast records form 79 fetch groups of 40 forecast slots each, retrieved between 12:36:27 and 12:37:35 UTC on 12 November 2026. The original 164 records are preserved. Barcelona has no saved application records in this snapshot; this is not a claim of complete 83-destination weather coverage.
+At the 12:37 UTC snapshot, the saved application CSV contained **3,324 records across 82 catalog destinations**. The additional 3,160 forecast records form 79 fetch groups of 40 forecast slots each, retrieved between 12:36:27 and 12:37:35 UTC on 12 November 2026. The original 164 records are preserved. Barcelona has no saved application records in this snapshot; this is not a claim of complete 83-destination weather coverage.
 
 Pre-publication validation passed using the application record loader: schema and value validation, catalog membership, unique record keys, coherent city/kind/retrieval time within each new fetch group, and preservation of the original rows. These are dated forecasts, not observations of future weather. No live requests or synthetic records were added during publication. The absence of Barcelona records does not establish the cause of the missing fetch.
+
+Further genuine searches during the P5.5 review append newer fetch groups to the same CSV. The counts above describe the original dated snapshot, not a permanent row-count constraint. Validate newly collected groups through WeatherStore before committing; retain earlier records.
+
+
+## Normal app use during P5.5 - 12 November 2026
+
+At 17:35:30 UTC the CSV contained **6,604 records across all 83 destinations**, including Barcelona. Asier confirmed he was running the app during the review. Compared with the earlier snapshot, 82 new genuine forecast groups added 3,280 rows; all original 3,324 rows are preserved in order. A frozen copy passed WeatherStore schema/model validation, catalog membership, unique record keys and coherent city/kind/retrieval time within each group. Review tests did not create these records or make live requests. These counts are a dated checkpoint and may grow during subsequent use.

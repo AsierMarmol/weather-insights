@@ -306,10 +306,14 @@ def test_progress_reaches_completion_and_is_removed(journey, monkeypatch):
 def test_genuine_saved_data_drives_complete_app_without_requests(journey):
     app, service, session, clock, factory = journey
     original = ROOT / "data/weather/weather_records.csv"
-    service.store.path.write_bytes(original.read_bytes())
-    saved = service.store.path.read_bytes()
-    # Replay the existing genuine snapshot at its original retrieval window.
+    # Replay only records available at that historical time. New app use
+    # must not replace this test's known forecast inputs with later issues.
     clock.now = datetime.fromisoformat("2026-11-12T11:34:00+00:00")
+    historical = [r for r in WeatherStore(original).load()
+                  if r.retrieved_at_utc <= clock.now]
+    assert len(historical) == 164
+    service.store.append(historical)  # Temporary store only.
+    saved = service.store.path.read_bytes()
     app.run().button(key="run_search").click().run()
     assert not app.exception and not session.calls
     scores = [float(metric.value) for metric in app.metric[::3]]
