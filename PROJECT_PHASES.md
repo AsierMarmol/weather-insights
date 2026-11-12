@@ -2,14 +2,14 @@
 
 ## Current checkpoint
 
-Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher was approved by Gabriel and merged in PR #10. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12. P4.4 (independent Spain weather Dashboard) is implemented and awaits Asier's review. Phase 5 is in progress: P5.1 merged in PR #13 (Christian's approval) and P5.2 merged in PR #14 (Selin's approval); P5.3-P5.5 and Phase 6 remain pending.
+Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher was approved by Gabriel and merged in PR #10. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12. P4.4 (independent Spain weather Dashboard) was approved by Asier and merged in PR #15; current dev is 1e43be3. Phase 5 is in progress: P5.1 merged in PR #13 (Christian's approval) and P5.2 merged in PR #14 (Selin's approval); P5.3-P5.5 and Phase 6 remain pending.
 
 | Phase | Outcome | Status |
 | --- | --- | --- |
 | [1 - Setup](PHASE1_SETUP.md) | Environment, package, credentials and GitHub collaboration | Completed; historical record retained |
 | [2 - Scope and data](PHASE2_SCOPE.md) | Product rules, catalog, API rules and shared specification | Foundation and P2.5 approved/merged |
 | [3 - Core data](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Core accepted for Phase 4; final integration checks in Phase 5 |
-| [4 - Interface](PHASE4_ANALYTICS_UI.md) | Searcher, Dashboard and connected user journey | P4.1-P4.3 approved and merged (PR #10-#12); P4.4 implemented, awaiting review |
+| [4 - Interface](PHASE4_ANALYTICS_UI.md) | Searcher, Dashboard and connected user journey | P4.1-P4.3 approved and merged (PR #10-#12); P4.4 approved and merged in PR #15 |
 | [5 - Quality](PHASE5_QUALITY_REVIEW.md) | Integrated acceptance and rubric evidence | In progress: P5.1/P5.2 merged; P5.3-P5.5 pending |
 | [6 - Delivery](PHASE6_DELIVERY.md) | Documentation, clean-clone verification and submission | Not started |
 
@@ -29,4 +29,4 @@ Substantial AI assistance is recorded truthfully in [PROMPTS.md](PROMPTS.md); or
 
 ## Next action
 
-Asier reviews P4.4. Christian (P5.3) and Selin (P5.4, after P4.4) perform their Phase 5 component checks, followed by Asier’s integrated rubric walkthrough. The rubric mapping is in Phase 2 and final acceptance is in Phase 5. Saved observations/forecasts must accumulate through normal use and be submitted; no continuous collection process or historical-trend chart is required.
+P4.4 is merged. Christian (P5.3) and Selin (P5.4) perform their Phase 5 component checks, followed by Asier’s integrated rubric walkthrough. The rubric mapping is in Phase 2 and final acceptance is in Phase 5. Saved observations/forecasts must accumulate through normal use and be submitted; no continuous collection process or historical-trend chart is required.
