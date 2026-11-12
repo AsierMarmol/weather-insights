@@ -1,6 +1,6 @@
 # Phase 5 - Quality Review
 
-Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3-P5.5 pending. P5.4 now follows P4.4.
+Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3 analytical acceptance completed locally and awaiting Selin's review; P5.4-P5.5 pending. P5.4 now follows P4.4.
 
 ## Purpose and dependencies
 
@@ -12,7 +12,7 @@ Verify the integrated app against the teacher rubric. Component tests already be
 | --- | --- | --- | --- | --- | --- | --- |
 | P5.1 | Model/storage acceptance | Alejandra | Christian | P4.1-P4.3 merged | Validate catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity. | Completed locally: three gaps fixed, 21 new tests, 333 total pass, Flake8 clean; commit ac30f13, [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); approved by Christian and merged |
 | P5.2 | API/security/save acceptance | Gabriel | Alejandra | P4.1-P4.3 merged | Exercise input/key/location/network/server/quota/malformed responses, partial batches, cache saves and safe failure messages. | Completed locally: one gap fixed (key file in another encoding), 43 new tests, 376 total pass, Flake8 clean; merged in PR #14 with Selin's approval (Alejandra was the planned reviewer) |
-| P5.3 | Analytical acceptance | Christian | Selin | P4.1-P4.3 merged | Verify all day windows, clock changes, threshold boundaries, missing/stale metrics, driving cap, ties and three distinct analyses. | Pending |
+| P5.3 | Analytical acceptance | Christian | Selin | P4.1-P4.3 merged | Verify all day windows, clock changes, threshold boundaries, missing/stale metrics, driving cap, ties and three distinct analyses. | Completed locally: no analytical defect found, 22 new acceptance tests; 403 passed, 2 skipped, 2 failed (Dashboard timeouts from a storage lookup cost, reported to its owners); awaiting Selin's review |
 | P5.4 | Dashboard/chart acceptance | Selin | Asier | P4.4 merged | Validate the independent Dashboard: all 83 map markers, hover values, plotted inputs and units, weather-only ranks/ties, interactive filters, windows, freshness and empty/unavailable states against common results. | Pending; P4.4 approved and merged in PR #15 |
 | P5.5 | Searcher/integration and rubric walkthrough | Asier | Gabriel | P5.1-P5.4 | Validate seasonal/manual preference persistence, All options, top-five/full-table consistency, complete user journey, every rubric row and actual team contributions. | Pending |
 
@@ -43,10 +43,11 @@ request review, merge or submit without the relevant authorization.
 | 12 November 2026 | Phase 5 start | Prerequisites checked on GitHub: P4.1 (PR #10, Gabriel), P4.2 (PR #11, Asier) and P4.3 (PR #12, approved by Gabriel and merged into dev `27e088e`). Baseline at `27e088e`: 312 passed, Flake8 zero findings. | Phase 4 accepted |
 | 12 November 2026 | P5.1 | Alejandra/Claude Code accepted models/storage against catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity; three actual gaps found and fixed (details below). 333 passed; Flake8 zero findings; genuine CSV and catalog byte-identical and permissions unchanged; no live requests. | Awaiting Christian's review |
 | 12 November 2026 | P5.2 | Gabriel/Claude Code accepted the API/security/save path through the connected app: credentials, input, location, network, server, quota and malformed responses, partial batches, cache saves and safe messages (details below). One actual gap found and fixed. 376 passed; Flake8 zero findings; genuine data byte-identical; no live requests. | Awaiting Alejandra's review |
+| 12 November 2026 | P5.3 | Christian/Claude Code accepted the analytics against windows, daytime, clock changes, thresholds, scoring, ties, both rankings, the three analyses and missing/invalid/stale data, on dev `cda1cc2` (details below). No analytical defect found; 22 regression/acceptance tests added. 403 passed, 2 skipped, 2 failed (Windows; the two failures are Dashboard AppTest 60-second timeouts explained below, not analytical results); Flake8 zero findings; genuine data byte-identical; no live requests. | Awaiting Selin's review |
 
 ## Next action
 
-P5.1 and P5.2 are merged. P4.4 is approved and merged in PR #15; Christian (P5.3) and Selin (P5.4) run their acceptance checks, then Asier runs the connected walkthrough (P5.5), recording failures and fixes with actual evidence. P4.3 provides 11 integration journeys and a 312-test passing baseline; reuse that evidence and investigate actual remaining rubric gaps rather than rebuilding components. Phase 5 is not yet completed.
+P5.1 and P5.2 are merged. P4.4 is approved and merged in PR #15. Christian's P5.3 analytical acceptance is completed locally and awaits Selin's review; Selin (P5.4) runs the Dashboard/chart acceptance, then Asier runs the connected walkthrough (P5.5), recording failures and fixes with actual evidence. P4.3 provides 11 integration journeys and a 312-test passing baseline; reuse that evidence and investigate actual remaining rubric gaps rather than rebuilding components. Phase 5 is not yet completed.
 
 ### P5.1 model/storage acceptance - 12 November 2026
 
@@ -90,3 +91,37 @@ Limitations: the rate limiter is per process, so two separately started apps sha
 
 **Status:** completed locally; awaiting commit, PR into dev and Alejandra's review. Not approved or merged.
 
+### P5.3 analytical acceptance - 12 November 2026
+
+Christian / Claude Code, on `christian/feature` fast-forwarded to dev `cda1cc2` (a descendant of `1e43be3`, adding the P4.4 acceptance notes and the accumulated 82-destination forecasts). Since P3.3 the engine (`analytics.py`) changed only by the P2.5 line-length reformatting; its behavior is unchanged. Acceptance reused the existing tests where they already prove a requirement and added `tests/test_analytics_acceptance.py` (22 tests) for the boundaries they did not cover.
+
+Already proven by existing tests (rerun, passing): the worked example and the three analyses (`test_analytics.py`), inclusive thresholds and the zero floor, the excluded reference time and included window end, the autumn clock change and off-grid 09:00/18:00 local boundaries, a missing fifth-day slot, staleness at exactly three hours versus one second more, other-city/mixed-fetch/mixed-retrieval/current-kind groups, duplicate timestamps, reason precedence, ANY/AND filters on the real catalog, the trip tie-break order, the driving cap, the service/store integration and the P2.5 genuine replay (`test_analytics_integration.py`); seasonal Dashboard criteria, weather-only competition ranks (1, 1, 3), city_id order within ties and filters that keep ranks (`test_dashboard.py`); seasonal Searcher defaults and the cached fifth-day refresh (`test_searcher.py`, `test_app_integration.py`).
+
+Added and passing without code changes:
+
+- **Windows:** for reference times every 7 h 13 min 17 s across March 2026-March 2027 (both clock changes, month and year ends, on and off the grid), every 1-5-day window holds exactly three daytime slots per day, all strictly after the reference time, at or before the end, on whole three-hour UTC times. The reason is checked by hand: Madrid daytime holds the 09/12/15 UTC slots in both CET and CEST. The spring clock change (28 March 2027) and a reference time already on 1 January in Madrid are spelled out.
+- **Fifth day:** the end slot of a five-day window is included and required. A cached forecast that is still fresh (exactly three hours old) but no longer reaches the fifth-day end becomes `missing_periods`, never a 14-slot result. The Searcher then refreshes it once. Genuine evidence: replayed at `12:37:35 UTC`, the three 11:29 P2.5 groups end at 17 November 09:00, while the five-day window needs 12:00.
+- **Missing and malformed data:** a missing temperature, probability or wind in any required slot gives `missing_metrics` with null scores, not zero. Missing values outside the window or at night do not matter. NaN, infinity, booleans and text cannot enter a record. Two partial fetch groups that would together cover the window are `invalid_data`, never stitched.
+- **Unrounded ranking:** Segovia (26/27 checks, 75 min: 95.046) ranks above Seville (27/27, capped penalty: 95.0), although both display as 95.0 and a rounded score would favour Seville on weather match. The Dashboard ranks the same rows by weather alone, with Seville first.
+- **Genuine catalog replay:** for 1-5 days at the historical reference time, the latest group per city saved by then (82 destinations; Barcelona has none and is `fetch_failed`) is compared with an independent tally of the raw CSV text. The tally uses no WeatherRecord, zoneinfo or analytics code. It is compared on reason, coverage, weather match, all-three percentage, mean temperature, highest slot probability, highest slot wind, final score and trip order. Dashboard competition ranks, the order within ties and a Coast display filter that keeps the global ranks are compared too. The Dashboard criteria are its own seasonal defaults (autumn 16-24 °C, ≤30%, ≤25 km/h) from `product_defaults.json`.
+
+Mutation check (temporary edits, then restored): ranking on rounded scores, an exclusive window end and stitching fetch groups each make the new tests fail. A fixed UTC+1 offset instead of Europe/Madrid does not change any selected three-hour slot. That case is already caught by the off-grid boundary test in `test_analytics.py`.
+
+No defect was found in analytics, so no source file changed. Wording was reviewed too: both views call the probability statistic the highest slot probability, and the Dashboard states it is not a whole-window rain probability. The Searcher's "below your limit" text is already qualified by "(boundaries included)". No Dashboard integration defect was found for Selin.
+
+Validation on Windows: 403 passed, 2 skipped, 2 failed (Windows; the two failures are Dashboard AppTest 60-second timeouts explained below, not analytical results) (two POSIX-permission checks skip on Windows); `uv run --locked flake8 src tests scripts app.py` zero findings. The genuine CSV bytes are checked unchanged; no live request was made.
+
+**Unresolved, outside analytics - storage lookup cost (reproducible):** `tests/test_dashboard.py::test_old_forecasts_warn_and_refresh_fetches_again` and `::test_genuine_saved_forecasts_rank_without_requests` fail on this PC, also when run alone. Each hits Streamlit AppTest's 60-second limit (96.7 s and 60.0 s). The cause is `WeatherStore.latest_forecast(city_id)` (`storage.py`): it re-reads and re-validates the whole weather CSV for every city. A full Dashboard load makes 83 such lookups:
+
+```text
+uv run --locked python -c "import time; from weather_app.storage import WeatherStore, load_destinations as L; s=WeatherStore(); t=time.perf_counter(); [s.latest_forecast(d.city_id) for d in L()]; print(time.perf_counter()-t)"
+```
+
+The 83 lookups take 1.57 s on the 164-row CSV of `1e43be3` and 28.7 s on the 3,324-row CSV after `18c0f04`, and the cost keeps growing as data accumulates. A single `load()` takes 0.41 s. This is a performance defect in the shared save/reuse path, not in the scores; the analytics results are correct. It belongs to the storage/service owners (Alejandra/Gabriel), and it affects Selin's Dashboard load and P5.4. For example, one read per batch, or a per-city index, would remove the repeated work. It is reported to them rather than changed here, because it lies outside `analytics.py`. The 383-test Windows baseline at `1e43be3` used the smaller CSV.
+
+Limitations and observations:
+
+- Genuine data covers one collection on 12 November 2026, and only up to five days ahead.
+- One risk is not reproduced against the real provider. Saved responses start at the first three-hour slot after retrieval. If a batch that started just before a slot time (00, 03 ... 21 UTC) fetches a city just after it, that city's forecast may lack the first required slot and show as unavailable (`missing_periods`). It is not a cached result, so no refresh retries it; the next search does. This touches `searcher.search_destinations`, which both views use. It is recorded for Asier (P5.5) and Selin (P5.4) rather than changed. Rerunning the search clears it.
+
+**Status:** completed locally; awaiting commit, push and Selin's review. Not approved or merged. P5.4 and P5.5 are not claimed.

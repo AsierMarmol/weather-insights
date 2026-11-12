@@ -718,3 +718,35 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Selin directed the work. Asier's P4.4 review is pending; no approval is claimed. P5.4 acceptance follows P4.4.
 
 **Commit / PR:** Pending Selin's authorization.
+
+
+---
+
+## Phase 5: P5.3 analytical acceptance (2026-11-12)
+
+**Requested by:** Christian Sawaya (christiansawaya-code).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Bring `christian/feature` up to the latest dev and complete P5.3. Verify the existing analytics rather than rebuild it: rolling 1-5-day windows from one UTC reference time, Europe/Madrid daytime, clock-change and date boundaries, complete fifth-day coverage, inclusive thresholds, the weather match, driving-penalty, final-score and tie-break rules, the Dashboard's weather-only competition ranks and seasonal criteria, the three analyses, and missing, invalid, stale and mixed-group data. Fix real defects, add meaningful tests with independent expectations, and update the records.
+
+**Got:** Fast-forwarded to dev `cda1cc2`. Reviewed the engine, the Searcher's `search_destinations` and the Dashboard's `overview_preferences`, `weather_ranks`, `prepare_frame` and `filter_frame` against PHASE2_SCOPE.md, PHASE4_ANALYTICS_UI.md and `product_defaults.json`. Added `tests/test_analytics_acceptance.py` (22 tests) covering:
+
+- year-long window sweeps
+- the spring clock change and the year boundary
+- the fifth-day end slot, and a fresh cached forecast that no longer reaches it
+- each missing metric
+- malformed values
+- two partial fetch groups
+- unrounded versus displayed ranking (Segovia 95.046 vs Seville 95.0)
+- a genuine 82-destination replay at its historical reference time, compared with an independent tally of the raw CSV for both rankings and all three analyses
+
+Updated the P5.3 phase record and status lines.
+
+**Checked:** Baseline at `cda1cc2`: 379 passed, 2 skipped, 4 failed, all Dashboard AppTest 60-second timeouts, on a run slowed by parallel probes; the isolated rerun is below. After: 403 passed, 2 skipped, 2 failed (Windows; the two failures are Dashboard AppTest 60-second timeouts explained below, not analytical results); Flake8 zero findings. The new tests passed on the first run, so the engine needed no fix. A mutation check showed they fail on rounded ranking, an exclusive window end and stitched groups. Genuine CSV bytes unchanged; no live request.
+
+**Kept / changed / rejected:** No source change was needed. The engine, Searcher and Dashboard are kept as they are. A possible gap is recorded rather than fixed, because it is the Searcher's code and the provider's behavior is unverified: a batch that crosses a three-hour slot time may lose a city's first slot, and that city is not refreshed. Considered and rejected: changing the shared reference time. Found while running the suite: `WeatherStore.latest_forecast` re-reads the whole CSV for each city. After the CSV grew to 3,324 rows, two all-catalog Dashboard AppTests exceed the 60 s limit; 83 lookups take 28.7 s, against 1.57 s on 164 rows. This is reported to the storage/service owners, not changed here.
+
+**Human review:** Christian directed the work. Selin's review of P5.3 is pending; no approval is claimed.
+
+**Commit / PR:** Pending.

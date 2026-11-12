@@ -10,7 +10,7 @@ Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core 
 | [2 - Scope and data](PHASE2_SCOPE.md) | Product rules, catalog, API rules and shared specification | Foundation and P2.5 approved/merged |
 | [3 - Core data](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Core accepted for Phase 4; final integration checks in Phase 5 |
 | [4 - Interface](PHASE4_ANALYTICS_UI.md) | Searcher, Dashboard and connected user journey | P4.1-P4.3 approved and merged (PR #10-#12); P4.4 approved and merged in PR #15 |
-| [5 - Quality](PHASE5_QUALITY_REVIEW.md) | Integrated acceptance and rubric evidence | In progress: P5.1/P5.2 merged; P5.3-P5.5 pending |
+| [5 - Quality](PHASE5_QUALITY_REVIEW.md) | Integrated acceptance and rubric evidence | In progress: P5.1/P5.2 merged; P5.3 awaiting Selin's review; P5.4-P5.5 pending |
 | [6 - Delivery](PHASE6_DELIVERY.md) | Documentation, clean-clone verification and submission | Not started |
 
 ## Work order
