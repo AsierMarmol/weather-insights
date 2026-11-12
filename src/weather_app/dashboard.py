@@ -409,11 +409,9 @@ def _keep_all_exclusive(key: str) -> None:
     The choice is also copied to a plain session key, because Streamlit
     discards widget state while the Searcher is shown.
     """
-    selection = list(st.session_state.get(key, []))
-    if not selection or selection[-1] == ALL:
-        st.session_state[key] = [ALL]
-    elif ALL in selection:
-        st.session_state[key] = [v for v in selection if v != ALL]
+    st.session_state[key] = searcher.normalize_all_selection(
+        st.session_state.get(key, [])
+    )
     st.session_state[f"_saved{key}"] = list(st.session_state[key])
 
 
@@ -553,6 +551,11 @@ def _filters(frame: pd.DataFrame) -> pd.DataFrame:
     return filter_frame(frame, chosen_ids, chosen_tags, chosen_kinds)
 
 
+def _remember_metric() -> None:
+    """Preserve the chart choice when Streamlit removes hidden widgets."""
+    st.session_state["_saved_dashboard_metric"] = st.session_state[METRIC_KEY]
+
+
 def _render_tabs(available: pd.DataFrame, preferences: object) -> None:
     ranking_tab, comparison_tab, all_tab = st.tabs(
         ["Ranking", "Weather comparison", "Periods meeting all preferences"]
@@ -574,9 +577,16 @@ def _render_tabs(available: pd.DataFrame, preferences: object) -> None:
             "Searcher. Driving times are reference estimates from Madrid."
         )
     with comparison_tab:
+        if METRIC_KEY not in st.session_state:
+            saved = st.session_state.get("_saved_dashboard_metric")
+            st.session_state[METRIC_KEY] = (
+                saved if saved in COMPARISON_METRICS
+                else next(iter(COMPARISON_METRICS))
+            )
         metric = st.radio(
             "Weather measure", list(COMPARISON_METRICS), key=METRIC_KEY,
             horizontal=True, format_func=lambda m: COMPARISON_METRICS[m][0],
+            on_change=_remember_metric,
         )
         st.plotly_chart(comparison_chart(available, metric, preferences))
         st.caption(COMPARISON_METRICS[metric][2])

@@ -1,6 +1,6 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-Updated: 12 November 2026. **In progress:** P4.1 approved by Gabriel and merged (PR #10); P4.2 implemented, awaiting Asier's review; P4.3 pending.
+Updated: 12 November 2026. **In progress:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 implemented locally, awaiting Gabriel review.
 
 ## Purpose and dependencies
 
@@ -11,8 +11,8 @@ Deliver Searcher and Dashboard on the same data and calculations, then connect t
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
 | P4.1 | Complete Searcher | Asier | Gabriel | Phase 3 accepted incl. P2.5 | Editable seasonal preferences, rolling 1-5 days, All filters from catalog values, five leading results/full ranking, useful errors and tests. | Approved by Gabriel and merged into dev in PR #10 (12 November 2026) |
-| P4.2 | Complete Dashboard | Selin | Asier | Phase 3 accepted incl. P2.5 | Interactive ranking, weather comparison and simultaneous-preference metrics; at least two labeled real-data charts, missing states and tests. | Implemented; 42 tests pass; Asier review pending |
-| P4.3 | Integrate the app | Asier | Gabriel | P4.1 + P4.2 | Shared search state, navigation, data reuse, progress/freshness and partial errors verified end to end. | Pending |
+| P4.2 | Complete Dashboard | Selin | Asier | Phase 3 accepted incl. P2.5 | Interactive ranking, weather comparison and simultaneous-preference metrics; at least two labeled real-data charts, missing states and tests. | Approved by Asier and merged into dev in PR #11 (12 November 2026) |
+| P4.3 | Integrate the app | Asier | Gabriel | P4.1 + P4.2 | Shared search state, navigation, data reuse, progress/freshness and partial errors verified end to end. | Implemented; 11 integration tests and 312 total tests pass; Gabriel review pending |
 
 ## Implementation and acceptance
 
@@ -43,18 +43,18 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-Asier reviews P4.2 (including the one-line `app.py` Dashboard call), then completes P4.3 integration and the end-to-end journey. P5.4 Dashboard/chart acceptance follows in Phase 5.
+Gabriel reviews P4.3 integration. After approval/merge, proceed to Phase 5 component acceptance and the complete rubric walkthrough. P4.1/P4.2 approvals do not imply P4.3 approval.
 
 
 ### P4.1 implementation and state contract
 
-`searcher.initial_preferences(now_utc, defaults)` derives the initial season from Europe/Madrid; only first use or explicit reset applies it. Valid manual choices persist across reruns, navigation and season changes. Activities/sizes derive from the real catalog and visibly default to All. Empty selections mean All; All overrides any other selected values as explained beside the controls. Invalid temperature ranges disable Search.
+`searcher.initial_preferences(now_utc, defaults)` derives the initial season from Europe/Madrid; only first use or explicit reset applies it. Valid manual choices persist across reruns, navigation and season changes. Activities/sizes derive from the real catalog and visibly default to All. Empty selections mean All. P4.3 makes All exclusive in both views: a specific choice clears All; choosing All or clearing the selection restores it. Invalid temperature ranges disable Search.
 
 `search_destinations` filters before asking the actual WeatherService for forecasts and delegates all scoring to analytics. It captures one common UTC search time and refreshes cached forecasts once when they no longer cover the requested window. The service remains the only fetch/save path. No network occurs on initial load, control edits, reset or navigation. Fresh searches save automatically and show progress; key/network/quota/provider/storage/location failures use safe distinct messages.
 
 The view displays up to five available destinations, the full eligible ranking (including unavailable reasons), travel units, score explanation, window/preferences, coverage and data age. Changed controls leave the old results explicitly labeled until another search. Old results show a warning after three hours. The three-day historical genuine replay renders Seville 83.9, Toledo 50.8 and Segovia 46.9; this is a test replay at the original search time, not fresh weather.
 
-Shared session keys: `search_preferences` (current controls), `search_run_at_utc`, `search_analysis_rows`, `search_result_preferences` (preferences used for those results), `search_errors` and `search_cached_count`. `weather_service` is lazily created once per session. P4.2/P4.3 must consume the result snapshot and its preferences together, rather than implying that unsent control changes have recomputed scores. No Dashboard implementation or final integrated acceptance is claimed.
+Shared session keys: `search_preferences` (current controls), `search_run_at_utc`, `search_analysis_rows`, `search_result_preferences` (preferences used for those results), `search_errors` and `search_cached_count`. `weather_service` is lazily created once per session. P4.2/P4.3 must consume the result snapshot and its preferences together, rather than implying that unsent control changes have recomputed scores. Dashboard now consumes this contract; P4.3 implementation is verified below and awaits review.
 
 Validation: 259 tests passed, including 22 new checks for season/Madrid-month boundaries, navigation/reset persistence, lazy requests, filters, top-five/full-ranking agreement, save/cache reuse, safe failures, empty matches, incomplete cached coverage, historical genuine replay and age warnings. Tests block live HTTP and assert the genuine CSV is unchanged. Flake8 reports zero findings. P4.1 publication for Gabriel review is authorized; review and merge remain pending. Selin owns the separate P4.2 implementation.
 
@@ -66,4 +66,17 @@ Three analyses, each with a chart and a table: suitability ranking (final score,
 
 Validation: `tests/test_dashboard.py` (42 tests) covers helpers, contract validation, filter logic, chart data/axis units/preference markers, AppTest interactions, freshness and changed-settings notices, a read-only replay of the genuine P2.5 forecasts through the real analytics engine (charts plot Seville, Toledo, Segovia with the independently tallied scores) and an end-to-end `app.py` journey (fake HTTP, temporary store: search, open Dashboard, filter, navigate back) proving the view makes no requests and writes no records. Full suite 301 passed; Flake8 zero findings. Visually checked with the genuine replay in a throwaway local harness outside the repository.
 
-Limitations: genuine data currently covers three cities from P2.5; wider real coverage comes from normal searches. Dashboard filters only narrow the shown result; changing days/preferences requires a new search in the Searcher. Final integrated acceptance remains P4.3/P5.4.
+Limitations: genuine data currently covers three cities from P2.5; wider real coverage comes from normal searches. Dashboard filters only narrow the shown result; changing days/preferences requires a new search in the Searcher. P4.3 verification is recorded below; its peer review and P5.4 final chart acceptance remain pending.
+
+
+### P4.3 integration - 12 November 2026
+
+Asier / OpenAI Codex verified the merged app at dev `d6d210e`. P4.2 PR #11 is approved by Asier and merged; earlier pending notes above describe the original submission state. No second page router, service, data store or analytics implementation was needed.
+
+Two reproduced gaps were corrected: the Dashboard's weather-measure radio reset after navigation, and Searcher's default All could remain alongside a specific choice, causing the specific choice to be ignored. Dashboard now saves/restores its selected measure outside transient widget state. Both views use the same small `searcher.normalize_all_selection` helper for exclusive All behavior. Searcher’s existing empty-selection test now checks the visible All value.
+
+`tests/test_app_integration.py` adds 11 complete journeys through app.py: metric/filter persistence; consistent All behavior; all five forecast windows; changing preferences while retaining the labeled old snapshot until Search; resetting an invalid Dashboard destination filter after a narrower search; partial failure and recovery; persistence failure/recovery without charting unsaved results; stale-result warnings in both views and explicit refresh; empty new searches clearing old charts; progress completion/cleanup; and genuine saved data through the actual service, storage, analytics, Searcher and Dashboard at a fixed historical replay time.
+
+The two regression tests failed before their fixes. Final verification: **312 tests passed; Flake8 zero findings**. Synthetic HTTP and temporary stores isolate writes; integration fixtures block live HTTP and verify every repository data file remains unchanged. The genuine replay copies the existing CSV to a temporary store, renders Seville/Toledo/Segovia in the expected order and scores, and makes zero HTTP calls. Normal navigation/filtering does not request or write weather. The same service instance is reused, and successful requests retain the existing automatic-saving path. No new live requests or genuine-data edits were made.
+
+**Status:** implemented, awaiting Gabriel review. Phase 5's integrated rubric acceptance and the clean-clone delivery check are still pending. No commit, push or merge performed for P4.3.

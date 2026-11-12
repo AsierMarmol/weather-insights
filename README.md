@@ -4,7 +4,7 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher (editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states) was approved and merged. P4.2 Dashboard (ranking, weather comparison and all-preferences charts over the same results) is implemented and awaiting review; P4.3 integration remains pending. Source limitations remain documented.
+Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher (editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states) was approved and merged. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration is implemented locally and awaiting Gabriel review: shared results, navigation, consistent All filters, chart-choice persistence and failure/recovery journeys are verified. Phase 5 quality acceptance and Phase 6 delivery remain pending. Source limitations remain documented.
 
 Searcher behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. The Dashboard shows ranking, weather comparison and periods meeting all preferences as labeled charts and tables of the same search results. Every fresh successful weather fetch saves automatically.
 
@@ -81,11 +81,11 @@ uv run --locked streamlit run app.py
 
 If Streamlit asks for an email during its welcome prompt, you can leave it blank and press Enter. Follow the **Local URL** printed in the terminal, usually [http://localhost:8501](http://localhost:8501).
 
-In **Searcher**, choose the next 1-5 days, comfortable temperature range, maximum precipitation probability and wind. Activities and size default to **All**; remove All before choosing specific values (an empty selection also means All). Click **Search destinations** to request forecasts for matching cities. A full 83-city search can take a few minutes because requests are paced. Each fresh successful response saves automatically; suitable saved forecasts are reused.
+In **Searcher**, choose the next 1-5 days, comfortable temperature range, maximum precipitation probability and wind. Activities and size default to **All**; choosing a specific value clears All, while choosing All or clearing the selection restores it. Click **Search destinations** to request forecasts for matching cities. A full 83-city search can take a few minutes because requests are paced. Each fresh successful response saves automatically; suitable saved forecasts are reused.
 
 The top five recommendations and full ranking use identical scores. Unavailable cities have an explanation rather than a zero score. Results show their search window, preferences, forecast age and coverage. Editing controls does not fetch automatically; click Search again to update results. **Reset to seasonal defaults** resets preferences explicitly; normal reruns/navigation preserve your choices. Driving estimates are one-way from Madrid Km0 and do not include live traffic.
 
-Open **Dashboard** after a search to compare the same results: the suitability ranking, a weather comparison (mean temperature, highest period precipitation probability or highest period wind) and the share of daytime periods meeting all your preferences. Destination, activity and size filters default to **All** and only narrow what is shown; they make no requests and do not change your search settings. Search again in Searcher to change days or preferences. Stop the app with **Ctrl + C** in its terminal.
+Open **Dashboard** after a search to compare the same results: the suitability ranking, a weather comparison (mean temperature, highest period precipitation probability or highest period wind) and the share of daytime periods meeting all your preferences. Destination, activity and size filters default to **All** and only narrow what is shown; they make no requests and do not change your search settings. Dashboard filters and the selected weather measure persist when switching views. They never change the search preferences. Search again in Searcher to change days or preferences; results keep the original window/settings until that search completes. Stop the app with **Ctrl + C** in its terminal.
 
 ## Verify the installation
 
@@ -138,4 +138,4 @@ Read the [catalog sources](data/reference/README.md), [saved-data record](data/w
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Asier reviews P4.2 Dashboard, then P4.3 completes integration of both views. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Gabriel reviews P4.3 integration. After acceptance, each component owner performs the Phase 5 quality review, followed by the full rubric walkthrough. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
