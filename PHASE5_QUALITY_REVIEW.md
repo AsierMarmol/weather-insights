@@ -1,6 +1,6 @@
 # Phase 5 - Quality Review
 
-Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance submitted in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13), awaiting Christian's review; P5.2 API/security/save acceptance completed locally, awaiting Alejandra's review; P5.3-P5.5 pending.
+Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3-P5.5 pending. P5.4 now follows P4.4.
 
 ## Purpose and dependencies
 
@@ -10,10 +10,10 @@ Verify the integrated app against the teacher rubric. Component tests already be
 
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5.1 | Model/storage acceptance | Alejandra | Christian | Phase 4 | Validate catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity. | Completed locally: three gaps fixed, 21 new tests, 333 total pass, Flake8 clean; commit ac30f13, [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); awaiting Christian's review |
-| P5.2 | API/security/save acceptance | Gabriel | Alejandra | Phase 4 | Exercise input/key/location/network/server/quota/malformed responses, partial batches, cache saves and safe failure messages. | Completed locally: one gap fixed (key file in another encoding), 43 new tests, 376 total pass, Flake8 clean; awaiting commit, PR and Alejandra's review |
+| P5.1 | Model/storage acceptance | Alejandra | Christian | Phase 4 | Validate catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity. | Completed locally: three gaps fixed, 21 new tests, 333 total pass, Flake8 clean; commit ac30f13, [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); approved by Christian and merged |
+| P5.2 | API/security/save acceptance | Gabriel | Alejandra | Phase 4 | Exercise input/key/location/network/server/quota/malformed responses, partial batches, cache saves and safe failure messages. | Completed locally: one gap fixed (key file in another encoding), 43 new tests, 376 total pass, Flake8 clean; merged in PR #14 with Selin's approval (Alejandra was the planned reviewer) |
 | P5.3 | Analytical acceptance | Christian | Selin | Phase 4 | Verify all day windows, clock changes, threshold boundaries, missing/stale metrics, driving cap, ties and three distinct analyses. | Pending |
-| P5.4 | Dashboard/chart acceptance | Selin | Asier | Phase 4 | Validate plotted inputs, units, interactive filters and empty/unavailable states against common results. | Pending |
+| P5.4 | Dashboard/chart acceptance | Selin | Asier | Phase 4 incl. P4.4 | Validate the independent Dashboard: all 83 map markers, hover values, plotted inputs and units, weather-only ranks/ties, interactive filters, windows, freshness and empty/unavailable states against common results. | Pending (after P4.4 review) |
 | P5.5 | Searcher/integration and rubric walkthrough | Asier | Gabriel | P5.1-P5.4 | Validate seasonal/manual preference persistence, All options, top-five/full-table consistency, complete user journey, every rubric row and actual team contributions. | Pending |
 
 ## Implementation and acceptance
@@ -46,7 +46,7 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-Christian reviews P5.1 and Alejandra reviews P5.2. Christian (P5.3) and Selin (P5.4) run their acceptance checks, then Asier runs the connected walkthrough (P5.5), recording failures and fixes with actual evidence. P4.3 provides 11 integration journeys and a 312-test passing baseline; reuse that evidence and investigate actual remaining rubric gaps rather than rebuilding components. Phase 5 is not yet completed.
+P5.1 and P5.2 are merged. Asier reviews P4.4; Christian (P5.3) and Selin (P5.4, after P4.4) run their acceptance checks, then Asier runs the connected walkthrough (P5.5), recording failures and fixes with actual evidence. P4.3 provides 11 integration journeys and a 312-test passing baseline; reuse that evidence and investigate actual remaining rubric gaps rather than rebuilding components. Phase 5 is not yet completed.
 
 ### P5.1 model/storage acceptance - 12 November 2026
 

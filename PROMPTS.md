@@ -698,3 +698,23 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Commit / PR:** Pending.
 
+
+---
+
+## Phase 4: P4.4 independent Spain weather Dashboard (2026-11-12)
+
+**Requested by:** Selin Atalar (selin-atalar).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Synchronize `selin/feature` with reviewed dev `4f4faec`, then implement P4.4: make the Dashboard work without a Searcher run, showing all 83 catalog destinations on a mainland-Spain map with its own 1-5-day window and explicit Load/refresh, seasonal default criteria, a weather-only ranking without driving penalty (shared ranks for ties, city_id ordering within ties), hover details, neutral unavailable markers, separate state from the Searcher, reuse of the existing service/cache/save path and analytics, and clearer "three-hour daytime forecast slot" wording in both views, with tests and documentation.
+
+**Got:** `src/weather_app/dashboard.py` rewritten around `render_dashboard_page()`: `overview_preferences` (Madrid-season temperature range, probability <=30%, wind <=25 km/h, All filters), `weather_ranks` (competition ranks on unrounded weather match), `prepare_frame` (contract validation, weather-rank order), `matches`/`filter_frame`, `map_points`/`map_figure` (Plotly `Scattergeo`, two traces, grey neutral markers, highlight by opacity, `fitbounds="locations"`), `weather_score_chart`, `comparison_chart`, `all_preferences_chart`, and a `_load` that calls the Searcher's `search_destinations` with the shared session service. `src/weather_app/searcher.py`: wording only (three-hour daytime forecast slots, a 9/9 explanation, two table headings and two reason messages); calculations unchanged. `tests/test_dashboard.py` rewritten (51 tests); ten journeys in `tests/test_app_integration.py` updated for the independent Dashboard. Phase 2/4/5 plans, project phases, roles and README updated.
+
+**Checked:** Baseline dev `4f4faec` on macOS (Apple Silicon): 376 passed, 0 skipped (the two POSIX-permission tests run here), Flake8 zero findings. After the change: 385 passed, 0 skipped; `uv run --locked flake8 src tests scripts app.py` zero findings; the genuine `weather_records.csv` checksum unchanged. Tests use fake HTTP, temporary stores and a read-only genuine copy, covering 83 markers/coordinates/hover values, windows 1-5, seasonal defaults, weather-only ranks and ties, independent state, cache reuse, freshness, partial failures, failed saves, missing key and no duplicate requests or saves. Map rendering, colour bar and hover (for example "Cuenca … Average daytime temperature: 19.8 °C · Weather rank: 1 of 83 · Weather score: 100.0%") were inspected in a throwaway offline harness outside the repository using synthetic fake-provider data. No live API request was made.
+
+**Kept / changed / rejected:** Kept the shared fetch/save/analysis path (no new client, store or scoring), P4.3's All-selection helper and P5.1/P5.2 storage, encoding and credential fixes untouched. Changed the Dashboard from displaying Searcher results to its own overview, and replaced fixed lat/lon map ranges with `fitbounds` after the visual check showed the map zoomed out too far. Added a rerun after Load so the button and status update immediately. Rejected map tiles requiring another API key. The failed-save test expects 84 saved responses because the service keeps and saves the first response once on retry and the refresh fetches that city again as a distinct response.
+
+**Human review:** Selin directed the work. Asier's P4.4 review is pending; no approval is claimed. P5.4 acceptance follows P4.4.
+
+**Commit / PR:** Pending Selin's authorization.
