@@ -4,7 +4,7 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher (editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states) was approved and merged. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12: shared results, navigation, consistent All filters, chart-choice persistence and failure/recovery journeys are verified. P4.4 makes the Dashboard an independent weather overview of all 83 destinations; it is implemented and awaiting Asier's review. Phase 5 quality acceptance is in progress (P5.1 and P5.2 merged); Phase 6 delivery remains pending. Source limitations remain documented.
+Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher (editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states) was approved and merged. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12: shared results, navigation, consistent All filters, chart-choice persistence and failure/recovery journeys are verified. P4.4 makes the Dashboard an independent weather overview of all 83 destinations; it was approved by Asier and merged in PR #15. Phase 5 quality acceptance is in progress (P5.1 and P5.2 merged); Phase 6 delivery remains pending. Source limitations remain documented.
 
 Searcher behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. The Dashboard is an independent weather overview: a map of all 83 destinations ranked by weather alone for its own next 1-5 days, with weather comparison and all-criteria charts. Every fresh successful weather fetch saves automatically.
 
@@ -120,7 +120,7 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 | tests/ | Offline diagnostic, configuration, model, storage, analytics, client, service, Searcher and Dashboard tests (fake HTTP and temporary files only); further component tests added with implementation |
 | scripts/verify_weather_access.py | Optional bounded live diagnostic, not the production service |
 | data/reference/ | Nine-column catalog, product defaults, provider overrides and source notes |
-| data/weather/ | Genuine timestamped responses and run summaries; normalized application CSV now contains 164 records across three cities |
+| data/weather/ | Genuine timestamped responses and run summaries; normalized application CSV contains 3,324 records across 82 destinations; Barcelona has no saved application records yet |
 | PHASE1_SETUP.md through PHASE6_DELIVERY.md | Owned tasks, dependencies and actual progress |
 | PROJECT_PHASES.md / TEAMROLES.MD | Navigation and whole-component ownership |
 | WEATHER_API_CONTRACT.md | Provider fields, requests and safe save/error rules |

@@ -43,3 +43,7 @@ request review, merge or submit without the relevant authorization.
 ## Next action
 
 After Phase 5, assemble the package, verify a clean clone and obtain the required publication/submission authorization.
+
+## P4.4 delivery dependency
+
+P6.1 must document the independent Spain Dashboard and the difference between its weather rank and Searcher's trip score. P6.2 must test both views from a clean clone, including the all-83 map before a Searcher run, without copying another user's credentials. P6.3 remains blocked until P4.4 and the affected P5.4/P5.5 checks are accepted; no delivery work is marked complete by this planning update.
