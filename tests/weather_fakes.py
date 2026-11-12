@@ -1,4 +1,5 @@
-"""Offline test doubles for P3.2. All weather values here are SYNTHETIC test inputs.
+"""Offline test doubles for P3.2. All weather values here are SYNTHETIC test
+inputs.
 
 Nothing in this module performs HTTP or writes to data/weather.
 """
@@ -35,14 +36,22 @@ class Clock:
 
 
 class FakeResponse:
-    def __init__(self, status: int = 200, payload: object = None, *, bad_json: bool = False) -> None:
+    def __init__(
+        self,
+        status: int = 200,
+        payload: object = None,
+        *,
+        bad_json: bool = False,
+    ) -> None:
         self.status_code = status
         self._payload = payload
         self._bad_json = bad_json
 
     def json(self) -> object:
         if self._bad_json:
-            raise requests.exceptions.JSONDecodeError("Expecting value", "<html>", 0)
+            raise requests.exceptions.JSONDecodeError(
+                "Expecting value", "<html>", 0
+            )
         return self._payload
 
 
@@ -56,9 +65,16 @@ class FakeSession:
 
     def get(self, url, *, params, timeout, allow_redirects):
         self.calls.append(
-            {"url": url, "params": dict(params), "timeout": timeout, "allow_redirects": allow_redirects}
+            {
+                "url": url,
+                "params": dict(params),
+                "timeout": timeout,
+                "allow_redirects": allow_redirects,
+            }
         )
-        answer = self.handler(url, params) if self.handler else self.answers.pop(0)
+        answer = (
+            self.handler(url, params) if self.handler else self.answers.pop(0)
+        )
         if isinstance(answer, Exception):
             raise answer
         return answer
@@ -67,13 +83,27 @@ class FakeSession:
         pass
 
 
-def make_client(session: FakeSession, clock: Clock | None = None, **options) -> OpenWeatherClient:
-    options.setdefault("rate_limiter", RateLimiter(max_calls=10_000, period_s=60))
+def make_client(
+    session: FakeSession, clock: Clock | None = None, **options
+) -> OpenWeatherClient:
+    options.setdefault(
+        "rate_limiter", RateLimiter(max_calls=10_000, period_s=60)
+    )
     options.setdefault("sleep", lambda seconds: None)
-    return OpenWeatherClient(DUMMY_KEY, session=session, clock=clock, **options)
+    return OpenWeatherClient(
+        DUMMY_KEY, session=session, clock=clock, **options
+    )
 
 
-def location(destination, *, name=None, provider_id=2510409, country="ES", lat=None, lon=None) -> dict:
+def location(
+    destination,
+    *,
+    name=None,
+    provider_id=2510409,
+    country="ES",
+    lat=None,
+    lon=None,
+) -> dict:
     return {
         "id": provider_id,
         "name": destination.city if name is None else name,
@@ -85,7 +115,9 @@ def location(destination, *, name=None, provider_id=2510409, country="ES", lat=N
     }
 
 
-def current_payload(destination, valid_at: datetime, **location_options) -> dict:
+def current_payload(
+    destination, valid_at: datetime, **location_options
+) -> dict:
     """Synthetic /weather body shaped like OpenWeatherMap's."""
     place = location(destination, **location_options)
     return {
@@ -101,7 +133,12 @@ def current_payload(destination, valid_at: datetime, **location_options) -> dict
     }
 
 
-def forecast_payload(destination, first_valid_at: datetime, periods: int = 40, **location_options) -> dict:
+def forecast_payload(
+    destination,
+    first_valid_at: datetime,
+    periods: int = 40,
+    **location_options,
+) -> dict:
     """Synthetic /forecast body with ``periods`` 3-hour entries."""
     items = []
     for index in range(periods):
@@ -115,11 +152,18 @@ def forecast_payload(destination, first_valid_at: datetime, periods: int = 40, *
                 "pop": 0.3,
             }
         )
-    return {"cod": "200", "cnt": periods, "list": items, "city": location(destination, **location_options)}
+    return {
+        "cod": "200",
+        "cnt": periods,
+        "list": items,
+        "city": location(destination, **location_options),
+    }
 
 
 def catalog_handler(clock: Clock, *, failures: dict | None = None):
-    """Answer like the provider for any catalog city; ``failures`` maps city_id -> status."""
+    """Answer like the provider for any catalog city; ``failures`` maps city_id
+    -> status.
+    """
     by_coordinates = {(d.latitude, d.longitude): d for d in CATALOG.values()}
     failures = failures or {}
 
@@ -127,13 +171,30 @@ def catalog_handler(clock: Clock, *, failures: dict | None = None):
         if "id" in params:
             destination, provider_id = LUGO, params["id"]
         else:
-            destination, provider_id = by_coordinates[(params["lat"], params["lon"])], 1000
+            destination, provider_id = (
+                by_coordinates[(params["lat"], params["lon"])],
+                1000,
+            )
         if destination.city_id in failures:
-            return FakeResponse(failures[destination.city_id], {"message": "synthetic failure"})
+            return FakeResponse(
+                failures[destination.city_id], {"message": "synthetic failure"}
+            )
         name = "Vitoria-Gasteiz" if destination is VITORIA else None
         if url.endswith("/weather"):
-            return FakeResponse(200, current_payload(destination, clock.now, provider_id=provider_id, name=name))
-        start = clock.now.replace(minute=0, second=0, microsecond=0) + timedelta(hours=3)
-        return FakeResponse(200, forecast_payload(destination, start, provider_id=provider_id, name=name))
+            return FakeResponse(
+                200,
+                current_payload(
+                    destination, clock.now, provider_id=provider_id, name=name
+                ),
+            )
+        start = clock.now.replace(
+            minute=0, second=0, microsecond=0
+        ) + timedelta(hours=3)
+        return FakeResponse(
+            200,
+            forecast_payload(
+                destination, start, provider_id=provider_id, name=name
+            ),
+        )
 
     return handle

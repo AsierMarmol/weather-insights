@@ -64,9 +64,20 @@ def prefs(**overrides):
     return SearchPreferences(**values)
 
 
-def record(city_id, valid_at, temp, pop, wind, *, fetch_id=None, retrieved=RUN_AT, kind="forecast"):
+def record(
+    city_id,
+    valid_at,
+    temp,
+    pop,
+    wind,
+    *,
+    fetch_id=None,
+    retrieved=RUN_AT,
+    kind="forecast",
+):
     return WeatherRecord(
-        fetch_id=fetch_id or FETCH.get(city_id, "00000000-0000-4000-8000-0000000000ff"),
+        fetch_id=fetch_id
+        or FETCH.get(city_id, "00000000-0000-4000-8000-0000000000ff"),
         city_id=city_id,
         kind=kind,
         retrieved_at_utc=retrieved,
@@ -95,7 +106,7 @@ def by_city(rows):
     return {row["city_id"]: row for row in rows}
 
 
-# --- worked example and the three analyses ---------------------------------------
+# --- worked example and the three analyses
 
 
 def test_worked_example_ranking_and_values(three):
@@ -106,15 +117,25 @@ def test_worked_example_ranking_and_values(three):
     toledo, segovia, seville = rows
 
     assert toledo["status"] == "available" and toledo["reason"] is None
-    assert (toledo["temperature_passes"], toledo["precipitation_passes"], toledo["wind_passes"]) == (3, 3, 3)
+    assert (
+        toledo["temperature_passes"],
+        toledo["precipitation_passes"],
+        toledo["wind_passes"],
+    ) == (3, 3, 3)
     assert toledo["weather_match_pct"] == 100
     assert toledo["travel_penalty"] == pytest.approx(61 / 60)
     assert toledo["final_score"] == pytest.approx(5939 / 60)
-    assert toledo["suitable_period_count"] == 3 and toledo["all_preferences_pct"] == 100
+    assert (
+        toledo["suitable_period_count"] == 3
+        and toledo["all_preferences_pct"] == 100
+    )
 
     assert segovia["weather_match_pct"] == pytest.approx(200 / 3)
     assert segovia["final_score"] == pytest.approx(785 / 12)
-    assert segovia["suitable_period_count"] == 0 and segovia["all_preferences_pct"] == 0
+    assert (
+        segovia["suitable_period_count"] == 0
+        and segovia["all_preferences_pct"] == 0
+    )
 
     assert seville["travel_penalty"] == 5  # 351 minutes capped at five
     assert seville["final_score"] == pytest.approx(185 / 3)
@@ -128,7 +149,9 @@ def test_worked_example_ranking_and_values(three):
 
 
 def test_weather_comparison_statistics(three):
-    rows = by_city(analyse_destinations(three, worked_forecasts(), prefs(), RUN_AT))
+    rows = by_city(
+        analyse_destinations(three, worked_forecasts(), prefs(), RUN_AT)
+    )
     assert rows[TOLEDO]["mean_temperature_c"] == pytest.approx(20)
     assert rows[TOLEDO]["max_precipitation_probability_pct"] == 30
     assert rows[TOLEDO]["max_wind_kmh"] == 25
@@ -138,8 +161,13 @@ def test_weather_comparison_statistics(three):
 
 
 def test_same_weather_match_different_simultaneous_suitability(three):
-    rows = by_city(analyse_destinations(three, worked_forecasts(), prefs(), RUN_AT))
-    assert rows[SEGOVIA]["weather_match_pct"] == rows[SEVILLE]["weather_match_pct"]
+    rows = by_city(
+        analyse_destinations(three, worked_forecasts(), prefs(), RUN_AT)
+    )
+    assert (
+        rows[SEGOVIA]["weather_match_pct"]
+        == rows[SEVILLE]["weather_match_pct"]
+    )
     assert rows[SEGOVIA]["all_preferences_pct"] == 0
     assert rows[SEVILLE]["all_preferences_pct"] == pytest.approx(200 / 3)
 
@@ -147,12 +175,18 @@ def test_same_weather_match_different_simultaneous_suitability(three):
 def test_bounds_are_inclusive_and_just_outside_fails(catalog):
     toledo = catalog[TOLEDO]
     edge = {TOLEDO: group(TOLEDO, [(16, 30, 25), (24, 30, 25), (24, 30, 25)])}
-    assert analyse_destinations([toledo], edge, prefs(), RUN_AT)[0]["weather_match_pct"] == 100
+    assert (
+        analyse_destinations([toledo], edge, prefs(), RUN_AT)[0][
+            "weather_match_pct"
+        ]
+        == 100
+    )
 
     outside = {TOLEDO: group(TOLEDO, [(15.9, 30.1, 25.1)] * 3)}
     row = analyse_destinations([toledo], outside, prefs(), RUN_AT)[0]
     assert row["status"] == "available"  # imperfect weather stays eligible
-    assert row["weather_match_pct"] == 0 and row["final_score"] == 0  # floored, not negative
+    # floored, not negative
+    assert row["weather_match_pct"] == 0 and row["final_score"] == 0
     assert row["suitable_period_count"] == 0
 
 
@@ -164,13 +198,15 @@ def test_records_outside_window_or_at_night_are_ignored(catalog):
         datetime(2026, 11, 12, 18, tzinfo=UTC),  # 19:00 Madrid, after daytime
         datetime(2026, 11, 13, 12, tzinfo=UTC),  # beyond the one-day window
     ]
-    records = group(TOLEDO, WORKED[TOLEDO]) + [record(TOLEDO, t, 40, 100, 90) for t in extra_times]
+    records = group(TOLEDO, WORKED[TOLEDO]) + [
+        record(TOLEDO, t, 40, 100, 90) for t in extra_times
+    ]
     row = analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0]
     assert row["evaluated_periods"] == 3 and row["weather_match_pct"] == 100
     assert row["max_wind_kmh"] == 25
 
 
-# --- time window and daytime coverage --------------------------------------------
+# --- time window and daytime coverage
 
 
 def test_expected_periods_for_one_and_five_days():
@@ -198,9 +234,11 @@ def test_daytime_follows_madrid_clock_change():
         datetime(2026, 10, 25, 12, tzinfo=UTC),
         datetime(2026, 10, 25, 15, tzinfo=UTC),  # 16:00 CET
         datetime(2026, 10, 26, 9, tzinfo=UTC),
-        datetime(2026, 10, 26, 12, tzinfo=UTC),  # window ends 12:00 UTC inclusive
+        # window ends 12:00 UTC inclusive
+        datetime(2026, 10, 26, 12, tzinfo=UTC),
     ]
-    # Summer: 06:00 UTC is 08:00 CEST (excluded), 15:00 UTC is 17:00 CEST (included).
+    # Summer: 06:00 UTC is 08:00 CEST (excluded), 15:00 UTC is 17:00 CEST
+    # (included).
     summer = expected_period_times(datetime(2026, 7, 1, 0, 30, tzinfo=UTC), 1)
     assert summer == [datetime(2026, 7, 1, h, tzinfo=UTC) for h in (9, 12, 15)]
 
@@ -220,26 +258,40 @@ def test_missing_fifth_day_period_is_unavailable(catalog):
     toledo = catalog[TOLEDO]
     times = expected_period_times(RUN_AT, 5)
     complete = [record(TOLEDO, t, 20, 0, 10) for t in times]
-    assert analyse_destinations([toledo], {TOLEDO: complete}, prefs(days=5), RUN_AT)[0][
-        "evaluated_periods"
-    ] == 15
+    assert (
+        analyse_destinations(
+            [toledo], {TOLEDO: complete}, prefs(days=5), RUN_AT
+        )[0]["evaluated_periods"]
+        == 15
+    )
 
-    dropped = [r for r in complete if r.valid_at_utc != datetime(2026, 11, 16, 12, tzinfo=UTC)]
-    row = analyse_destinations([toledo], {TOLEDO: dropped}, prefs(days=5), RUN_AT)[0]
+    dropped = [
+        r
+        for r in complete
+        if r.valid_at_utc != datetime(2026, 11, 16, 12, tzinfo=UTC)
+    ]
+    row = analyse_destinations(
+        [toledo], {TOLEDO: dropped}, prefs(days=5), RUN_AT
+    )[0]
     assert (row["status"], row["reason"]) == ("unavailable", "missing_periods")
     assert row["expected_periods"] == 15 and row["evaluated_periods"] == 0
 
 
-# --- unavailable states and precedence -------------------------------------------
+# --- unavailable states and precedence
 
 
 def test_unavailable_row_shape(three):
     forecasts = worked_forecasts()
-    forecasts[TOLEDO] = [r for r in forecasts[TOLEDO] if r.valid_at_utc != DAY_PERIODS[1]]
+    forecasts[TOLEDO] = [
+        r for r in forecasts[TOLEDO] if r.valid_at_utc != DAY_PERIODS[1]
+    ]
     rows = analyse_destinations(three, forecasts, prefs(), RUN_AT)
     assert [r["city_id"] for r in rows] == [SEGOVIA, SEVILLE, TOLEDO]
     toledo = rows[-1]
-    assert (toledo["status"], toledo["reason"]) == ("unavailable", "missing_periods")
+    assert (toledo["status"], toledo["reason"]) == (
+        "unavailable",
+        "missing_periods",
+    )
     assert toledo["expected_periods"] == 3 and toledo["evaluated_periods"] == 0
     assert toledo["forecast_retrieved_at_utc"] == "2026-11-11T18:30:00+00:00"
     for name in RESULT_FIELDS[8:]:
@@ -248,7 +300,9 @@ def test_unavailable_row_shape(three):
 
 def test_missing_probability_is_missing_metrics(catalog):
     records = group(TOLEDO, [(16, None, 25), (20, 0, 10), (24, 30, 25)])
-    row = analyse_destinations([catalog[TOLEDO]], {TOLEDO: records}, prefs(), RUN_AT)[0]
+    row = analyse_destinations(
+        [catalog[TOLEDO]], {TOLEDO: records}, prefs(), RUN_AT
+    )[0]
     assert row["reason"] == "missing_metrics" and row["final_score"] is None
 
 
@@ -267,42 +321,79 @@ def test_staleness_boundary(catalog):
 
     def reason(retrieved):
         records = group(TOLEDO, WORKED[TOLEDO], retrieved=retrieved)
-        return analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0]["reason"]
+        return analyse_destinations(
+            [toledo], {TOLEDO: records}, prefs(), RUN_AT
+        )[0]["reason"]
 
     assert reason(datetime(2026, 11, 11, 14, tzinfo=UTC)) == "stale_forecast"
     assert reason(RUN_AT - timedelta(hours=3)) is None  # equality is allowed
     assert reason(RUN_AT - timedelta(hours=3, seconds=1)) == "stale_forecast"
-    assert reason(RUN_AT + timedelta(minutes=2)) is None  # batch receipt after run_at
+    # batch receipt after run_at
+    assert reason(RUN_AT + timedelta(minutes=2)) is None
 
 
 @pytest.mark.parametrize(
     "mutate",
     [
-        pytest.param(lambda rs: [record(SEGOVIA, r.valid_at_utc, 20, 0, 10) for r in rs], id="other-city"),
         pytest.param(
-            lambda rs: rs[:2] + [record(TOLEDO, DAY_PERIODS[2], 20, 0, 10, fetch_id="00000000-0000-4000-8000-0000000000aa")],
+            lambda rs: [
+                record(SEGOVIA, r.valid_at_utc, 20, 0, 10) for r in rs
+            ],
+            id="other-city",
+        ),
+        pytest.param(
+            lambda rs: rs[:2]
+            + [
+                record(
+                    TOLEDO,
+                    DAY_PERIODS[2],
+                    20,
+                    0,
+                    10,
+                    fetch_id="00000000-0000-4000-8000-0000000000aa",
+                )
+            ],
             id="mixed-fetch",
         ),
         pytest.param(
-            lambda rs: rs[:2] + [record(TOLEDO, DAY_PERIODS[2], 20, 0, 10, retrieved=RUN_AT - timedelta(minutes=1))],
+            lambda rs: rs[:2]
+            + [
+                record(
+                    TOLEDO,
+                    DAY_PERIODS[2],
+                    20,
+                    0,
+                    10,
+                    retrieved=RUN_AT - timedelta(minutes=1),
+                )
+            ],
             id="mixed-retrieval",
         ),
         pytest.param(
-            lambda rs: [record(TOLEDO, r.valid_at_utc, 20, None, 10, kind="current") for r in rs],
+            lambda rs: [
+                record(TOLEDO, r.valid_at_utc, 20, None, 10, kind="current")
+                for r in rs
+            ],
             id="current-kind",
         ),
     ],
 )
 def test_identity_and_mixed_groups_are_invalid_data(catalog, mutate):
     records = mutate(group(TOLEDO, WORKED[TOLEDO]))
-    row = analyse_destinations([catalog[TOLEDO]], {TOLEDO: records}, prefs(), RUN_AT)[0]
+    row = analyse_destinations(
+        [catalog[TOLEDO]], {TOLEDO: records}, prefs(), RUN_AT
+    )[0]
     assert row["reason"] == "invalid_data"
     assert row["forecast_retrieved_at_utc"] is None
 
 
 def test_duplicate_valid_time_is_duplicate_periods(catalog):
-    records = group(TOLEDO, WORKED[TOLEDO]) + [record(TOLEDO, DAY_PERIODS[0], 18, 0, 10)]
-    row = analyse_destinations([catalog[TOLEDO]], {TOLEDO: records}, prefs(), RUN_AT)[0]
+    records = group(TOLEDO, WORKED[TOLEDO]) + [
+        record(TOLEDO, DAY_PERIODS[0], 18, 0, 10)
+    ]
+    row = analyse_destinations(
+        [catalog[TOLEDO]], {TOLEDO: records}, prefs(), RUN_AT
+    )[0]
     assert row["reason"] == "duplicate_periods"
 
 
@@ -314,70 +405,147 @@ def test_reason_precedence(catalog):
         record(TOLEDO, DAY_PERIODS[0], 20, None, 10, retrieved=stale),
         record(TOLEDO, DAY_PERIODS[0], 20, None, 10, retrieved=stale),
     ]
-    assert analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0]["reason"] == "stale_forecast"
+    assert (
+        analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0][
+            "reason"
+        ]
+        == "stale_forecast"
+    )
     # Duplicate beats missing period and missing metric.
     records = [record(TOLEDO, DAY_PERIODS[0], 20, None, 10)] * 2
-    assert analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0]["reason"] == "duplicate_periods"
+    assert (
+        analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0][
+            "reason"
+        ]
+        == "duplicate_periods"
+    )
     # Missing period beats missing metric.
     records = [record(TOLEDO, DAY_PERIODS[0], 20, None, 10)]
-    assert analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0]["reason"] == "missing_periods"
+    assert (
+        analyse_destinations([toledo], {TOLEDO: records}, prefs(), RUN_AT)[0][
+            "reason"
+        ]
+        == "missing_periods"
+    )
 
 
-# --- filters, ordering and inputs ------------------------------------------------
+# --- filters, ordering and inputs
 
 
 def test_activity_filter_matches_any(three):
     rows = analyse_destinations(
-        three, worked_forecasts(), prefs(activities=("History and heritage", "Coast")), RUN_AT
+        three,
+        worked_forecasts(),
+        prefs(activities=("History and heritage", "Coast")),
+        RUN_AT,
     )
     assert [r["city_id"] for r in rows] == [TOLEDO, SEVILLE]
 
 
 def test_size_filter_and_groups_combine_with_and(three):
     small = prefs(destination_sizes=("Small city or town",))
-    assert [r["city_id"] for r in analyse_destinations(three, worked_forecasts(), small, RUN_AT)] == [
+    assert [
+        r["city_id"]
+        for r in analyse_destinations(three, worked_forecasts(), small, RUN_AT)
+    ] == [
         TOLEDO,
         SEGOVIA,
     ]
-    both = prefs(destination_sizes=("Small city or town",), activities=("History and heritage",))
-    assert [r["city_id"] for r in analyse_destinations(three, worked_forecasts(), both, RUN_AT)] == [TOLEDO]
+    both = prefs(
+        destination_sizes=("Small city or town",),
+        activities=("History and heritage",),
+    )
+    assert [
+        r["city_id"]
+        for r in analyse_destinations(three, worked_forecasts(), both, RUN_AT)
+    ] == [TOLEDO]
 
 
 def test_filters_on_full_catalog(catalog):
     destinations = list(catalog.values())
-    assert len(analyse_destinations(destinations, {}, prefs(days=3), RUN_AT)) == 83
+    assert (
+        len(analyse_destinations(destinations, {}, prefs(days=3), RUN_AT))
+        == 83
+    )
     counts = {
-        size: sum(is_eligible(d, prefs(destination_sizes=(size,))) for d in destinations)
+        size: sum(
+            is_eligible(d, prefs(destination_sizes=(size,)))
+            for d in destinations
+        )
         for size in ("Large city", "Medium city", "Small city or town")
     }
-    assert counts == {"Large city": 14, "Medium city": 26, "Small city or town": 43}
+    assert counts == {
+        "Large city": 14,
+        "Medium city": 26,
+        "Small city or town": 43,
+    }
 
 
 def test_tie_breaking_order():
     rows = [
-        {"city_id": "ES-45168", "final_score": 95.0, "weather_match_pct": 100.0},
-        {"city_id": "ES-41091", "final_score": 95.0, "weather_match_pct": 100.0},
-        {"city_id": "ES-40194", "final_score": 95.0, "weather_match_pct": 100.0},
-        {"city_id": "ES-08019", "final_score": 97.0, "weather_match_pct": 100.0},
-        {"city_id": "ES-28079", "final_score": 95.0, "weather_match_pct": 99.0},
+        {
+            "city_id": "ES-45168",
+            "final_score": 95.0,
+            "weather_match_pct": 100.0,
+        },
+        {
+            "city_id": "ES-41091",
+            "final_score": 95.0,
+            "weather_match_pct": 100.0,
+        },
+        {
+            "city_id": "ES-40194",
+            "final_score": 95.0,
+            "weather_match_pct": 100.0,
+        },
+        {
+            "city_id": "ES-08019",
+            "final_score": 97.0,
+            "weather_match_pct": 100.0,
+        },
+        {
+            "city_id": "ES-28079",
+            "final_score": 95.0,
+            "weather_match_pct": 99.0,
+        },
     ]
-    minutes = {"ES-45168": 300, "ES-41091": 360, "ES-40194": 300, "ES-08019": 180, "ES-28079": 10}
+    minutes = {
+        "ES-45168": 300,
+        "ES-41091": 360,
+        "ES-40194": 300,
+        "ES-08019": 180,
+        "ES-28079": 10,
+    }
     ordered = sorted(rows, key=lambda r: ranking_key(r, minutes[r["city_id"]]))
-    assert [r["city_id"] for r in ordered] == ["ES-08019", "ES-40194", "ES-45168", "ES-41091", "ES-28079"]
+    assert [r["city_id"] for r in ordered] == [
+        "ES-08019",
+        "ES-40194",
+        "ES-45168",
+        "ES-41091",
+        "ES-28079",
+    ]
 
 
 def test_engine_breaks_equal_scores_by_drive_then_city_id(catalog):
     # Seville (351 min) and Barcelona-like long drives are both capped at 5,
     # so identical weather gives identical scores; then minutes, then city_id.
     long_drives = sorted(
-        (d for d in catalog.values() if d.car_duration_min >= 300), key=lambda d: d.city_id
+        (d for d in catalog.values() if d.car_duration_min >= 300),
+        key=lambda d: d.city_id,
     )[:2]
     toledo = catalog[TOLEDO]
     chosen = long_drives + [toledo]
-    forecasts = {d.city_id: group(d.city_id, [(20, 0, 10)] * 3, fetch_id=None) for d in chosen}
+    forecasts = {
+        d.city_id: group(d.city_id, [(20, 0, 10)] * 3, fetch_id=None)
+        for d in chosen
+    }
     rows = analyse_destinations(chosen, forecasts, prefs(), RUN_AT)
-    long_sorted = sorted(long_drives, key=lambda d: (d.car_duration_min, d.city_id))
-    assert [r["city_id"] for r in rows] == [TOLEDO] + [d.city_id for d in long_sorted]
+    long_sorted = sorted(
+        long_drives, key=lambda d: (d.car_duration_min, d.city_id)
+    )
+    assert [r["city_id"] for r in rows] == [TOLEDO] + [
+        d.city_id for d in long_sorted
+    ]
     assert rows[1]["final_score"] == rows[2]["final_score"] == 95
 
 
@@ -401,7 +569,9 @@ def test_rejects_invalid_preferences_and_inputs(three):
     with pytest.raises(ValueError, match="invalid_input"):
         analyse_destinations(three, worked_forecasts(), {"days": 1}, RUN_AT)
     with pytest.raises(ValueError, match="invalid_input"):
-        analyse_destinations(three + three[:1], worked_forecasts(), prefs(), RUN_AT)
+        analyse_destinations(
+            three + three[:1], worked_forecasts(), prefs(), RUN_AT
+        )
 
 
 def test_is_pure(three, monkeypatch):

@@ -22,7 +22,8 @@ _SEASONS = ("Winter", "Spring", "Summer", "Autumn")
 
 
 def get_api_key() -> str:
-    """Respect process environment precedence; never include a key in errors."""
+    """Respect process environment precedence; never include a key in errors.
+    """
     load_dotenv(ENV_FILE, override=False)
     key = os.getenv("OPENWEATHER_API_KEY", "").strip()
     if not key:
@@ -37,9 +38,13 @@ def _read_json(path: Path, label: str) -> dict:
     try:
         data = json.loads(Path(path).read_text(encoding="utf-8"))
     except OSError as error:
-        raise ValueError(f"Cannot read {label} ({Path(path).name}): {error.strerror}") from None
+        raise ValueError(
+            f"Cannot read {label} ({Path(path).name}): {error.strerror}"
+        ) from None
     except json.JSONDecodeError:
-        raise ValueError(f"{label} ({Path(path).name}) is not valid JSON") from None
+        raise ValueError(
+            f"{label} ({Path(path).name}) is not valid JSON"
+        ) from None
     if not isinstance(data, dict):
         raise ValueError(f"{label} must be a JSON object")
     return data
@@ -54,10 +59,12 @@ def _finite(value: object) -> bool:
 
 
 def load_product_defaults(path: Path = PRODUCT_DEFAULTS_FILE) -> dict:
-    """Load and validate the initial search settings from product_defaults.json.
+    """Load and validate the initial search settings from
+    product_defaults.json.
 
     These are editable starting preferences (P2.1), not climate data. The
-    returned dictionary is the file content unchanged; Searcher decides how to
+    returned dictionary is the file content unchanged; Searcher decides how
+    to
     initialize or reset user preferences from it.
     """
     data = _read_json(path, "Product defaults")
@@ -92,11 +99,16 @@ def _defaults_problem(data: dict) -> str | None:
         return "seasons must cover each month exactly once"
     rain = data.get("max_precipitation_probability_percent")
     if not _finite(rain) or not 0 <= rain <= 100:
-        return "max_precipitation_probability_percent must be between 0 and 100"
+        return (
+            "max_precipitation_probability_percent must be between 0 and 100"
+        )
     wind = data.get("max_wind_kmh")
     if not _finite(wind) or wind < 0:
         return "max_wind_kmh must be a non-negative number"
-    if data.get("default_activities") != "All" or data.get("default_destination_sizes") != "All":
+    if (
+        data.get("default_activities") != "All"
+        or data.get("default_destination_sizes") != "All"
+    ):
         return "activity and size filters must default to All"
     count = data.get("recommendation_count")
     if isinstance(count, bool) or not isinstance(count, int) or count < 1:
@@ -106,7 +118,9 @@ def _defaults_problem(data: dict) -> str | None:
     return None
 
 
-def load_location_overrides(path: Path = LOCATION_OVERRIDES_FILE) -> dict[str, dict]:
+def load_location_overrides(
+    path: Path = LOCATION_OVERRIDES_FILE,
+) -> dict[str, dict]:
     """Return provider overrides keyed by catalog city_id.
 
     Each entry may contain ``request_parameters`` (only a positive provider
@@ -116,19 +130,31 @@ def load_location_overrides(path: Path = LOCATION_OVERRIDES_FILE) -> dict[str, d
     data = _read_json(path, "Location overrides")
     locations = data.get("locations")
     if not isinstance(locations, dict):
-        raise ValueError("Location overrides must contain a 'locations' object")
+        raise ValueError(
+            "Location overrides must contain a 'locations' object"
+        )
     for city_id, entry in locations.items():
         if not isinstance(entry, dict):
             raise ValueError(f"Override for {city_id} must be an object")
         params = entry.get("request_parameters")
-        if params is not None and (set(params) != {"id"} or not _positive_int(params["id"])):
-            raise ValueError(f"Override for {city_id} may only request a positive city id")
+        if params is not None and (
+            set(params) != {"id"} or not _positive_int(params["id"])
+        ):
+            raise ValueError(
+                f"Override for {city_id} may only request a positive city id"
+            )
         expected = entry.get("expected_provider_id")
         if expected is not None and not _positive_int(expected):
-            raise ValueError(f"Override for {city_id} has an invalid expected_provider_id")
+            raise ValueError(
+                f"Override for {city_id} has an invalid expected_provider_id"
+            )
         names = entry.get("accepted_names", [])
-        if not isinstance(names, list) or not all(isinstance(n, str) and n.strip() for n in names):
-            raise ValueError(f"Override for {city_id} has invalid accepted_names")
+        if not isinstance(names, list) or not all(
+            isinstance(n, str) and n.strip() for n in names
+        ):
+            raise ValueError(
+                f"Override for {city_id} has invalid accepted_names"
+            )
     return locations
 
 

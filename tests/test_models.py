@@ -67,7 +67,7 @@ def record(**changes):
     return WeatherRecord(**values)
 
 
-# --- Destination ----------------------------------------------------------------
+# --- Destination
 
 
 def test_destination_normalizes_numbers_and_computes_drive_hours():
@@ -76,14 +76,23 @@ def test_destination_normalizes_numbers_and_computes_drive_hours():
     assert isinstance(destination.car_distance_km, float)
     assert destination.drive_hours == pytest.approx(61 / 60)
     assert str(destination) == "Toledo (Castilla-La Mancha)"
-    assert "ES-45168" in repr(destination) and "drive_hours=1.02" in repr(destination)
+    assert "ES-45168" in repr(destination) and "drive_hours=1.02" in repr(
+        destination
+    )
 
 
 def test_destination_catalog_row_uses_activity_list():
     row = toledo().as_catalog_row()
     assert list(row) == [
-        "city_id", "city", "region", "car_distance_km", "car_duration_min",
-        "latitude", "longitude", "activities", "destination_size",
+        "city_id",
+        "city",
+        "region",
+        "car_distance_km",
+        "car_duration_min",
+        "latitude",
+        "longitude",
+        "activities",
+        "destination_size",
     ]
     assert row["activities"] == ["History and heritage", "Food and gastronomy"]
 
@@ -118,7 +127,7 @@ def test_destination_rejects_invalid_values(changes):
         toledo(**changes)
 
 
-# --- SearchPreferences ------------------------------------------------------------
+# --- SearchPreferences
 
 
 def test_preferences_default_to_all_and_compute_horizon():
@@ -130,8 +139,12 @@ def test_preferences_default_to_all_and_compute_horizon():
 
 
 def test_preferences_accept_equal_temperature_bounds_and_limits():
-    prefs = preferences(temperature_min_c=20, temperature_max_c=20,
-                        max_precipitation_probability_pct=0, max_wind_kmh=0)
+    prefs = preferences(
+        temperature_min_c=20,
+        temperature_max_c=20,
+        max_precipitation_probability_pct=0,
+        max_wind_kmh=0,
+    )
     assert prefs.temperature_min_c == prefs.temperature_max_c == 20.0
 
 
@@ -156,7 +169,7 @@ def test_preferences_reject_invalid_values(changes):
         preferences(**changes)
 
 
-# --- WeatherRecord -------------------------------------------------------------------
+# --- WeatherRecord
 
 
 def test_record_normalizes_times_to_utc_and_keeps_them_separate():
@@ -172,7 +185,9 @@ def test_record_normalizes_times_to_utc_and_keeps_them_separate():
 
 
 def test_record_keeps_missing_metrics_as_none():
-    rec = record(temperature_c=None, wind_kmh=None, precipitation_probability_pct=None)
+    rec = record(
+        temperature_c=None, wind_kmh=None, precipitation_probability_pct=None
+    )
     assert rec.temperature_c is None and rec.wind_kmh is None
     assert "n/a" in str(rec)
 
@@ -190,8 +205,9 @@ def test_records_sort_chronologically_and_have_readable_text():
     later = record(valid_at_utc=datetime(2026, 11, 12, 15, tzinfo=UTC))
     earlier = record(valid_at_utc=datetime(2026, 11, 12, 9, tzinfo=UTC))
     assert sorted([later, earlier]) == [earlier, later]
-    assert str(earlier) == (
-        "forecast ES-45168 at 2026-11-12T09:00:00+00:00: 20 °C, "
+    assert (
+        str(earlier)
+        == "forecast ES-45168 at 2026-11-12T09:00:00+00:00: 20 °C, "
         "wind 10.548 km/h, rain probability 30 %"
     )
 
@@ -241,7 +257,11 @@ def test_current_observation_is_valid_before_retrieval():
 
 @pytest.mark.parametrize(
     "field, value",
-    [("valid_at_utc", "yesterday"), ("temperature_c", "warm"), ("provider_city_id", "x")],
+    [
+        ("valid_at_utc", "yesterday"),
+        ("temperature_c", "warm"),
+        ("provider_city_id", "x"),
+    ],
 )
 def test_from_csv_row_rejects_malformed_cells(field, value):
     row = record().to_csv_row()
@@ -257,7 +277,7 @@ def test_from_csv_row_rejects_naive_timestamps():
         WeatherRecord.from_csv_row(row)
 
 
-# --- schema version (regression: 1.0 used to be accepted and saved as "1.0") ---
+# --- schema version (regression: 1.0 used to be accepted and saved as "1.0")
 
 
 def test_integer_schema_version_serializes_and_parses():
@@ -268,7 +288,9 @@ def test_integer_schema_version_serializes_and_parses():
     assert WeatherRecord.from_csv_row(row) == rec
 
 
-@pytest.mark.parametrize("version", [1.0, True, False, "1", 0, 2, -1, None, 1.5])
+@pytest.mark.parametrize(
+    "version", [1.0, True, False, "1", 0, 2, -1, None, 1.5]
+)
 def test_schema_version_must_be_the_supported_integer(version):
     with pytest.raises(ValueError, match="schema_version"):
         record(schema_version=version)

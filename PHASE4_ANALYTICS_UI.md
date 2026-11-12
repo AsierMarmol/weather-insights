@@ -1,6 +1,6 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-Updated: 11 November 2026. **Not started.**
+Updated: 12 November 2026. **Not started.**
 
 ## Purpose and dependencies
 
@@ -42,4 +42,4 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-Build each complete view using the shared services; Asier connects the two and verifies the user journey.
+P2.5 verification has passed locally; Gabriel's review and Christian's multi-city analytical acceptance remain pending. After that gate, Asier builds P4.1 and Selin builds P4.2 using the shared services; Asier then connects the two in P4.3 and verifies the user journey. No view implementation is claimed complete.
