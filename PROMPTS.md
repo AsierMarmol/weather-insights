@@ -550,4 +550,4 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Human review:** Alejandra directed the work. Christian's review of this follow-up is pending; no approval is claimed.
 
-**Commit / PR:** Pending.
+**Commit / PR:** Commit ef74a86; [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8) into dev, review requested from Christian (christiansawaya-code); not merged.
