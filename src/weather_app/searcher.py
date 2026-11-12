@@ -30,8 +30,11 @@ MESSAGES = {
     ),
     "fetch_failed": "No usable forecast was returned.",
     "stale_forecast": "The forecast is too old for this search.",
-    "duplicate_periods": "The forecast contains conflicting periods.",
-    "missing_periods": "The forecast does not cover the full selected window.",
+    "duplicate_periods": "The forecast repeats a three-hour slot.",
+    "missing_periods": (
+        "The forecast does not cover every three-hour daytime slot in "
+        "the selected window."
+    ),
     "missing_metrics": "Required weather measurements are missing.",
 }
 WIDGETS = {
@@ -251,8 +254,8 @@ def ranking_table(rows, catalog, errors):
                 "All preferences (%)": row["all_preferences_pct"],
                 "Drive (min)": d.car_duration_min,
                 "Distance (km)": d.car_distance_km,
-                "Daytime periods": row["evaluated_periods"],
-                "Expected periods": row["expected_periods"],
+                "Daytime slots with data": row["evaluated_periods"],
+                "Daytime slots required": row["expected_periods"],
                 "Forecast retrieved (UTC)": row["forecast_retrieved_at_utc"],
             }
         )
@@ -278,7 +281,7 @@ def _render_results(catalog, current_preferences, defaults):
     st.subheader("Your results")
     st.caption(
         f"{start_label} → {end_label}. Madrid daytime: 09:00–18:00 "
-        "(18:00 excluded), using three-hour forecast periods."
+        "(18:00 excluded), checked in three-hour daytime forecast slots."
     )
     st.caption(
         f"Preferences: {searched.temperature_min_c:g}–"
@@ -339,7 +342,7 @@ def _render_results(catalog, current_preferences, defaults):
                 )
                 st.caption(
                     f"{row['evaluated_periods']}/{row['expected_periods']} "
-                    "daytime periods covered · "
+                    "three-hour daytime forecast slots with data · "
                     f"{row['travel_penalty']:.2f} driving penalty points"
                 )
     else:
@@ -364,14 +367,20 @@ def _render_results(catalog, current_preferences, defaults):
     )
     with st.expander("How the ranking works"):
         st.write(
-            "Each daytime period earns one point for temperature in your "
+            "Each three-hour daytime forecast slot earns one point for "
+            "temperature in your "
             "range, one for precipitation probability below your limit, and "
             "one for wind below your limit (boundaries included). Weather "
             "match is the percentage of checks passed. The trip score "
             "subtracts one point per driving hour, capped at five, with a "
             "minimum score of zero. All preferences met is the percentage "
-            "of periods passing all three checks together; it adds no "
+            "of slots passing all three checks together; it adds no "
             "extra points. Activities and size only filter destinations."
+        )
+        st.caption(
+            "A coverage of 9/9 means all nine required three-hour daytime "
+            "forecast slots (09:00-18:00 Madrid time) have data. It is not "
+            "nine days or nine hours of good weather."
         )
         st.caption(
             "Driving times are reference estimates from Madrid Km0, not "
