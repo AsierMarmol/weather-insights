@@ -4,7 +4,7 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup is complete. Phase 2 product rules, 83-city catalog, API contract and shared specification are prepared; peer/source reviews remain open. The application currently displays Searcher and Dashboard headings only. Domain models, catalog loading and the weather-record store (P3.1) and the pure analytics/ranking engine (P3.3) are reviewed and merged. The OpenWeatherMap client and request/save service (P3.2) are reviewed and merged, and the analytics engine reads their results, but they are not yet connected to the views; controls and charts remain pending.
+Phase 1 setup is complete. Phase 2 product rules, 83-city catalog, API contract and shared specification are prepared; the foundation was approved in PR #3; documented source limitations remain visible. P2.5's three-city save/readback/cache verification passed locally and awaits Gabriel review. The application currently displays Searcher and Dashboard headings only. Domain models, catalog loading and the weather-record store (P3.1) and the pure analytics/ranking engine (P3.3) are reviewed and merged. The OpenWeatherMap client and request/save service (P3.2) are reviewed and merged, and the analytics engine reads their results, but they are not yet connected to the views; controls and charts remain pending.
 
 Planned behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. Dashboard provides ranking, weather comparison and periods meeting all preferences, with at least two real-data charts. Every fresh successful weather fetch saves automatically.
 
@@ -30,14 +30,16 @@ Open a new terminal after installation so `uv` is available.
 Run these commands from a folder where you want to keep your clone:
 
 ```powershell
-git clone https://github.com/AsierMarmol/weather-insights.git
+git clone --branch dev https://github.com/AsierMarmol/weather-insights.git
 Set-Location -LiteralPath .\weather-insights
 uv sync --locked
 ```
 
+During development, clone `dev` to get the reviewed team version; work on your own feature branch before making changes. The final submission will use reviewed `main`.
+
 If you already have the project open, run only `uv sync --locked` from the directory containing `pyproject.toml` and `uv.lock`.
 
-This creates `.venv`, installs the local `weather-app` package and its dependencies, and includes the development tools such as pytest. `--locked` uses the checked-in dependency resolution and reports an error if it no longer matches `pyproject.toml`. Share `.python-version` and `uv.lock` with the team; each person creates their own `.venv`.
+This creates `.venv`, installs the local `weather-app` package and its dependencies, and includes the development tools pytest and Flake8. `--locked` uses the checked-in dependency resolution and reports an error if it no longer matches `pyproject.toml`. Share `.python-version` and `uv.lock` with the team; each person creates their own `.venv`.
 
 ## Configure your local API key
 
@@ -88,9 +90,10 @@ uv run --locked python --version
 uv pip check
 uv run --locked python -c "import weather_app; print('weather_app import OK')"
 uv run --locked python -m pytest -q
+uv run --locked flake8 src tests scripts app.py
 ```
 
-Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading, storage, the analytics engine, the API client and the request/save service (fake HTTP and temporary files only); application features remain pending. Synthetic tests do not write to the genuine weather dataset.
+Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading, storage, the analytics engine, the API client and the request/save service. Simulated requests and writes use fake HTTP and temporary files; genuine-data replay tests read fixed saved fetch groups without modifying them. Interactive application features remain pending. Synthetic tests do not write to the genuine weather dataset. Run Flake8 before committing; a successful run prints no findings. Keep Python lines within 79 characters and wrap long expressions, comments and docstrings rather than suppressing the checks.
 
 ## Troubleshooting
 
@@ -112,7 +115,7 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 | tests/ | Offline diagnostic, configuration, model, storage, analytics, client and service tests (fake HTTP and temporary files only); further component tests added with implementation |
 | scripts/verify_weather_access.py | Optional bounded live diagnostic, not the production service |
 | data/reference/ | Nine-column catalog, product defaults, provider overrides and source notes |
-| data/weather/ | Genuine timestamped responses and run summaries; normal application CSV comes with storage implementation |
+| data/weather/ | Genuine timestamped responses and run summaries; normalized application CSV now contains 164 records across three cities |
 | PHASE1_SETUP.md through PHASE6_DELIVERY.md | Owned tasks, dependencies and actual progress |
 | PROJECT_PHASES.md / TEAMROLES.MD | Navigation and whole-component ownership |
 | WEATHER_API_CONTRACT.md | Provider fields, requests and safe save/error rules |
@@ -127,8 +130,8 @@ Each member owns a complete implementation with tests/docs/fixes and makes genui
 
 ## Data and development
 
-Read the [catalog sources](data/reference/README.md), [saved-data record](data/weather/README.md), [API contract](WEATHER_API_CONTRACT.md) and [shared specification](PHASE2_SCOPE.md#p24-shared-data-and-calculation-specification). The CSV remains 83 destinations and nine fields; weather records are separate. Source/activity/access review is still pending. Genuine development weather must be retained and submitted; no scheduler or historical-trend chart is required.
+Read the [catalog sources](data/reference/README.md), [saved-data record](data/weather/README.md), [API contract](WEATHER_API_CONTRACT.md) and [shared specification](PHASE2_SCOPE.md#p24-shared-data-and-calculation-specification). The CSV remains 83 destinations and nine fields; weather records are separate. Christian approved the catalog foundation in PR #3; retain the source/access limitations described in its notes. Genuine development weather must be retained and submitted; no scheduler or historical-trend chart is required.
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: finish the Phase 2 reviews, build the three Phase 3 components, then have Asier verify their single fetch/save path in P2.5. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Gabriel reviews P2.5 and Christian checks the new multi-city analytical evidence; after acceptance, Asier and Selin build the Searcher and Dashboard. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.

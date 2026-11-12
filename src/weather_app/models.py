@@ -60,15 +60,19 @@ _OPTIONAL_METRICS = _FLOAT_FIELDS[2:]
 _CITY_ID = re.compile(r"ES-\d{5}")
 
 
-# --- shared validation helpers -------------------------------------------------
+# --- shared validation helpers
 
 
-def _number(name: str, value: object, *, optional: bool = False) -> float | None:
+def _number(
+    name: str, value: object, *, optional: bool = False
+) -> float | None:
     """Return a finite float, rejecting booleans, text and NaN/infinity."""
     if value is None and optional:
         return None
     if isinstance(value, bool) or not isinstance(value, (int, float)):
-        raise ValueError(f"{name} must be a number, got {type(value).__name__}")
+        raise ValueError(
+            f"{name} must be a number, got {type(value).__name__}"
+        )
     number = float(value)
     if not math.isfinite(number):
         raise ValueError(f"{name} must be finite")
@@ -102,7 +106,9 @@ def _utc(name: str, value: object) -> datetime:
     return value.astimezone(timezone.utc)
 
 
-def _choices(name: str, values: object, allowed: tuple[str, ...]) -> tuple[str, ...]:
+def _choices(
+    name: str, values: object, allowed: tuple[str, ...]
+) -> tuple[str, ...]:
     """Normalize a selection to a duplicate-free tuple of allowed labels."""
     if isinstance(values, str) or not isinstance(values, (tuple, list)):
         raise ValueError(f"{name} must be a tuple or list of labels")
@@ -117,7 +123,8 @@ def _choices(name: str, values: object, allowed: tuple[str, ...]) -> tuple[str, 
 
 
 def _set(instance: object, name: str, value: object) -> None:
-    # Frozen dataclasses normalize their own fields during __post_init__ this way.
+    # Frozen dataclasses normalize their own fields during __post_init__ this
+    # way.
     object.__setattr__(instance, name, value)
 
 
@@ -135,7 +142,7 @@ def parse_utc(name: str, text: str) -> datetime:
     return _utc(name, parsed)
 
 
-# --- models -------------------------------------------------------------------
+# --- models
 
 
 @dataclass(frozen=True, kw_only=True)
@@ -170,7 +177,9 @@ class Destination:
             raise ValueError("activities must contain at least one tag")
         _set(self, "activities", activities)
         if self.destination_size not in DESTINATION_SIZES:
-            raise ValueError(f"unknown destination_size {self.destination_size!r}")
+            raise ValueError(
+                f"unknown destination_size {self.destination_size!r}"
+            )
 
     @property
     def drive_hours(self) -> float:
@@ -206,15 +215,21 @@ class SearchPreferences:
     destination_sizes: tuple[str, ...] = ()
 
     def __post_init__(self) -> None:
-        if isinstance(self.days, bool) or self.days not in SUPPORTED_FORECAST_DAYS:
+        if (
+            isinstance(self.days, bool)
+            or self.days not in SUPPORTED_FORECAST_DAYS
+        ):
             raise ValueError("days must be a whole number from 1 to 5")
         _set(self, "days", int(self.days))
         low = _number("temperature_min_c", self.temperature_min_c)
         high = _number("temperature_max_c", self.temperature_max_c)
         if low > high:
-            raise ValueError("temperature_min_c must not exceed temperature_max_c")
+            raise ValueError(
+                "temperature_min_c must not exceed temperature_max_c"
+            )
         rain = _number(
-            "max_precipitation_probability_pct", self.max_precipitation_probability_pct
+            "max_precipitation_probability_pct",
+            self.max_precipitation_probability_pct,
         )
         _in_range("max_precipitation_probability_pct", rain, 0, 100)
         wind = _number("max_wind_kmh", self.max_wind_kmh)
@@ -224,11 +239,17 @@ class SearchPreferences:
         _set(self, "temperature_max_c", high)
         _set(self, "max_precipitation_probability_pct", rain)
         _set(self, "max_wind_kmh", wind)
-        _set(self, "activities", _choices("activities", self.activities, ACTIVITIES))
+        _set(
+            self,
+            "activities",
+            _choices("activities", self.activities, ACTIVITIES),
+        )
         _set(
             self,
             "destination_sizes",
-            _choices("destination_sizes", self.destination_sizes, DESTINATION_SIZES),
+            _choices(
+                "destination_sizes", self.destination_sizes, DESTINATION_SIZES
+            ),
         )
 
     @property
@@ -263,14 +284,17 @@ class WeatherRecord:
     provider_city_name: str
 
     def __post_init__(self) -> None:
-        # A genuine int only: 1.0 or True compare equal to 1 but would serialize
+        # A genuine int only: 1.0 or True compare equal to 1 but would
+        # serialize
         # as "1.0"/"True", which from_csv_row() could never read back.
         if (
             isinstance(self.schema_version, bool)
             or not isinstance(self.schema_version, int)
             or self.schema_version != SCHEMA_VERSION
         ):
-            raise ValueError(f"schema_version must be the integer {SCHEMA_VERSION}")
+            raise ValueError(
+                f"schema_version must be the integer {SCHEMA_VERSION}"
+            )
         try:
             fetch_id = str(uuid.UUID(_text("fetch_id", self.fetch_id)))
         except ValueError:
@@ -289,17 +313,30 @@ class WeatherRecord:
             _set(self, name, _number(name, getattr(self, name), optional=True))
         if self.wind_kmh is not None and self.wind_kmh < 0:
             raise ValueError("wind_kmh must not be negative")
-        for name in ("precipitation_probability_pct", "humidity_pct", "cloud_pct"):
+        for name in (
+            "precipitation_probability_pct",
+            "humidity_pct",
+            "cloud_pct",
+        ):
             _in_range(name, getattr(self, name), 0, 100)
-        if self.kind == "current" and self.precipitation_probability_pct is not None:
-            raise ValueError("current observations have no precipitation probability")
+        if (
+            self.kind == "current"
+            and self.precipitation_probability_pct is not None
+        ):
+            raise ValueError(
+                "current observations have no precipitation probability"
+            )
         if (
             isinstance(self.provider_city_id, bool)
             or not isinstance(self.provider_city_id, int)
             or self.provider_city_id <= 0
         ):
             raise ValueError("provider_city_id must be a positive integer")
-        _set(self, "provider_city_name", _text("provider_city_name", self.provider_city_name))
+        _set(
+            self,
+            "provider_city_name",
+            _text("provider_city_name", self.provider_city_name),
+        )
 
     @staticmethod
     def new_fetch_id() -> str:
@@ -308,16 +345,20 @@ class WeatherRecord:
 
     @property
     def key(self) -> tuple[str, str, str, datetime]:
-        """Identity used to make repeated saves of the same record idempotent."""
+        """Identity used to make repeated saves of the same record idempotent.
+        """
         return (self.fetch_id, self.city_id, self.kind, self.valid_at_utc)
 
     @property
     def lead_time(self) -> timedelta:
-        """How far ahead of retrieval this record is valid (negative for observations)."""
+        """How far ahead of retrieval this record is valid (negative for
+        observations).
+        """
         return self.valid_at_utc - self.retrieved_at_utc
 
     def to_csv_row(self) -> dict[str, str]:
-        """Serialize for CSV: ISO UTC times and blank cells for missing values."""
+        """Serialize for CSV: ISO UTC times and blank cells for missing values.
+        """
         row: dict[str, str] = {}
         for name in RECORD_FIELDS:
             value = getattr(self, name)
@@ -341,7 +382,9 @@ class WeatherRecord:
             values["schema_version"] = int(row["schema_version"])
             values["provider_city_id"] = int(row["provider_city_id"])
         except (TypeError, ValueError):
-            raise ValueError("schema_version and provider_city_id must be integers") from None
+            raise ValueError(
+                "schema_version and provider_city_id must be integers"
+            ) from None
         for name in ("fetch_id", "city_id", "kind", "provider_city_name"):
             values[name] = row[name]
         for name in _TIME_FIELDS:
@@ -361,7 +404,12 @@ class WeatherRecord:
         """Chronological order, so ``sorted(records)`` follows valid time."""
         if not isinstance(other, WeatherRecord):
             return NotImplemented
-        return (self.valid_at_utc, self.city_id, self.kind, self.retrieved_at_utc) < (
+        return (
+            self.valid_at_utc,
+            self.city_id,
+            self.kind,
+            self.retrieved_at_utc,
+        ) < (
             other.valid_at_utc,
             other.city_id,
             other.kind,
@@ -373,7 +421,8 @@ class WeatherRecord:
             return "n/a" if value is None else f"{value:g} {unit}"
 
         return (
-            f"{self.kind} {self.city_id} at {format_utc(self.valid_at_utc)}: "
-            f"{show(self.temperature_c, '°C')}, wind {show(self.wind_kmh, 'km/h')}, "
-            f"rain probability {show(self.precipitation_probability_pct, '%')}"
+            f"{self.kind} {self.city_id} at {format_utc(self.valid_at_utc)}:"
+            f" {show(self.temperature_c, '°C')}, wind"
+            f" {show(self.wind_kmh, 'km/h')}, rain probability"
+            f" {show(self.precipitation_probability_pct, '%')}"
         )

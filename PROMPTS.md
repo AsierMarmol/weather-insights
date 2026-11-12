@@ -551,3 +551,47 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Alejandra directed the work. Christian's review of this follow-up is pending; no approval is claimed.
 
 **Commit / PR:** Commit ef74a86; [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8) into dev, review requested from Christian (christiansawaya-code); not merged.
+
+
+---
+
+## Phase 2: P2.5 genuine multi-city fetch/save/readback verification (2026-11-12)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Complete P2.5 after merging the reviewed P3.1 fixes. Use the existing production service and storage to retrieve a small genuine multi-city sample, verify automatic timestamped saving, exact reload and cache reuse without duplicate rows, and update the affected phase records and next dependencies.
+
+**Got:** Six live current/forecast requests for Toledo, Segovia and Seville through `WeatherService.from_environment()` appended 123 genuine records to `data/weather/weather_records.csv` (164 total). Added five offline genuine-data replay cases to `tests/test_analytics_integration.py`, pinned to the recorded fetch IDs. Updated Phase 2 evidence, Phase 3/4 dependencies, phase navigation, application README and saved-data notes. Recorded existing PR #3 foundation approvals and merged PR #7/#8 status without inventing a new review. No production component was rewritten.
+
+**Checked:** Local UTC agreed with the independent clock check; all six HTTP responses were successful and provider Date checks were within 30 seconds. Existing records were preserved; all 164 keys are unique. Fresh records and latest groups reloaded exactly. Cache/restart checks blocked HTTP and made no requests; repeat saves and cache reads left the CSV unchanged, with no unsaved records. All three destinations cover all 1-5-day windows (3/6/9/12/15 daytime periods); service/store analysis agrees and independent arithmetic verifies scores, aggregates and simultaneous suitability. Full offline suite: **237 passed**. `git diff --check` passed. Credential and virtual-environment exclusions remain in place; the user's existing `.gitignore` bytes were preserved.
+
+**Kept / changed / rejected:** Kept the shared schema, actual service/store, all original genuine data and component ownership. Corrected the temporary verification harness to call keyword-only preferences properly and account for Git's Windows line endings when comparing the saved baseline; resumed against already fetched records without extra requests. The one-off harness stayed outside the repo; permanent tests replay the genuine dataset without network or writes. Historical JSONL import remains optional/deferred; no UI feature or final project acceptance is claimed.
+
+**Human review:** Pending. Gabriel reviews P2.5; Christian can review the resulting multi-city analytics evidence. Their earlier approvals cover their earlier PRs, not these new changes.
+
+**Follow-up validation:** At Asier's request, rechecked P2.5 against the instructor requirements and the current phase map before committing. 237 offline tests and both starter views passed; all genuine/reference data stayed unchanged. Lock/dependency, package build, Python syntax, catalog/store integrity, local file-link and configured-key exclusion checks passed. Corrected the development clone command to select dev and aligned stale catalog-review/test-description wording. No new live requests, production code changes or approval claims. Final interactive UI, clean-clone delivery and team walkthrough remain future phase work.
+
+**Commit / PR:** Asier authorized committing and publishing the P2.5 changes for review from `asier/feature` to `dev`. Gabriel is the P2.5 reviewer; Christian reviews the multi-city analytical evidence. Approval and merge remain pending.
+
+
+---
+
+## P2.5 pre-commit quality: resolve editor lint diagnostics (2026-11-12)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Resolve the Flake8 Problems shown in VS Code before committing P2.5. Check the rest of the project's Python files, preserve behavior and make the formatting check repeatable for the team.
+
+**Got:** Formatted 17 Python files across src, tests, the verification script and the app's comments. Wrapped long expressions, strings, comments and docstrings; corrected blank lines and continuation spacing. Added Flake8 to pyproject.toml's development group and uv.lock, and documented its command in README and Phase 5 acceptance. Recorded this follow-up in Phase 2.
+
+**Checked:** The editor's bundled Flake8 found 529 initial findings: 517 E501 line-length findings plus 12 blank-line/nested-definition spacing findings. Formatted isolated copies first. All 18 Python syntax trees match the working originals after normalizing only docstring whitespace; runtime string values and expressions are preserved. Both the editor checker on those copies and the shared project checker report zero findings. Full suite: 237 passed. Dependency lock, installed-package compatibility and git diff whitespace checks passed; the existing .gitignore hash remains unchanged.
+
+**Kept / changed / rejected:** Kept the default 79-character limit and existing behavior. Did not disable warnings or add noqa suppressions. Used isolated formatting tools without adding them as runtime dependencies; Flake8 is development-only. The previous validation checked behavior but missed lint; the README check now includes it. No live request or genuine-data edit was made during cleanup.
+
+**Human review:** Pending. This formatting follow-up accompanies the local P2.5 work; no teammate approval is claimed.
+
+**Commit / PR:** Included in the authorized P2.5 submission from `asier/feature` to `dev`; review and merge remain pending.

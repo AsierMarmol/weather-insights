@@ -2,13 +2,13 @@
 
 ## Current checkpoint
 
-Phase 1 is completed by Asier. Phase 2 product decisions, 83-city catalog, API rules and shared specification are prepared; peer/source reviews remain pending. Production components and Phases 3-6 are not complete. Local changes have not been published by this cleanup.
+Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 passed locally on three cities and awaits Gabriel review; Christian can review the new multi-city analytical evidence. Phases 4-6 remain pending. The P2.5 submission, including the formatting cleanup, awaits peer review before acceptance.
 
 | Phase | Outcome | Status |
 | --- | --- | --- |
 | [1 - Setup](PHASE1_SETUP.md) | Environment, package, credentials and GitHub collaboration | Completed; historical record retained |
-| [2 - Scope and data](PHASE2_SCOPE.md) | Product rules, catalog, API rules and shared specification | Prepared; review pending; P2.5 deferred integration check |
-| [3 - Core data](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Not started |
+| [2 - Scope and data](PHASE2_SCOPE.md) | Product rules, catalog, API rules and shared specification | Foundation reviewed; P2.5 verified, awaiting Gabriel review |
+| [3 - Core data](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Components merged; P2.5 review and multi-city acceptance pending |
 | [4 - Interface](PHASE4_ANALYTICS_UI.md) | Searcher, Dashboard and connected user journey | Not started |
 | [5 - Quality](PHASE5_QUALITY_REVIEW.md) | Integrated acceptance and rubric evidence | Not started |
 | [6 - Delivery](PHASE6_DELIVERY.md) | Documentation, clean-clone verification and submission | Not started |
@@ -29,4 +29,4 @@ Substantial AI assistance is recorded truthfully in [PROMPTS.md](PROMPTS.md); or
 
 ## Next action
 
-Finish the pending Phase 2 reviews and then begin the three complete core components. The rubric mapping is in Phase 2 and final acceptance is in Phase 5. Saved observations/forecasts must accumulate through normal use and be submitted; no continuous collection process or historical-trend chart is required.
+Gabriel reviews P2.5; Christian checks the new multi-city analytical evidence. After acceptance, Asier builds P4.1 Searcher and Selin builds P4.2 Dashboard. The rubric mapping is in Phase 2 and final acceptance is in Phase 5. Saved observations/forecasts must accumulate through normal use and be submitted; no continuous collection process or historical-trend chart is required.

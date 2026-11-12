@@ -28,7 +28,7 @@ import requests
 from weather_app.config import get_api_key, load_location_overrides
 from weather_app.models import Destination, WeatherRecord
 
-# --- errors -------------------------------------------------------------------
+# --- errors
 
 
 class APIError(Exception):
@@ -46,7 +46,8 @@ class APIError(Exception):
 
 
 class InvalidInputError(APIError, ValueError):
-    """The request was rejected before (or by) the provider as invalid input."""
+    """The request was rejected before (or by) the provider as invalid input.
+    """
 
     code = "invalid_input"
 
@@ -87,18 +88,21 @@ class ProviderError(APIError):
 
 
 class InvalidDataError(APIError):
-    """The response was received but cannot be trusted as the requested data."""
+    """The response was received but cannot be trusted as the requested data.
+    """
 
     code = "invalid_data"
 
 
-# --- request pacing -------------------------------------------------------------
+# --- request pacing
 
 
 class RateLimiter:
-    """Sliding-window cap shared by every request, including failures and retries.
+    """Sliding-window cap shared by every request, including failures and
+    retries.
 
-    ``wait()`` blocks until another call fits in the window. Holding the lock
+    ``wait()`` blocks until another call fits in the window. Holding the
+    lock
     while sleeping makes concurrent callers queue in order.
     """
 
@@ -110,7 +114,11 @@ class RateLimiter:
         clock: Callable[[], float] = time.monotonic,
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
-        if isinstance(max_calls, bool) or not isinstance(max_calls, int) or max_calls < 1:
+        if (
+            isinstance(max_calls, bool)
+            or not isinstance(max_calls, int)
+            or max_calls < 1
+        ):
             raise ValueError("max_calls must be a positive whole number")
         if not period_s > 0:
             raise ValueError("period_s must be positive")
@@ -122,7 +130,9 @@ class RateLimiter:
         self._lock = threading.Lock()
 
     def wait(self) -> float:
-        """Reserve one call slot and return how many seconds were spent waiting."""
+        """Reserve one call slot and return how many seconds were spent
+        waiting.
+        """
         with self._lock:
             waited = 0.0
             now = self._clock()
@@ -146,15 +156,18 @@ class RateLimiter:
 OPENWEATHER_RATE_LIMITER = RateLimiter(max_calls=40, period_s=60.0)
 
 
-# --- generic JSON API base ------------------------------------------------------
+# --- generic JSON API base
 
 
 class JSONAPIClient:
-    """Reusable base for JSON APIs that authenticate with a key query parameter.
+    """Reusable base for JSON APIs that authenticate with a key query
+    parameter.
 
     Public: ``base_url`` and ``request_count`` for callers and tests.
-    Protected: ``_get_json`` and ``_error_for_status`` for provider subclasses.
-    Private: the credential and its parameter name, name-mangled so a subclass
+    Protected: ``_get_json`` and ``_error_for_status`` for provider
+    subclasses.
+    Private: the credential and its parameter name, name-mangled so a
+    subclass
     cannot accidentally overwrite or log them.
     """
 
@@ -171,20 +184,31 @@ class JSONAPIClient:
         retry_delay_s: float = 2.0,
         sleep: Callable[[float], None] = time.sleep,
     ) -> None:
-        if not isinstance(base_url, str) or not base_url.startswith("https://"):
+        if not isinstance(base_url, str) or not base_url.startswith(
+            "https://"
+        ):
             raise ValueError("base_url must be an https:// URL")
         if not isinstance(api_key, str) or not api_key.strip():
             raise AuthenticationError("No API key was provided.")
-        if not isinstance(api_key_parameter, str) or not api_key_parameter.strip():
+        if (
+            not isinstance(api_key_parameter, str)
+            or not api_key_parameter.strip()
+        ):
             raise ValueError("api_key_parameter must be non-empty text")
-        if isinstance(max_retries, bool) or not isinstance(max_retries, int) or max_retries < 0:
+        if (
+            isinstance(max_retries, bool)
+            or not isinstance(max_retries, int)
+            or max_retries < 0
+        ):
             raise ValueError("max_retries must be a non-negative whole number")
         self.base_url = base_url.rstrip("/")
         self.__api_key = api_key.strip()
         self.__api_key_parameter = api_key_parameter
         self.__owns_session = session is None
         self._session = session if session is not None else requests.Session()
-        self._rate_limiter = rate_limiter if rate_limiter is not None else RateLimiter()
+        self._rate_limiter = (
+            rate_limiter if rate_limiter is not None else RateLimiter()
+        )
         self._timeout = timeout
         self._max_retries = max_retries
         self._retry_delay_s = retry_delay_s
@@ -193,12 +217,16 @@ class JSONAPIClient:
 
     @property
     def request_count(self) -> int:
-        """HTTP attempts sent by this client, including failed ones and retries."""
+        """HTTP attempts sent by this client, including failed ones and
+        retries.
+        """
         return self._request_count
 
     def __repr__(self) -> str:
         # The key is deliberately masked so logging a client never leaks it.
-        return f"{type(self).__name__}(base_url={self.base_url!r}, api_key='***')"
+        return (
+            f"{type(self).__name__}(base_url={self.base_url!r}, api_key='***')"
+        )
 
     def __enter__(self) -> JSONAPIClient:
         return self
@@ -217,12 +245,25 @@ class JSONAPIClient:
         Validates the request first, then makes at most ``1 + max_retries``
         paced attempts; only transient failures (network or 5xx) are retried.
         """
-        if not isinstance(path, str) or not path or path.startswith("/") or "://" in path:
-            raise InvalidInputError("The request path must be a relative endpoint name.")
-        if not isinstance(params, Mapping) or not all(isinstance(k, str) for k in params):
-            raise InvalidInputError("Request parameters must be a mapping with text names.")
+        if (
+            not isinstance(path, str)
+            or not path
+            or path.startswith("/")
+            or "://" in path
+        ):
+            raise InvalidInputError(
+                "The request path must be a relative endpoint name."
+            )
+        if not isinstance(params, Mapping) or not all(
+            isinstance(k, str) for k in params
+        ):
+            raise InvalidInputError(
+                "Request parameters must be a mapping with text names."
+            )
         if self.__api_key_parameter in params:
-            raise InvalidInputError("Request parameters must not supply the API key.")
+            raise InvalidInputError(
+                "Request parameters must not supply the API key."
+            )
         attempt = 0
         while True:
             try:
@@ -245,87 +286,139 @@ class JSONAPIClient:
                 allow_redirects=False,
             )
         except requests.Timeout:
-            raise NetworkError("The weather service did not respond in time.") from None
+            raise NetworkError(
+                "The weather service did not respond in time."
+            ) from None
         except requests.ConnectionError:
             raise NetworkError(
-                "Could not connect to the weather service. Check your internet connection."
+                "Could not connect to the weather service. Check your internet"
+                " connection."
             ) from None
         except requests.RequestException:
-            raise NetworkError("The weather request could not be completed.") from None
+            raise NetworkError(
+                "The weather request could not be completed."
+            ) from None
         if response.status_code != 200:
             raise self._error_for_status(response.status_code)
         try:
             payload = response.json()
         except ValueError:
-            raise InvalidDataError("The weather service returned a response that is not JSON.") from None
+            raise InvalidDataError(
+                "The weather service returned a response that is not JSON."
+            ) from None
         if not isinstance(payload, dict):
-            raise InvalidDataError("The weather service returned an unexpected response shape.")
+            raise InvalidDataError(
+                "The weather service returned an unexpected response shape."
+            )
         return payload
 
     def _error_for_status(self, status: int) -> APIError:
-        """Translate a non-200 status into a distinct safe error (subclasses may refine)."""
+        """Translate a non-200 status into a distinct safe error (subclasses
+        may refine).
+        """
         if status in (401, 403):
             return AuthenticationError(
-                "The API key was rejected (invalid, inactive or not authorized). "
-                "Check OPENWEATHER_API_KEY in your local variables.env."
+                "The API key was rejected (invalid, inactive or not"
+                " authorized). Check OPENWEATHER_API_KEY in your local"
+                " variables.env."
             )
         if status == 404:
-            return LocationNotFoundError("The provider could not find the requested location.")
+            return LocationNotFoundError(
+                "The provider could not find the requested location."
+            )
         if status == 429:
-            return RateLimitError("The provider's request limit was reached. Wait a minute and try again.")
+            return RateLimitError(
+                "The provider's request limit was reached. Wait a minute and"
+                " try again."
+            )
         if status == 400:
-            return InvalidInputError("The provider rejected the request parameters.")
+            return InvalidInputError(
+                "The provider rejected the request parameters."
+            )
         if 300 <= status < 400:
-            return ProviderError("The provider answered with a redirect, which was not followed.")
+            return ProviderError(
+                "The provider answered with a redirect, which was not"
+                " followed."
+            )
         if status >= 500:
             return ProviderError(
-                f"The weather service had a server error (HTTP {status}). Try again later.",
+                f"The weather service had a server error (HTTP {status}). Try"
+                " again later.",
                 transient=True,
             )
-        return ProviderError(f"The weather service answered with unexpected HTTP status {status}.")
+        return ProviderError(
+            "The weather service answered with unexpected HTTP status"
+            f" {status}."
+        )
 
 
-# --- OpenWeatherMap provider ------------------------------------------------------
+# --- OpenWeatherMap provider
 
 
 def _name_key(value: str) -> str:
-    """Compare names ignoring accents, punctuation and case (no invented aliases)."""
+    """Compare names ignoring accents, punctuation and case (no invented
+    aliases).
+    """
     plain = unicodedata.normalize("NFKD", value)
-    return "".join(c for c in plain.casefold() if c.isalnum() and not unicodedata.combining(c))
+    return "".join(
+        c
+        for c in plain.casefold()
+        if c.isalnum() and not unicodedata.combining(c)
+    )
 
 
 def _finite(value: object) -> bool:
-    return isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value)
+    return (
+        isinstance(value, (int, float))
+        and not isinstance(value, bool)
+        and math.isfinite(value)
+    )
 
 
 def _distance_km(lat1: float, lon1: float, lat2: float, lon2: float) -> float:
     phi1, phi2 = math.radians(lat1), math.radians(lat2)
     dphi, dlambda = phi2 - phi1, math.radians(lon2 - lon1)
-    a = math.sin(dphi / 2) ** 2 + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    a = (
+        math.sin(dphi / 2) ** 2
+        + math.cos(phi1) * math.cos(phi2) * math.sin(dlambda / 2) ** 2
+    )
     return 6371.0088 * 2 * math.asin(math.sqrt(min(1.0, max(0.0, a))))
 
 
 def _metric(
-    container: object, name: str, *, scale: float = 1.0, low: float | None = None, high: float | None = None
+    container: object,
+    name: str,
+    *,
+    scale: float = 1.0,
+    low: float | None = None,
+    high: float | None = None,
 ) -> float | None:
-    """Read one measurement; absent, malformed or out-of-range values become None."""
+    """Read one measurement; absent, malformed or out-of-range values become
+    None.
+    """
     if not isinstance(container, dict):
         return None
     value = container.get(name)
     if not _finite(value):
         return None
-    if (low is not None and value < low) or (high is not None and value > high):
+    if (low is not None and value < low) or (
+        high is not None and value > high
+    ):
         return None
     if scale == 1.0:
         return float(value)
-    # Remove binary noise from the unit conversion (0.3 * 100 is 30.000000000000004
-    # in floating point, which would wrongly fail a "<= 30 %" preference). Provider
+    # Remove binary noise from the unit conversion (0.3 * 100 is
+    # 30.000000000000004
+    # in floating point, which would wrongly fail a "<= 30 %" preference).
+    # Provider
     # values carry at most two decimals, so nine decimals lose no information.
     return round(float(value) * scale, 9)
 
 
 class OpenWeatherClient(JSONAPIClient):
-    """OpenWeatherMap current conditions and 5-day/3-hour forecast for catalog destinations."""
+    """OpenWeatherMap current conditions and 5-day/3-hour forecast for catalog
+    destinations.
+    """
 
     BASE_URL = "https://api.openweathermap.org/data/2.5"
     UNITS = "metric"
@@ -349,25 +442,40 @@ class OpenWeatherClient(JSONAPIClient):
             api_key=api_key,
             api_key_parameter="appid",
             session=session,
-            rate_limiter=rate_limiter if rate_limiter is not None else OPENWEATHER_RATE_LIMITER,
+            rate_limiter=(
+                rate_limiter
+                if rate_limiter is not None
+                else OPENWEATHER_RATE_LIMITER
+            ),
             **options,
         )
-        self._overrides = dict(load_location_overrides() if overrides is None else overrides)
-        self._clock = clock if clock is not None else (lambda: datetime.now(timezone.utc))
+        self._overrides = dict(
+            load_location_overrides() if overrides is None else overrides
+        )
+        self._clock = (
+            clock
+            if clock is not None
+            else (lambda: datetime.now(timezone.utc))
+        )
 
     @classmethod
     def from_environment(cls, **kwargs) -> OpenWeatherClient:
-        """Build a client with the local key; a missing key is an authentication error."""
+        """Build a client with the local key; a missing key is an
+        authentication error.
+        """
         try:
             key = get_api_key()
         except ValueError as error:
             raise AuthenticationError(str(error)) from None
         return cls(key, **kwargs)
 
-    # -- requests ----------------------------------------------------------------
+    # -- requests
 
-    def request_parameters(self, destination: Destination) -> dict[str, object]:
-        """The exact provider parameters (without the key) used for a destination.
+    def request_parameters(
+        self, destination: Destination
+    ) -> dict[str, object]:
+        """The exact provider parameters (without the key) used for a
+        destination.
 
         Catalog coordinates are used unless a documented override requests a
         verified provider city ID (Lugo). The service also uses these
@@ -378,24 +486,34 @@ class OpenWeatherClient(JSONAPIClient):
         if "request_parameters" in override:
             params: dict[str, object] = dict(override["request_parameters"])
         else:
-            params = {"lat": destination.latitude, "lon": destination.longitude}
+            params = {
+                "lat": destination.latitude,
+                "lon": destination.longitude,
+            }
         params["units"] = self.UNITS
         params["lang"] = self.LANGUAGE
         return params
 
     def current(self, destination: Destination) -> WeatherRecord:
-        """Fetch and map current conditions (one record; precipitation probability is None)."""
-        payload = self._get_json("weather", self.request_parameters(destination))
+        """Fetch and map current conditions (one record; precipitation
+        probability is None).
+        """
+        payload = self._get_json(
+            "weather", self.request_parameters(destination)
+        )
         retrieved_at = self._now()
         return self.map_current(destination, payload, retrieved_at)
 
     def forecast(self, destination: Destination) -> list[WeatherRecord]:
         """Fetch and map the full 3-hour forecast, ordered by valid time."""
-        payload = self._get_json("forecast", self.request_parameters(destination))
+        payload = self._get_json(
+            "forecast", self.request_parameters(destination)
+        )
         retrieved_at = self._now()
         return self.map_forecast(destination, payload, retrieved_at)
 
-    # -- mapping (also usable for deliberately importing retained raw responses) --
+    # -- mapping (also usable for deliberately importing retained raw
+    # responses) --
 
     def map_current(
         self,
@@ -405,10 +523,14 @@ class OpenWeatherClient(JSONAPIClient):
         *,
         fetch_id: str | None = None,
     ) -> WeatherRecord:
-        """Map a /weather response to a WeatherRecord after checking its location."""
+        """Map a /weather response to a WeatherRecord after checking its
+        location.
+        """
         self._require_destination(destination)
         if not isinstance(payload, dict):
-            raise InvalidDataError(f"{destination.city}: the response is not a JSON object.")
+            raise InvalidDataError(
+                f"{destination.city}: the response is not a JSON object."
+            )
         system = payload.get("sys")
         country = system.get("country") if isinstance(system, dict) else None
         provider_id, provider_name, lat, lon = self._check_location(
@@ -434,14 +556,20 @@ class OpenWeatherClient(JSONAPIClient):
         """Map a /forecast response to one fetch group of WeatherRecords."""
         self._require_destination(destination)
         if not isinstance(payload, dict):
-            raise InvalidDataError(f"{destination.city}: the response is not a JSON object.")
+            raise InvalidDataError(
+                f"{destination.city}: the response is not a JSON object."
+            )
         city = payload.get("city")
         if not isinstance(city, dict):
-            raise InvalidDataError(f"{destination.city}: the forecast has no location details.")
+            raise InvalidDataError(
+                f"{destination.city}: the forecast has no location details."
+            )
         provider = self._check_location(destination, city, city.get("country"))
         periods = payload.get("list")
         if not isinstance(periods, list) or not periods:
-            raise InvalidDataError(f"{destination.city}: the forecast contains no periods.")
+            raise InvalidDataError(
+                f"{destination.city}: the forecast contains no periods."
+            )
         fetch_id = fetch_id or WeatherRecord.new_fetch_id()
         records = [
             self._record(
@@ -455,10 +583,12 @@ class OpenWeatherClient(JSONAPIClient):
             for period in periods
         ]
         if len({record.valid_at_utc for record in records}) != len(records):
-            raise InvalidDataError(f"{destination.city}: the forecast repeats a forecast time.")
+            raise InvalidDataError(
+                f"{destination.city}: the forecast repeats a forecast time."
+            )
         return sorted(records)
 
-    # -- protected helpers ---------------------------------------------------------
+    # -- protected helpers
 
     def _now(self) -> datetime:
         return self._clock()
@@ -466,39 +596,68 @@ class OpenWeatherClient(JSONAPIClient):
     @staticmethod
     def _require_destination(destination: object) -> None:
         if not isinstance(destination, Destination):
-            raise InvalidInputError("A catalog Destination is required for a weather request.")
+            raise InvalidInputError(
+                "A catalog Destination is required for a weather request."
+            )
 
     def _check_location(
         self, destination: Destination, location: dict, country: object
     ) -> tuple[int, str, float, float]:
-        """Reject responses that do not plausibly describe the requested destination."""
+        """Reject responses that do not plausibly describe the requested
+        destination.
+        """
         place = destination.city
         provider_id = location.get("id")
         name = location.get("name")
         coord = location.get("coord")
         lat = coord.get("lat") if isinstance(coord, dict) else None
         lon = coord.get("lon") if isinstance(coord, dict) else None
-        if isinstance(provider_id, bool) or not isinstance(provider_id, int) or provider_id <= 0:
-            raise InvalidDataError(f"{place}: the response has no valid provider location id.")
+        if (
+            isinstance(provider_id, bool)
+            or not isinstance(provider_id, int)
+            or provider_id <= 0
+        ):
+            raise InvalidDataError(
+                f"{place}: the response has no valid provider location id."
+            )
         if not isinstance(name, str) or not name.strip():
-            raise InvalidDataError(f"{place}: the response has no location name.")
-        if not (_finite(lat) and _finite(lon) and -90 <= lat <= 90 and -180 <= lon <= 180):
-            raise InvalidDataError(f"{place}: the response has no valid coordinates.")
+            raise InvalidDataError(
+                f"{place}: the response has no location name."
+            )
+        if not (
+            _finite(lat)
+            and _finite(lon)
+            and -90 <= lat <= 90
+            and -180 <= lon <= 180
+        ):
+            raise InvalidDataError(
+                f"{place}: the response has no valid coordinates."
+            )
         if country != self.COUNTRY:
-            raise InvalidDataError(f"{place}: the provider returned a location outside Spain.")
+            raise InvalidDataError(
+                f"{place}: the provider returned a location outside Spain."
+            )
         override = self._overrides.get(destination.city_id, {})
         expected_id = override.get("expected_provider_id")
         if expected_id is not None and provider_id != expected_id:
-            raise InvalidDataError(f"{place}: the provider returned a different city id.")
-        accepted = {_name_key(place)} | {_name_key(n) for n in override.get("accepted_names", ())}
+            raise InvalidDataError(
+                f"{place}: the provider returned a different city id."
+            )
+        accepted = {_name_key(place)} | {
+            _name_key(n) for n in override.get("accepted_names", ())
+        }
         if _name_key(name) not in accepted:
             raise InvalidDataError(
-                f"{place}: the provider returned {name.strip()!r}, which does not match this destination."
+                f"{place}: the provider returned {name.strip()!r}, which does"
+                " not match this destination."
             )
-        distance = _distance_km(destination.latitude, destination.longitude, lat, lon)
+        distance = _distance_km(
+            destination.latitude, destination.longitude, lat, lon
+        )
         if distance > self.MAX_LOCATION_DISTANCE_KM:
             raise InvalidDataError(
-                f"{place}: the provider location is {distance:.0f} km from the catalog coordinates."
+                f"{place}: the provider location is {distance:.0f} km from the"
+                " catalog coordinates."
             )
         return provider_id, name.strip(), float(lat), float(lon)
 
@@ -513,14 +672,24 @@ class OpenWeatherClient(JSONAPIClient):
         provider: tuple[int, str, float, float],
     ) -> WeatherRecord:
         if not isinstance(item, dict):
-            raise InvalidDataError(f"{destination.city}: a {kind} entry is malformed.")
+            raise InvalidDataError(
+                f"{destination.city}: a {kind} entry is malformed."
+            )
         moment = item.get("dt")
-        if isinstance(moment, bool) or not isinstance(moment, int) or moment <= 0:
-            raise InvalidDataError(f"{destination.city}: a {kind} entry has no valid time.")
+        if (
+            isinstance(moment, bool)
+            or not isinstance(moment, int)
+            or moment <= 0
+        ):
+            raise InvalidDataError(
+                f"{destination.city}: a {kind} entry has no valid time."
+            )
         provider_id, provider_name, lat, lon = provider
         main, wind = item.get("main"), item.get("wind")
         probability = (
-            _metric(item, "pop", scale=100.0, low=0.0, high=1.0) if kind == "forecast" else None
+            _metric(item, "pop", scale=100.0, low=0.0, high=1.0)
+            if kind == "forecast"
+            else None
         )
         try:
             return WeatherRecord(
@@ -535,9 +704,13 @@ class OpenWeatherClient(JSONAPIClient):
                 wind_kmh=_metric(wind, "speed", scale=3.6, low=0.0),
                 precipitation_probability_pct=probability,
                 humidity_pct=_metric(main, "humidity", low=0.0, high=100.0),
-                cloud_pct=_metric(item.get("clouds"), "all", low=0.0, high=100.0),
+                cloud_pct=_metric(
+                    item.get("clouds"), "all", low=0.0, high=100.0
+                ),
                 provider_city_id=provider_id,
                 provider_city_name=provider_name,
             )
         except (ValueError, OverflowError, OSError):
-            raise InvalidDataError(f"{destination.city}: a {kind} entry could not be normalized.") from None
+            raise InvalidDataError(
+                f"{destination.city}: a {kind} entry could not be normalized."
+            ) from None
