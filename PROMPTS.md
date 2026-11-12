@@ -508,9 +508,9 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Kept / changed / rejected:** Kept the P2.4 entry points, result dictionary and error codes, the contract's TTLs, pacing and Lugo override, and P3.1's store unchanged. Reused the 10 km plausibility tolerance from the P2.3 verification instead of inventing a new threshold. Classified identity mismatches as `invalid_data` to match the analytics reason codes. Kept saving inside the service only; the client maps but never saves. Rejected silently dropping unsaved data: a storage failure returns no records, and the batch is kept in memory and saved before the next write. Did not import the retained JSONL into `weather_records.csv`; that remains a team decision.
 
-**Human review:** Gabriel directed the work and chose to start after P3.1 was merged, while Christian's P2.4 review is still outstanding. Alejandra's P3.2 review is pending; no approval is claimed.
+**Human review:** Gabriel directed the work and chose to start after P3.1 was merged, while Christian's P2.4 review is still outstanding. Alejandra (alemedinabarreto) resolved the documentation conflicts with P3.3, approved PR #6 and merged it into dev on 12 November 2026.
 
-**Commit / PR:** Pending.
+**Commit / PR:** Commit a34d380; [PR #6](https://github.com/AsierMarmol/weather-insights/pull/6), merged into dev as 0dec8a2.
 
 ---
 
@@ -677,4 +677,24 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Alejandra directed the work. Christian's review of P5.1 is pending; no approval is claimed.
 
 **Commit / PR:** Commit ac30f13, authorized by Alejandra; [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13) into dev, review requested from Christian (christiansawaya-code); not merged.
+
+---
+
+## Phase 5: P5.2 API/security/save acceptance (2026-11-12)
+
+**Requested by:** Gabriel Polan Barros Stec (Gabrielstec).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Treat the latest dev as the source of truth and complete P5.2: exercise input, key, location, network, server, quota and malformed responses, partial batches, cache saves and safe failure messages in the integrated app, fixing actual gaps.
+
+**Got:** Fast-forwarded `gabrielstec/feature` to dev `bfa3f36` (Phase 4 accepted; P5.1 in review). Added `tests/test_api_security_acceptance.py` (43 tests) driving the real app, service, client and store with fake HTTP and temporary files. Found one gap: a UTF-16 `variables.env` (Windows PowerShell 5 redirection or Notepad "Unicode") raised a raw `UnicodeDecodeError` or silently hid the key, and the app only reported a missing or rejected key. Fixed in `config.get_api_key()` (clear UTF-8 guidance; a shell key still wins) and a three-line change in `searcher.py` that shows the fixed setup guidance; added a README troubleshooting row. Corrected the stale P3.2 records (this file and the Phase 3 log) to show PR #6 approved and merged, and updated Phase 5 and README status.
+
+**Checked:** Baseline at `bfa3f36`: 333 passed, Flake8 zero findings. After: 376 passed, Flake8 zero findings. Against the `bfa3f36` sources (separate temporary worktree) 7 of the new tests fail, all on the key-file gap, and 36 pass. Genuine data files byte-identical after each app test; no live request was made.
+
+**Kept / changed / rejected:** Kept the client/service interfaces, error codes, cache rules and fixed UI messages. Rejected echoing provider or exception text in the UI. The `searcher.py` change touches Asier's P4.1 file and is limited to showing `config`'s fixed setup message for key errors.
+
+**Human review:** Gabriel directed the work. Alejandra's review of P5.2 is pending; no approval is claimed.
+
+**Commit / PR:** Pending.
 

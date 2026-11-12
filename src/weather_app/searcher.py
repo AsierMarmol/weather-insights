@@ -430,6 +430,9 @@ def render_searcher():
             )
         except APIError as error:
             st.error(MESSAGES.get(error.code, "Weather is unavailable."))
+            if error.code == "authentication":
+                # Fixed local setup guidance from config; never the key.
+                st.caption(error.message)
             st.info("Previous results, if shown, have not been refreshed.")
         except ValueError:
             st.error(
