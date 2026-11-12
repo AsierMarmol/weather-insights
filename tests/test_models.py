@@ -255,3 +255,33 @@ def test_from_csv_row_rejects_naive_timestamps():
     row["valid_at_utc"] = "2026-11-12T12:00:00"
     with pytest.raises(ValueError):
         WeatherRecord.from_csv_row(row)
+
+
+# --- schema version (regression: 1.0 used to be accepted and saved as "1.0") ---
+
+
+def test_integer_schema_version_serializes_and_parses():
+    rec = record(schema_version=1)
+    assert rec.schema_version == 1 and type(rec.schema_version) is int
+    row = rec.to_csv_row()
+    assert row["schema_version"] == "1"
+    assert WeatherRecord.from_csv_row(row) == rec
+
+
+@pytest.mark.parametrize("version", [1.0, True, False, "1", 0, 2, -1, None, 1.5])
+def test_schema_version_must_be_the_supported_integer(version):
+    with pytest.raises(ValueError, match="schema_version"):
+        record(schema_version=version)
+
+
+def test_schema_version_cannot_be_swapped_after_construction():
+    with pytest.raises(ValueError, match="schema_version"):
+        replace(record(), schema_version=1.0)
+
+
+@pytest.mark.parametrize("cell", ["1.0", "True", "", "2"])
+def test_from_csv_row_rejects_non_integer_or_unsupported_versions(cell):
+    row = record().to_csv_row()
+    row["schema_version"] = cell
+    with pytest.raises(ValueError):
+        WeatherRecord.from_csv_row(row)

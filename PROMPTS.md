@@ -468,9 +468,9 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Kept / changed / rejected:** Kept the P2.4 field names, CSV header, entry-point signatures and `None`-not-zero rule. Added `append()` returning the count of new rows, and explicit error classes for P3.2 to map to the `storage`/`invalid_data` codes. Rejected the earlier unpublished local prototype (single-snapshot OpenWeatherMap client, comfort index and collector) because it predates the agreed scope and overlaps Gabriel's P3.2; it remains on a separate local branch and is not part of this change. Deferred importing the retained JSONL evidence until P3.2 provides the provider mapping, so original retrieval times are preserved without a second mapping implementation.
 
-**Human review:** Alejandra directed the work and approved proceeding while Christian's P2.4/catalog review is outstanding. Christian's P3.1 review is pending; no approval is claimed.
+**Human review:** Alejandra directed the work and approved proceeding while Christian's P2.4/catalog review is outstanding. Christian (christiansawaya-code) approved and merged the change on 12 November 2026. His separate P2.4/catalog review is not recorded by this approval.
 
-**Commit / PR:** Pending.
+**Commit / PR:** Commit f467693; [PR #4](https://github.com/AsierMarmol/weather-insights/pull/4), merged into dev as 7ac93c1.
 
 ---
 
@@ -531,3 +531,23 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Christian directed the work. Selin's review of this integration is pending; no approval is claimed.
 
 **Commit / PR:** Pending.
+
+---
+
+## Phase 3: P3.1 validation follow-up - schema version and saved duplicate keys (2026-11-12)
+
+**Requested by:** Alejandra Medina (alemedinabarreto).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Make a focused correction to the merged P3.1 component, not a rewrite. Require a genuine integer schema version, because `WeatherRecord` accepted `1.0`, saved it as `"1.0"` and then failed on reload. Detect saved CSV rows that share a record key `(fetch_id, city_id, kind, valid_at_utc)` but have different values, so `load()`, `latest_forecast()` and `append()` cannot silently use an inconsistent file. Make the handling of identical duplicate rows explicit. Add temporary-file regression tests and keep the CSV schema and public interfaces unchanged.
+
+**Got:** `models.py`: `WeatherRecord` now rejects any schema version that is not the integer 1 (floats, booleans, strings, other versions) at construction, so invalid records cannot reach `append()`. `storage.py`: `_read_all()` tracks the first line of each record key and raises `StorageError` (naming both lines, city, kind, valid time and fetch ID) when a later row has different values. An exact repeat of an earlier row is returned once and the file is left unchanged. `append()` docstring updated. 15 new tests in `tests/test_models.py` and 10 in `tests/test_storage.py`.
+
+**Checked:** Synced `alejandra/feature` to dev `aa1688c` by fast-forward; baseline 207 passed. Targeted model/storage tests: 107 passed. Full offline suite: 232 passed. Running the new tests against the previous `models.py`/`storage.py` made 8 fail (float version, `replace()` to 1.0, conflicting saved rows, append to a conflicting file and the identical-duplicate case), confirming they detect the defects. An ad-hoc check showed `WeatherService.forecast()` on a conflicting store returns a `storage` error with no records and no HTTP call. The genuine `weather_records.csv` (41 rows, 41 unique keys) still loads. Tests use pytest temporary directories only; no live request was made and genuine data was not modified.
+
+**Kept / changed / rejected:** Kept the CSV header, record key, entry points and error classes used by the P3.2 service and P3.3 analytics. Chose to collapse exact duplicate rows on read rather than reject them, because they describe the same genuine record and appends are already idempotent. Rejected automatic repair or rewriting during reads; a conflicting file must be resolved manually, for example from Git history.
+
+**Human review:** Alejandra directed the work. Christian's review of this follow-up is pending; no approval is claimed.
+
+**Commit / PR:** Commit ef74a86; [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8) into dev, review requested from Christian (christiansawaya-code); not merged.

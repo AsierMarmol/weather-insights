@@ -23,7 +23,13 @@ import threading
 from collections.abc import Sequence
 from pathlib import Path
 
-from weather_app.models import RECORD_FIELDS, WEATHER_KINDS, Destination, WeatherRecord
+from weather_app.models import (
+    RECORD_FIELDS,
+    WEATHER_KINDS,
+    Destination,
+    WeatherRecord,
+    format_utc,
+)
 
 PROJECT_ROOT = Path(__file__).resolve().parents[2]
 CATALOG_PATH = PROJECT_ROOT / "data" / "reference" / "destinations.csv"
@@ -129,7 +135,8 @@ class WeatherStore:
 
         Saving the same records again (a retry) writes nothing. A record whose
         key already exists with different values is a conflict and raises
-        ``ValueError``; file problems raise ``StorageError``. The file is only
+        ``ValueError``; file problems, including a saved file that already
+        holds conflicting rows for one key, raise ``StorageError``. The file is only
         created when the first genuine records arrive.
         """
         records = list(records)
@@ -246,14 +253,30 @@ class WeatherStore:
         reader = csv.DictReader(io.StringIO(text, newline=""))
         if tuple(reader.fieldnames or ()) != RECORD_FIELDS:
             raise StorageError(f"{self._path.name} does not have the expected header")
-        records = []
+        # Duplicate keys are checked here so no caller (load, latest_forecast or
+        # append's idempotency check) can use an inconsistent file. A row that
+        # repeats an earlier row exactly is the same genuine record: it is
+        # returned once. A row with the same key but different values is a
+        # conflict: reading stops. The file itself is never modified here.
+        records: list[WeatherRecord] = []
+        first_line: dict[tuple, tuple[int, WeatherRecord]] = {}
         for row in reader:
+            line = reader.line_num
             try:
-                records.append(WeatherRecord.from_csv_row(row))
+                record = WeatherRecord.from_csv_row(row)
             except ValueError as error:
+                raise StorageError(f"{self._path.name} line {line}: {error}") from None
+            earlier = first_line.get(record.key)
+            if earlier is None:
+                first_line[record.key] = (line, record)
+                records.append(record)
+            elif earlier[1] != record:
                 raise StorageError(
-                    f"{self._path.name} line {reader.line_num}: {error}"
-                ) from None
+                    f"{self._path.name} line {line}: conflicting values for the record on "
+                    f"line {earlier[0]} ({record.city_id} {record.kind} valid at "
+                    f"{format_utc(record.valid_at_utc)}, fetch {record.fetch_id}); "
+                    "resolve the file manually before using it"
+                )
         return records
 
 
