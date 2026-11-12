@@ -474,6 +474,26 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 ---
 
+## Phase 3: P3.3 analytics and ranking engine (2026-11-12)
+
+**Requested by:** Christian Sawaya (christiansawaya-code).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Synchronize the personal branch with the latest dev, then implement the owned P3.3 deliverable from PHASE3_CORE_DATA.md against the P2.4 specification in PHASE2_SCOPE.md: a pure analytical engine covering the rolling daytime window, activity/size filters, weather checks, capped driving penalty, tie-breaking and unavailable states, with independently checked tests.
+
+**Got:** `src/weather_app/analytics.py`: `analyse_destinations(destinations, forecasts_by_city, preferences, run_at_utc)` returning the full ordered list of P2.4 result dictionaries (ranking, cross-city weather comparison and all-preferences periods as columns of one result), plus `expected_period_times`, `is_daytime`, `is_eligible` and `ranking_key`. It uses the shared P3.1 `Destination`, `SearchPreferences` and `WeatherRecord` models, requires an explicit UTC run time, and performs no network, file, credential, UI or clock access. `tests/test_analytics.py` with 30 offline tests.
+
+**Checked:** Baseline before changes: 107 offline tests passed and the starter app ran under AppTest. After changes: `uv run --locked python -m pytest -q` passed 137 tests. Expected answers in the tests are written by hand from PHASE2_SCOPE.md (Toledo 5939/60, Segovia 785/12, Seville 185/3; clock-change and five-day period lists). The tests cover inclusive bounds, out-of-window/night records, the 25 October 2026 clock change, the staleness boundary, identity/mixed-group, duplicate, missing-period and missing-metric reasons and their precedence, filters on the real 83-row catalog, ties, invalid inputs and no network use. Deliberately altered comparisons, the penalty cap, window end, staleness boundary and daytime bounds each made tests fail. The private handoff fixtures were compared optionally outside the repository and agree; they are not a repository or test dependency. No live request was made and no weather data was written.
+
+**Kept / changed / rejected:** Kept the P2.4 entry point, field names, reason codes and precedence, and unrounded ordering. Added small public helpers so the Searcher can show the forecast window and the daytime boundaries can be tested directly. Chose to ignore off-grid, night and out-of-window records rather than reject them, because a full provider forecast always contains them. Rejected the starter comfort-index idea and any new thresholds or weights as outside the agreed scoring rules.
+
+**Human review:** Christian directed the work. Selin (selin-atalar) approved PR #5 and merged it into dev on 12 November 2026. Genuine-data verification waits for Gabriel's P3.2 service and Asier's P2.5 check.
+
+**Commit / PR:** Commit fa1d552; [PR #5](https://github.com/AsierMarmol/weather-insights/pull/5), merged into dev as 46675ea.
+
+---
+
 ## Phase 3: P3.2 reusable API client and request/save service (2026-11-12)
 
 **Requested by:** Gabriel Polan Barros Stec (Gabrielstec).
