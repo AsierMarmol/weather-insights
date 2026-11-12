@@ -8,6 +8,7 @@ No test makes a live request or writes to data/.
 
 from __future__ import annotations
 
+import csv
 import json
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -31,6 +32,7 @@ from weather_app.client import AuthenticationError
 from weather_app.config import load_product_defaults
 from weather_app.dashboard import (
     ALL,
+    MAP_SCALE,
     NO_DATA_COLOUR,
     DashboardDataError,
     all_preferences_chart,
@@ -264,8 +266,13 @@ def test_map_shows_all_83_destinations_before_loading():
     assert sum(len(trace.lat) for trace in figure.data) == 83
     assert figure.data[1].marker.color == NO_DATA_COLOUR
     assert figure.data[1].name == "Weather not loaded"
-    # The map zooms to the catalog coordinates, all in mainland Spain.
-    assert figure.layout.geo.fitbounds == "locations"
+    # The map is centred on the middle of the catalog coordinates (all in
+    # mainland Spain), not on Plotly's fitbounds guess, which sat ~3° north.
+    geo = figure.layout.geo
+    assert geo.fitbounds in (None, False)
+    assert geo.center.lat == pytest.approx(39.834, abs=0.01)
+    assert geo.center.lon == pytest.approx(-2.938, abs=0.01)
+    assert geo.projection.scale == MAP_SCALE
     assert all(35.8 < p["latitude"] < 43.9 for p in points)
     assert all(-9.4 < p["longitude"] < 3.4 for p in points)
 
@@ -325,18 +332,23 @@ def test_weather_score_chart_uses_weather_rank_without_driving(frame):
     assert "no driving penalty" in figure.layout.xaxis.title.text
 
 
-@pytest.mark.parametrize("metric, values, unit", [
-    ("mean_temperature_c", [20.0, 65 / 3, 65 / 3], "°C"),
-    ("max_precipitation_probability_pct", [30.0, 31.0, 31.0], "%"),
-    ("max_wind_kmh", [25.0, 26.0, 26.0], "km/h"),
+@pytest.mark.parametrize("metric, values, unit, limit", [
+    ("mean_temperature_c", [20.0, 65 / 3, 65 / 3], "°C",
+     "(seasonal range 16-24 °C shaded)"),
+    ("max_precipitation_probability_pct", [30.0, 31.0, 31.0], "%",
+     "(limit 30% dashed)"),
+    ("max_wind_kmh", [25.0, 26.0, 26.0], "km/h", "(limit 25 km/h dashed)"),
 ])
 def test_comparison_chart_plots_metric_with_units(
-    frame, metric, values, unit
+    frame, metric, values, unit, limit
 ):
     figure = comparison_chart(frame, metric, PREFERENCES)
     assert list(figure.data[0].x) == pytest.approx(values)
     assert unit in figure.layout.xaxis.title.text
     assert figure.layout.shapes  # seasonal range or limit marked
+    # Named in the title, where no bar can hide it (P5.4 visual check).
+    assert figure.layout.title.text.endswith(limit)
+    assert not figure.layout.annotations
     with pytest.raises(ValueError):
         comparison_chart(frame, "humidity_pct")
 
@@ -418,8 +430,15 @@ def _markers(app):
     return found
 
 
-def _load(app):
-    app.button(key="dashboard_load").click().run()
+# A load over a store with thousands of rows is slow on some Windows PCs:
+# WeatherStore.latest_forecast re-reads the whole CSV for each of the 83
+# cities (storage-owner defect recorded in PHASE5 P5.3/P5.4). Those loads
+# get a longer AppTest limit so the test checks behaviour, not that cost.
+LARGE_STORE_TIMEOUT = 240
+
+
+def _load(app, timeout=None):
+    app.button(key="dashboard_load").click().run(timeout=timeout)
     assert not app.exception
 
 
@@ -440,6 +459,9 @@ def test_page_shows_map_and_criteria_without_any_request(page):
         app.info
     )
     assert len(_specs(app)) == 1  # the map only
+    # Page scrolling over the map must not zoom it away from Spain.
+    map_config = json.loads(app.get("plotly_chart")[0].proto.config)
+    assert map_config["scrollZoom"] is False
     assert not session.calls and not factory.called
     assert "search_analysis_rows" not in app.session_state
 
@@ -629,7 +651,7 @@ def test_old_forecasts_warn_and_refresh_fetches_again(page):
     clock.advance(hours=4)
     app.run()
     assert "over three hours ago" in _texts(app.warning)
-    _load(app)
+    _load(app, timeout=LARGE_STORE_TIMEOUT)  # store now holds 3,320 rows
     assert len(session.calls) == 166
     assert "over three hours ago" not in _texts(app.warning)
 
@@ -644,12 +666,36 @@ def test_summer_load_uses_summer_criteria(page):
     assert (used.temperature_min_c, used.temperature_max_c) == (22, 30)
 
 
+GENUINE_CSV = ROOT / "data/weather/weather_records.csv"
+
+
+def _genuine_lines(until):
+    """Header plus genuine CSV lines retrieved at or before ``until``."""
+    with GENUINE_CSV.open(newline="", encoding="utf-8") as file:
+        header, *rows = list(csv.reader(file))
+    when = header.index("retrieved_at_utc")
+    kept = [
+        row for row in rows
+        if datetime.fromisoformat(row[when]) <= until
+    ]
+    return header, kept
+
+
+def _write_csv(path, header, rows):
+    with path.open("w", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file, lineterminator="\n")
+        writer.writerow(header)
+        writer.writerows(rows)
+
+
 def test_genuine_saved_forecasts_rank_without_requests(page):
+    # Replay the P2.5 snapshot as it was at 11:34 UTC: only the 164 rows
+    # saved by then (a temporary copy), not the later 12:36 collection.
     app, service, session, clock, _ = page
-    service.store.path.write_bytes(
-        (ROOT / "data/weather/weather_records.csv").read_bytes()
-    )
     clock.now = datetime.fromisoformat("2026-11-12T11:34:00+00:00")
+    header, rows = _genuine_lines(clock.now)
+    assert len(rows) == 164
+    _write_csv(service.store.path, header, rows)
     _load(app)
     fetched = {
         (c["params"]["lat"], c["params"]["lon"])
@@ -668,3 +714,175 @@ def test_genuine_saved_forecasts_rank_without_requests(page):
         )
     hover = _markers(app)[SEVILLE.city_id][1]
     assert f"{rows[SEVILLE.city_id]['mean_temperature_c']:.1f} °C" in hover
+
+
+# ------------------------------------------------ P5.4 acceptance additions
+
+BARCELONA = "ES-08019"
+# Last response of the accumulated 82-destination collection (PR #16).
+SNAPSHOT = datetime.fromisoformat("2026-11-12T12:37:35.318886+00:00")
+
+
+def _independent_tally(rows, header, until, days=3):
+    """Weather score and mean temperature per city from the raw CSV text.
+
+    Uses the latest forecast group per city retrieved by ``until``. In
+    November Madrid daytime (09:00-18:00 CET) holds the 09/12/15 UTC
+    slots. No WeatherRecord, zoneinfo or analytics code is used.
+    """
+    col = {name: i for i, name in enumerate(header)}
+    groups = {}
+    for row in rows:
+        if row[col["kind"]] != "forecast":
+            continue
+        key = (row[col["city_id"]], row[col["fetch_id"]])
+        groups.setdefault(key, []).append(row)
+    latest = {}
+    for (city, _), group in groups.items():
+        retrieved = datetime.fromisoformat(group[0][col["retrieved_at_utc"]])
+        if city not in latest or retrieved > latest[city][0]:
+            latest[city] = (retrieved, group)
+    end = until + timedelta(hours=24 * days)
+    result = {}
+    for city, (_, group) in latest.items():
+        by_time = {
+            datetime.fromisoformat(r[col["valid_at_utc"]]): r for r in group
+        }
+        slots = [
+            t for t in sorted(by_time)
+            if until < t <= end and t.hour in (9, 12, 15)
+        ]
+        assert len(slots) == 3 * days, city
+        values = [
+            (float(by_time[t][col["temperature_c"]]),
+             float(by_time[t][col["precipitation_probability_pct"]]),
+             float(by_time[t][col["wind_kmh"]]))
+            for t in slots
+        ]
+        checks = sum(
+            (16 <= t <= 24) + (p <= 30) + (w <= 25) for t, p, w in values
+        )
+        result[city] = (
+            100 * checks / (3 * len(slots)),
+            sum(v[0] for v in values) / len(values),
+        )
+    return result
+
+
+def test_genuine_82_destination_snapshot_matches_independent_tally(page):
+    # A temporary copy of every genuine row, replayed at the time of the
+    # last saved response, so all 82 saved forecasts are fresh. Barcelona
+    # has no genuine forecast; its request fails, so nothing synthetic is
+    # ranked.
+    app, service, session, clock, _ = page
+    clock.now = SNAPSHOT
+    session.handler = varied_handler(clock, failures={BARCELONA: 404})
+    header, rows = _genuine_lines(SNAPSHOT)
+    _write_csv(service.store.path, header, rows)
+    _load(app, timeout=LARGE_STORE_TIMEOUT)
+
+    barcelona = CATALOG[BARCELONA]
+    assert [
+        (c["params"]["lat"], c["params"]["lon"]) for c in session.calls
+    ] == [(barcelona.latitude, barcelona.longitude)]
+    assert len(service.store.load()) == len(rows)  # nothing new saved
+    assert "82 of 83 destinations can be ranked" in _texts(app.markdown)
+
+    expected = _independent_tally(rows, header, SNAPSHOT)
+    assert len(expected) == 82 and BARCELONA not in expected
+    want_rank = {
+        city: 1 + sum(o[0] > score for o in expected.values())
+        for city, (score, _) in expected.items()
+    }
+    got = {
+        r["city_id"]: r
+        for r in app.session_state["dashboard_overview"]["rows"]
+    }
+    markers = _markers(app)
+    assert len(markers) == 83
+    for city, (score, mean_t) in expected.items():
+        assert got[city]["weather_match_pct"] == pytest.approx(score)
+        assert got[city]["mean_temperature_c"] == pytest.approx(mean_t)
+        name, hover, _, _ = markers[city]
+        assert name == "Weather score"
+        assert f"Average daytime temperature: {mean_t:.1f} °C" in hover
+        assert f"Weather rank: {want_rank[city]} of 82" in hover
+        assert f"Weather score: {score:.1f}%" in hover
+    name, hover, _, _ = markers[BARCELONA]
+    assert name == "No weather rank" and "°C" not in hover
+
+    # Ranking chart: weather rank, then city_id within ties.
+    order = sorted(expected, key=lambda c: (want_rank[c], c))
+    names = {r["city_id"]: r["city"] for r in CATALOG_ROWS}
+    weather = _specs(app)[1]["data"][0]
+    assert weather["y"] == [f"{want_rank[c]}. {names[c]}" for c in order]
+    assert weather["x"] == pytest.approx([expected[c][0] for c in order])
+
+
+def test_charts_agree_with_their_tables(page):
+    app, _, _, _, _ = page
+    _load(app)
+    _, weather, comparison, slots = _specs(app)
+    ranking, compared, all_three = (d.value for d in app.dataframe[:3])
+    labels = [
+        f"{r}. {n}"
+        for r, n in zip(ranking["Weather rank"], ranking["Destination"])
+    ]
+    assert weather["data"][0]["y"] == labels
+    assert weather["data"][0]["x"] == pytest.approx(
+        ranking["Weather score (%)"].tolist()
+    )
+    assert "no driving penalty" in weather["layout"]["xaxis"]["title"]["text"]
+    columns = {
+        "mean_temperature_c": "Average daytime temperature (°C)",
+        "max_precipitation_probability_pct": (
+            "Highest slot precipitation probability (%)"
+        ),
+        "max_wind_kmh": "Highest slot wind speed (km/h)",
+    }
+    for metric, column in columns.items():
+        app.radio(key="dashboard_metric").set_value(metric).run()
+        chart = _specs(app)[2]
+        assert chart["data"][0]["y"] == labels
+        assert chart["data"][0]["x"] == pytest.approx(
+            compared[column].tolist()
+        )
+        assert chart["layout"]["xaxis"]["title"]["text"] == column
+    assert slots["data"][0]["y"] == labels
+    assert slots["data"][0]["x"] == pytest.approx(
+        all_three["Share of slots (%)"].tolist()
+    )
+    assert slots["data"][0]["text"] == [
+        f"{k}/{n} slots"
+        for k, n in zip(
+            all_three["Slots meeting all three"],
+            all_three["Slots with data"],
+        )
+    ]
+    assert set(all_three["Slots with data"]) == {9}  # 3 days x 3 slots
+
+
+def test_empty_filter_states_keep_every_marker(page):
+    app, _, session, clock, _ = page
+    session.handler = varied_handler(clock, failures={SEGOVIA.city_id: 404})
+    _load(app)
+    app.multiselect(key="dashboard_destinations").select(
+        SEGOVIA.city_id
+    ).run()
+    assert "None of the selected destinations has a complete forecast" in (
+        _texts(app.info)
+    )
+    assert len(_specs(app)) == 1  # map only; no empty charts
+    assert app.dataframe[-1].value["Destination"].tolist() == ["Segovia"]
+    segovia_size = next(
+        r["destination_size"] for r in CATALOG_ROWS
+        if r["city_id"] == SEGOVIA.city_id
+    )
+    other = next(
+        r["destination_size"] for r in CATALOG_ROWS
+        if r["destination_size"] != segovia_size
+    )
+    app.multiselect(key="dashboard_sizes").select(other).run()
+    assert "No destinations match these filters" in _texts(app.warning)
+    assert sum(len(t["lat"]) for t in _specs(app)[0]["data"]) == 83
+    assert len(session.calls) == 83
