@@ -2,14 +2,14 @@
 
 ## Current checkpoint
 
-Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher is implemented locally and awaits Gabriel review; P4.2/P4.3 and Phases 5-6 remain pending.
+Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher was approved by Gabriel and merged in PR #10. P4.2 Dashboard is implemented and awaits Asier's review; P4.3 and Phases 5-6 remain pending.
 
 | Phase | Outcome | Status |
 | --- | --- | --- |
 | [1 - Setup](PHASE1_SETUP.md) | Environment, package, credentials and GitHub collaboration | Completed; historical record retained |
 | [2 - Scope and data](PHASE2_SCOPE.md) | Product rules, catalog, API rules and shared specification | Foundation and P2.5 approved/merged |
 | [3 - Core data](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Core accepted for Phase 4; final integration checks in Phase 5 |
-| [4 - Interface](PHASE4_ANALYTICS_UI.md) | Searcher, Dashboard and connected user journey | P4.1 implemented, awaiting review; P4.2/P4.3 pending |
+| [4 - Interface](PHASE4_ANALYTICS_UI.md) | Searcher, Dashboard and connected user journey | P4.1 merged (PR #10); P4.2 implemented, awaiting review; P4.3 pending |
 | [5 - Quality](PHASE5_QUALITY_REVIEW.md) | Integrated acceptance and rubric evidence | Not started |
 | [6 - Delivery](PHASE6_DELIVERY.md) | Documentation, clean-clone verification and submission | Not started |
 

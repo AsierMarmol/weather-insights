@@ -4,9 +4,9 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher is implemented locally and awaiting Gabriel review: editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states use the existing service and analytics. P4.2 Dashboard/charts and P4.3 integration remain pending. Source limitations remain documented.
+Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher (editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states) was approved and merged. P4.2 Dashboard (ranking, weather comparison and all-preferences charts over the same results) is implemented and awaiting review; P4.3 integration remains pending. Source limitations remain documented.
 
-Searcher behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. The planned Dashboard will provide ranking, weather comparison and periods meeting all preferences, with at least two real-data charts. Every fresh successful weather fetch saves automatically.
+Searcher behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. The Dashboard shows ranking, weather comparison and periods meeting all preferences as labeled charts and tables of the same search results. Every fresh successful weather fetch saves automatically.
 
 ## Requirements
 
@@ -85,7 +85,7 @@ In **Searcher**, choose the next 1-5 days, comfortable temperature range, maximu
 
 The top five recommendations and full ranking use identical scores. Unavailable cities have an explanation rather than a zero score. Results show their search window, preferences, forecast age and coverage. Editing controls does not fetch automatically; click Search again to update results. **Reset to seasonal defaults** resets preferences explicitly; normal reruns/navigation preserve your choices. Driving estimates are one-way from Madrid Km0 and do not include live traffic.
 
-**Dashboard** currently shows a P4.2 placeholder. Stop the app with **Ctrl + C** in its terminal.
+Open **Dashboard** after a search to compare the same results: the suitability ranking, a weather comparison (mean temperature, highest period precipitation probability or highest period wind) and the share of daytime periods meeting all your preferences. Destination, activity and size filters default to **All** and only narrow what is shown; they make no requests and do not change your search settings. Search again in Searcher to change days or preferences. Stop the app with **Ctrl + C** in its terminal.
 
 ## Verify the installation
 
@@ -97,7 +97,7 @@ uv run --locked python -m pytest -q
 uv run --locked flake8 src tests scripts app.py
 ```
 
-Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading, storage, the analytics engine, the API client and the request/save service. Simulated requests and writes use fake HTTP and temporary files; genuine-data replay tests read fixed saved fetch groups without modifying them. Searcher interaction tests use headless AppTest with fake HTTP/temp stores or a read-only historical replay; Dashboard and end-to-end integration remain pending. Synthetic tests do not write to the genuine weather dataset. Run Flake8 before committing; a successful run prints no findings. Keep Python lines within 79 characters and wrap long expressions, comments and docstrings rather than suppressing the checks.
+Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading, storage, the analytics engine, the API client and the request/save service. Simulated requests and writes use fake HTTP and temporary files; genuine-data replay tests read fixed saved fetch groups without modifying them. Searcher interaction tests use headless AppTest with fake HTTP/temp stores or a read-only historical replay; Dashboard tests use AppTest with synthetic rows, a read-only genuine replay and a fake-HTTP search-to-Dashboard journey; final end-to-end integration (P4.3) remains pending. Synthetic tests do not write to the genuine weather dataset. Run Flake8 before committing; a successful run prints no findings. Keep Python lines within 79 characters and wrap long expressions, comments and docstrings rather than suppressing the checks.
 
 ## Troubleshooting
 
@@ -114,9 +114,9 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 
 | Location | Purpose |
 | --- | --- |
-| app.py | Navigation and P4.1 Searcher entry point; Dashboard placeholder |
-| src/weather_app/ | Installable package: configuration (`config.py`), domain models (`models.py`), catalog/weather storage (`storage.py`), OpenWeather client (`client.py`), request/save service (`service.py`) analytics/ranking engine (`analytics.py`) and Searcher controls/presentation (`searcher.py`) |
-| tests/ | Offline diagnostic, configuration, model, storage, analytics, client and service tests (fake HTTP and temporary files only); further component tests added with implementation |
+| app.py | Navigation between the Searcher and Dashboard views |
+| src/weather_app/ | Installable package: configuration (`config.py`), domain models (`models.py`), catalog/weather storage (`storage.py`), OpenWeather client (`client.py`), request/save service (`service.py`) analytics/ranking engine (`analytics.py`), Searcher controls/presentation (`searcher.py`) and Dashboard views/charts (`dashboard.py`) |
+| tests/ | Offline diagnostic, configuration, model, storage, analytics, client, service, Searcher and Dashboard tests (fake HTTP and temporary files only); further component tests added with implementation |
 | scripts/verify_weather_access.py | Optional bounded live diagnostic, not the production service |
 | data/reference/ | Nine-column catalog, product defaults, provider overrides and source notes |
 | data/weather/ | Genuine timestamped responses and run summaries; normalized application CSV now contains 164 records across three cities |
@@ -138,4 +138,4 @@ Read the [catalog sources](data/reference/README.md), [saved-data record](data/w
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Gabriel reviews P4.1 Searcher; Selin builds P4.2 Dashboard, reviewed by Asier. P4.3 connects both accepted views. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Asier reviews P4.2 Dashboard, then P4.3 completes integration of both views. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
