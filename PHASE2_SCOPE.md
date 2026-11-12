@@ -4,15 +4,15 @@ Updated: 11 November 2026.
 
 ## Current checkpoint
 
-Phase 1 is complete. Product decisions are agreed; the 83-destination catalog, verified API rules and shared technical specification are prepared. Gabriel's specification/API review and Christian's catalog/specification review remain pending. Production models, storage, API service, analytics and UI features are not implemented.
+Phase 1 is complete. Product decisions are agreed; the 83-destination catalog, verified API rules and shared technical specification are prepared. Gabriel's P2.1/P2.3 review is complete (reported 12 November 2026); Christian's catalog/specification review remains pending. Production models, storage, API service, analytics and UI features are not implemented.
 
 ## Deliverables
 
 | Step | Deliverable | Owner | Reviewer | Depends on | Finish condition / status |
 | --- | --- | --- | --- | --- | --- |
-| P2.1 | Product specification and two-view outline | Asier | Gabriel | Phase 1 | Rules and rubric mapping below prepared; user decisions approved; peer review pending |
+| P2.1 | Product specification and two-view outline | Asier | Gabriel | Phase 1 | Rules and rubric mapping below prepared; user decisions approved; reviewed by Gabriel (12 November 2026) |
 | P2.2 | Complete destination catalog and sources | Asier | Christian | P2.1 | 83 rows/nine columns checked; source/activity/access review pending |
-| P2.3 | Weather access and provider contract | Asier | Gabriel | P2.1 | Historical live checks passed; WEATHER_API_CONTRACT.md prepared; peer review pending |
+| P2.3 | Weather access and provider contract | Asier | Gabriel | P2.1 | Historical live checks passed; WEATHER_API_CONTRACT.md prepared; reviewed by Gabriel (12 November 2026) |
 | P2.4 | Shared data and calculation specification | Asier | Christian | P2.1 + P2.2 + P2.3 | Schema, component inputs/outputs and worked example below prepared; review pending |
 | P2.5 | Verify the shared fetch/save/readback path | Asier | Gabriel | P3.1 + P3.2 | Pending: use the actual shared implementation with a small genuine sample; verify saving, reload and no cache duplicates |
 
@@ -126,6 +126,7 @@ approval or commit/push/merge without authorization.
 | 11 November 2026 | P2.2 | Asier/Codex prepared 83-city catalog; nine-column schema, categories, sizes and API-standard labels checked; corrected Lugo values already present | Source/activity/access and Christian review |
 | 11 November 2026 | P2.3 | Initial two-city and full-catalog access checks completed; failure diagnostics returned 401/404; saved real responses; later replay checked all five windows at original run time | Gabriel review; cleaned retained data described in data/weather/README.md |
 | 11 November 2026 | P2.4 | Shared schema, component boundaries, safe defaults, worked calculations and phase dependencies documented here; lazy credential loading and safe diagnostic failures verified with 25 offline tests; both starter views pass AppTest; no production model/store/engine claimed | Christian review and remaining P2.1-P2.3 reviews |
+| 12 November 2026 | P2.1, P2.3 review | Gabriel reported his review of the product specification and the provider contract as complete; no corrections were raised. | Done for Gabriel's part; Christian's P2.2/P2.4 review still pending |
 | Pending | P2.5 | No normalized fetch/save/readback integration check performed | Implement P3.1/P3.2, then Asier verifies the same shared path |
 
 ## Next action

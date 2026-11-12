@@ -488,6 +488,26 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Kept / changed / rejected:** Kept the P2.4 entry point, field names, reason codes and precedence, and unrounded ordering. Added small public helpers so the Searcher can show the forecast window and the daytime boundaries can be tested directly. Chose to ignore off-grid, night and out-of-window records rather than reject them, because a full provider forecast always contains them. Rejected the starter comfort-index idea and any new thresholds or weights as outside the agreed scoring rules.
 
-**Human review:** Christian directed the work. Selin's P3.3 review is pending; no approval is claimed. Genuine-data verification waits for Gabriel's P3.2 service and Asier's P2.5 check.
+**Human review:** Christian directed the work. Selin (selin-atalar) approved PR #5 and merged it into dev on 12 November 2026. Genuine-data verification waits for Gabriel's P3.2 service and Asier's P2.5 check.
+
+**Commit / PR:** Commit fa1d552; [PR #5](https://github.com/AsierMarmol/weather-insights/pull/5), merged into dev as 46675ea.
+
+---
+
+## Phase 3: P3.2 reusable API client and request/save service (2026-11-12)
+
+**Requested by:** Gabriel Polan Barros Stec (Gabrielstec).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Synchronize the personal branch with the latest dev, which now includes the reviewed P3.1 models and store, then implement the owned P3.2 deliverable from PHASE3_CORE_DATA.md against the P2.4 specification and WEATHER_API_CONTRACT.md: a generic JSON API base class, an OpenWeatherMap subclass, the request/cache/save service and configuration loaders, with tests and documentation. Also record Gabriel's completed P2.1/P2.3 review in the Phase 2 log.
+
+**Got:** `src/weather_app/client.py`: `JSONAPIClient` (key and key-parameter name held as name-mangled private attributes, masked `__repr__`, context manager, `request_count` property, protected `_get_json`/`_error_for_status`), a shared 40-calls/minute `RateLimiter`, `APIError` subclasses for each safe error code, and `OpenWeatherClient` (`request_parameters`, `current`, `forecast`, `map_current`, `map_forecast`, location checks, field mapping). `src/weather_app/service.py`: `WeatherService` with `current`, `forecast`, `forecast_many`, `retry_unsaved`, `clear_cache`, `unsaved_record_count` and `from_environment`. `src/weather_app/config.py`: `load_product_defaults()` and `load_location_overrides()` alongside the existing `get_api_key()`. Tests in `tests/test_client.py`, `tests/test_service.py`, `tests/test_config.py` and the offline doubles in `tests/weather_fakes.py`. Updates to PHASE3_CORE_DATA.md, PHASE2_SCOPE.md and README.md.
+
+**Checked:** Baseline after synchronizing to dev `7ac93c1`: 107 offline tests passed. After changes: `uv run --locked python -m pytest -q` passed 172 tests (65 new). Tests use fake HTTP sessions, synthetic weather payloads and the real `WeatherStore` in pytest temporary directories. They cover every status/network failure code, one retry for transient failures only, no key in messages/reprs/exception chains, pacing including retries, Lugo's city-ID request, unit conversion, None for missing values, identity rejection, save-once-then-cache, TTL boundaries, reuse after restart, storage failure and recovery, and batch skip/stop behavior over the whole 83-city catalog. A read-only replay of the 168 retained genuine responses mapped all of them (84 current, 3,360 forecast periods) and passed every location check without HTTP or file writes. The replay found no problem; writing the tests found a boundary defect in the conversion (0.3 x 100 = 30.000000000000004), which was fixed by rounding conversions to nine decimals. Bounded live check with Gabriel's local key: Toledo current and forecast through `WeatherService.from_environment()`. It made 2 HTTP requests with no errors and saved 41 genuine rows to the new `data/weather/weather_records.csv` (1 current, 40 forecast periods, one fetch_id). Readback matched, and repeat or restarted-service calls caused no HTTP and no new rows. Full-catalog live requests were not run.
+
+**Kept / changed / rejected:** Kept the P2.4 entry points, result dictionary and error codes, the contract's TTLs, pacing and Lugo override, and P3.1's store unchanged. Reused the 10 km plausibility tolerance from the P2.3 verification instead of inventing a new threshold. Classified identity mismatches as `invalid_data` to match the analytics reason codes. Kept saving inside the service only; the client maps but never saves. Rejected silently dropping unsaved data: a storage failure returns no records, and the batch is kept in memory and saved before the next write. Did not import the retained JSONL into `weather_records.csv`; that remains a team decision.
+
+**Human review:** Gabriel directed the work and chose to start after P3.1 was merged, while Christian's P2.4 review is still outstanding. Alejandra's P3.2 review is pending; no approval is claimed.
 
 **Commit / PR:** Pending.
