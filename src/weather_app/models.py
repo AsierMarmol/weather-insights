@@ -375,7 +375,8 @@ class WeatherRecord:
     @classmethod
     def from_csv_row(cls, row: dict[str, str]) -> WeatherRecord:
         """Rebuild a validated record from one CSV row."""
-        if set(row) != set(RECORD_FIELDS):
+        # A short row leaves None values; a long one adds a None key.
+        if set(row) != set(RECORD_FIELDS) or None in row.values():
             raise ValueError("row does not match the weather record columns")
         values: dict[str, object] = {}
         try:

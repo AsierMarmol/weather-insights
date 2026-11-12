@@ -1,6 +1,6 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-Updated: 12 November 2026. **In progress:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 implemented locally, awaiting Gabriel review.
+Updated: 12 November 2026. **In progress:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12).
 
 ## Purpose and dependencies
 
@@ -12,7 +12,7 @@ Deliver Searcher and Dashboard on the same data and calculations, then connect t
 | --- | --- | --- | --- | --- | --- | --- |
 | P4.1 | Complete Searcher | Asier | Gabriel | Phase 3 accepted incl. P2.5 | Editable seasonal preferences, rolling 1-5 days, All filters from catalog values, five leading results/full ranking, useful errors and tests. | Approved by Gabriel and merged into dev in PR #10 (12 November 2026) |
 | P4.2 | Complete Dashboard | Selin | Asier | Phase 3 accepted incl. P2.5 | Interactive ranking, weather comparison and simultaneous-preference metrics; at least two labeled real-data charts, missing states and tests. | Approved by Asier and merged into dev in PR #11 (12 November 2026) |
-| P4.3 | Integrate the app | Asier | Gabriel | P4.1 + P4.2 | Shared search state, navigation, data reuse, progress/freshness and partial errors verified end to end. | Implemented; 11 integration tests and 312 total tests pass; Gabriel review pending |
+| P4.3 | Integrate the app | Asier | Gabriel | P4.1 + P4.2 | Shared search state, navigation, data reuse, progress/freshness and partial errors verified end to end. | Approved by Gabriel and merged into dev in PR #12 (12 November 2026); 11 integration tests, 312 total tests pass |
 
 ## Implementation and acceptance
 
@@ -43,7 +43,7 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-Gabriel reviews P4.3 integration. After approval/merge, proceed to Phase 5 component acceptance and the complete rubric walkthrough. P4.1/P4.2 approvals do not imply P4.3 approval.
+Phase 4 is complete: P4.3 was approved by Gabriel and merged in PR #12. Proceed with Phase 5 component acceptance and the complete rubric walkthrough. P4.1/P4.2 approvals do not imply P4.3 approval.
 
 
 ### P4.1 implementation and state contract
