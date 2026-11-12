@@ -4,7 +4,7 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup is complete. Phase 2 product rules, 83-city catalog, API contract and shared specification are prepared; peer/source reviews remain open. The application currently displays Searcher and Dashboard headings only. Domain models, catalog loading and the weather-record store (P3.1) and the pure analytics/ranking engine (P3.3) are reviewed and merged. The OpenWeatherMap client and request/save service (P3.2) are implemented and awaiting review but not yet connected to the views; controls and charts remain pending.
+Phase 1 setup is complete. Phase 2 product rules, 83-city catalog, API contract and shared specification are prepared; peer/source reviews remain open. The application currently displays Searcher and Dashboard headings only. Domain models, catalog loading and the weather-record store (P3.1) and the pure analytics/ranking engine (P3.3) are reviewed and merged. The OpenWeatherMap client and request/save service (P3.2) are reviewed and merged, and the analytics engine reads their results, but they are not yet connected to the views; controls and charts remain pending.
 
 Planned behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. Dashboard provides ranking, weather comparison and periods meeting all preferences, with at least two real-data charts. Every fresh successful weather fetch saves automatically.
 

@@ -233,6 +233,24 @@ def _analyse_one(
     return row
 
 
+def forecasts_from_service(results: Mapping[str, Mapping]) -> dict[str, list[WeatherRecord]]:
+    """Turn ``WeatherService.forecast_many`` results into ``forecasts_by_city``.
+
+    A city whose result carries an error contributes no records, so the
+    engine reports it as ``fetch_failed``; the service's own error message
+    stays with the caller for display. Only saved or cached records reach
+    analysis, because the service returns no records after a failed save.
+    """
+    if not isinstance(results, Mapping):
+        raise ValueError("invalid_input: service results must be a mapping by city_id")
+    forecasts: dict[str, list[WeatherRecord]] = {}
+    for city_id, result in results.items():
+        if not isinstance(result, Mapping) or "records" not in result or "error" not in result:
+            raise ValueError("invalid_input: each service result needs records and error")
+        forecasts[city_id] = [] if result["error"] is not None else list(result["records"])
+    return forecasts
+
+
 def analyse_destinations(
     destinations: Sequence[Destination],
     forecasts_by_city: Mapping[str, Sequence[WeatherRecord]],

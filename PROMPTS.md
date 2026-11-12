@@ -511,3 +511,23 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Gabriel directed the work and chose to start after P3.1 was merged, while Christian's P2.4 review is still outstanding. Alejandra's P3.2 review is pending; no approval is claimed.
 
 **Commit / PR:** Pending.
+
+---
+
+## Phase 3: P3.3 integration with the API/save service and genuine data (2026-11-12)
+
+**Requested by:** Christian Sawaya (christiansawaya-code).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Synchronize with the latest dev after Gabriel's P3.2 merge, then complete the remaining P3.3 dependency work: connect the analytics engine to the actual `WeatherService`/`WeatherStore` and check it on genuine saved forecasts.
+
+**Got:** `forecasts_from_service()` in `src/weather_app/analytics.py`, which converts `WeatherService.forecast_many` results into the engine's `forecasts_by_city` input (errors give no records, so the city is `fetch_failed`). `tests/test_analytics_integration.py` with 5 tests: the real service with fake HTTP and a temporary store feeding the engine, cache reuse on rerun without new rows, save-and-reload equivalence for 1/3/5 days, adapter validation, and a read-only replay of the genuine Toledo forecast saved during the P3.2 live check.
+
+**Checked:** Full suite after changes: 207 passed. Expected answers are by hand: the synthetic service case from the fake payload (18/19/20 C, 30 %, 10.8 km/h; scores 100 - 61/60 and 100 - 75/60), and the genuine Toledo one-day case from the three saved CSV rows inside the window (passes 2/0/1, score 100/3 - 61/60, mean 16.4 C). Five days give 15 complete genuine periods, and the same forecast four hours later is stale. The genuine CSV is byte-for-byte unchanged by the tests. A first draft wrongly expected no HTTP on rerun; the service correctly retries the failed city, and the test now asserts that.
+
+**Kept / changed / rejected:** Kept the engine's interface unchanged and added only the adapter. Did not make a new live fetch: this machine's clock was about an hour off UTC, which would have saved wrong retrieval times. Did not import the retained JSONL evidence (a team decision noted in P3.2) and did not duplicate Asier's P2.5 verification.
+
+**Human review:** Christian directed the work. Selin's review of this integration is pending; no approval is claimed.
+
+**Commit / PR:** Pending.
