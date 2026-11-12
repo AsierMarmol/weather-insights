@@ -1,6 +1,6 @@
 # Phase 5 - Quality Review
 
-Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance completed locally, awaiting Christian's review; P5.2-P5.5 pending.
+Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance submitted in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13), awaiting Christian's review; P5.2-P5.5 pending.
 
 ## Purpose and dependencies
 
@@ -10,7 +10,7 @@ Verify the integrated app against the teacher rubric. Component tests already be
 
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| P5.1 | Model/storage acceptance | Alejandra | Christian | Phase 4 | Validate catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity. | Completed locally: three gaps fixed, 21 new tests, 333 total pass, Flake8 clean; awaiting Christian's review |
+| P5.1 | Model/storage acceptance | Alejandra | Christian | Phase 4 | Validate catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity. | Completed locally: three gaps fixed, 21 new tests, 333 total pass, Flake8 clean; commit ac30f13, [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); awaiting Christian's review |
 | P5.2 | API/security/save acceptance | Gabriel | Alejandra | Phase 4 | Exercise input/key/location/network/server/quota/malformed responses, partial batches, cache saves and safe failure messages. | Pending |
 | P5.3 | Analytical acceptance | Christian | Selin | Phase 4 | Verify all day windows, clock changes, threshold boundaries, missing/stale metrics, driving cap, ties and three distinct analyses. | Pending |
 | P5.4 | Dashboard/chart acceptance | Selin | Asier | Phase 4 | Validate plotted inputs, units, interactive filters and empty/unavailable states against common results. | Pending |
@@ -63,5 +63,5 @@ The new regression tests failed against the dev `27e088e` sources (permissions, 
 
 Limitations: one writing process per clone remains the supported model (the lock is per process). A weather CSV saved with a byte-order mark (for example by a spreadsheet program) is reported as having an unexpected header and is not modified; it must be restored from Git. Permission checks are skipped on Windows. Importing the retained historical JSONL evidence remains deferred.
 
-**Status:** completed locally, awaiting Christian's review. No commit, push or PR yet.
+**Status:** committed (ac30f13) and submitted in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13) into dev; review requested from Christian (christiansawaya-code). Not approved or merged.
 

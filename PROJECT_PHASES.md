@@ -2,7 +2,7 @@
 
 ## Current checkpoint
 
-Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher was approved by Gabriel and merged in PR #10. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12. Phase 5 is in progress (P5.1 completed locally, awaiting Christian's review); Phase 6 remains pending.
+Phase 1 is completed by Asier. Phase 2 foundations were reviewed in PR #3. Core models/storage, API/service and analytics are reviewed and merged through PR #8. P2.5 was approved by Gabriel and Christian and merged in PR #9. P4.1 Searcher was approved by Gabriel and merged in PR #10. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12. Phase 5 is in progress (P5.1 submitted in PR #13, awaiting Christian's review); Phase 6 remains pending.
 
 | Phase | Outcome | Status |
 | --- | --- | --- |
