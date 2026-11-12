@@ -24,6 +24,9 @@ _SEASONS = ("Winter", "Spring", "Summer", "Autumn")
 def get_api_key() -> str:
     """Respect process environment precedence; never include a key in errors.
     """
+    key = os.getenv("OPENWEATHER_API_KEY", "").strip()
+    if key:
+        return key
     try:
         # For example Windows PowerShell 5 "echo ... > file" writes UTF-16,
         # which is not UTF-8 or, without a byte-order mark, decodes to text
@@ -32,11 +35,14 @@ def get_api_key() -> str:
             raise UnicodeDecodeError("utf-8", b"", 0, 1, "NUL byte")
         load_dotenv(ENV_FILE, override=False, encoding="utf-8")
     except UnicodeDecodeError:
-        if not os.getenv("OPENWEATHER_API_KEY", "").strip():
-            raise ValueError(
-                f"{ENV_FILE.name} is not UTF-8 text. Save it again as UTF-8 "
-                "(in Notepad: Save As > Encoding > UTF-8)."
-            ) from None
+        raise ValueError(
+            f"{ENV_FILE.name} is not UTF-8 text. Save it again as UTF-8 "
+            "(in Notepad: Save As > Encoding > UTF-8)."
+        ) from None
+    except OSError:
+        raise ValueError(
+            f"Cannot read {ENV_FILE.name}. Check its file permissions."
+        ) from None
     key = os.getenv("OPENWEATHER_API_KEY", "").strip()
     if not key:
         raise ValueError(
@@ -90,7 +96,10 @@ def _defaults_problem(data: dict) -> str | None:
     days = data.get("supported_forecast_days")
     if days != [1, 2, 3, 4, 5]:
         return "supported_forecast_days must be [1, 2, 3, 4, 5]"
-    if data.get("default_forecast_days") not in days:
+    if (
+        not _positive_int(data.get("default_forecast_days"))
+        or data["default_forecast_days"] not in days
+    ):
         return "default_forecast_days must be one of the supported days"
     seasons = data.get("seasonal_temperature_c")
     if not isinstance(seasons, dict) or set(seasons) != set(_SEASONS):
@@ -104,8 +113,10 @@ def _defaults_problem(data: dict) -> str | None:
         if not (_finite(low) and _finite(high)) or low > high:
             return f"{name} needs finite min <= max temperatures"
         season_months = season.get("months")
-        if not isinstance(season_months, list):
-            return f"{name} months must be a list"
+        if not isinstance(season_months, list) or not all(
+            _positive_int(month) and month <= 12 for month in season_months
+        ):
+            return f"{name} months must be integers from 1 to 12"
         months.extend(season_months)
     if sorted(months) != list(range(1, 13)):
         return "seasons must cover each month exactly once"
@@ -150,7 +161,9 @@ def load_location_overrides(
             raise ValueError(f"Override for {city_id} must be an object")
         params = entry.get("request_parameters")
         if params is not None and (
-            set(params) != {"id"} or not _positive_int(params["id"])
+            not isinstance(params, dict)
+            or set(params) != {"id"}
+            or not _positive_int(params["id"])
         ):
             raise ValueError(
                 f"Override for {city_id} may only request a positive city id"

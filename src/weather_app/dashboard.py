@@ -480,9 +480,8 @@ def map_figure(
         showlakes=False,
     )
     figure.update_layout(
-        title="Mainland Spain destinations by weather score",
         height=560,
-        margin={"l": 0, "r": 0, "t": 50, "b": 0},
+        margin={"l": 0, "r": 0, "t": 35, "b": 0},
         legend={"orientation": "h", "y": -0.02},
     )
     return figure
@@ -751,6 +750,14 @@ def _render_status(overview, frame, next_preferences, total) -> None:
         "Europe/Madrid (18:00 excluded)."
     )
     st.caption(f"Criteria used: {_criteria(used)}. All activities and sizes.")
+    if searcher.forecast_boundary_crossed(
+        overview["rows"], run_at, used.days
+    ):
+        st.warning(
+            "This load crossed a daytime forecast-slot boundary. Some "
+            "forecasts cannot cover the original window. Refresh the "
+            "overview to start a new window and reuse suitable saved data."
+        )
     context = search_context(frame)
     ranked = int((frame["status"] == AVAILABLE).sum()) if context else 0
     st.markdown(
@@ -983,11 +990,13 @@ def render_dashboard_page() -> None:
         if matches(row["city_id"], _activities(row["activities"]),
                    row["destination_size"], *chosen)
     ]
+    st.subheader("Mainland Spain destinations by weather score")
     st.plotly_chart(
         map_figure(map_points(catalog_rows, frame, errors), highlighted),
         # Scrolling the page over the map must not zoom it out of Spain;
         # the map's +/- buttons still zoom.
         config=MAP_CONFIG,
+        alt="All 83 mainland-Spain destinations by weather-only rank",
     )
     st.caption(
         f"All {len(catalog)} destinations stay on the map. Grey markers "

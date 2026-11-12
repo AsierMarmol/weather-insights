@@ -8,11 +8,11 @@ Updated: 11 November 2026.
 
 This is the setup reference for the project, not a new round of onboarding work. Historical evidence remains below with its original dates and observations. No new teammate-machine tests or remote merges are claimed by this documentation update.
 
-The active work is [Phase 2](PHASE2_SCOPE.md). Future responsibilities are in [TEAMROLES.MD](TEAMROLES.MD); navigation and plan-maintenance rules are in [PROJECT_PHASES.md](PROJECT_PHASES.md). No commit, push or merge is authorized by this planning check.
+Current work is tracked in [Project phases](PROJECT_PHASES.md) and [Phase 5](PHASE5_QUALITY_REVIEW.md). Future responsibilities are in [TEAMROLES.MD](TEAMROLES.MD); navigation and plan-maintenance rules are in [PROJECT_PHASES.md](PROJECT_PHASES.md). No commit, push or merge is authorized by this planning check.
 
 ## Next phase
 
-Preserve the existing repository and environment; no setup restart is needed. Begin the approved scope/candidate-catalog review. Feature development remains pending. The application is still the starter, so completed setup is not evidence of functional rubric completion.
+Preserve the existing repository and environment; no setup restart is needed. Phase 2 was the next phase after setup and is now complete. The application has since been implemented; use the current checkpoint above for its acceptance status. The historical starter checks below prove setup only.
 
 ## Updating this phase when something changes
 

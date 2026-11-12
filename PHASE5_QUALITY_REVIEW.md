@@ -1,6 +1,6 @@
 # Phase 5 - Quality Review
 
-Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3 analytical acceptance approved by Selin and merged in [PR #17](https://github.com/AsierMarmol/weather-insights/pull/17) (dev `bfd9fd7`); P5.4 Dashboard/chart acceptance completed on `selin/feature` and awaiting Asier's review; P5.5 pending.
+Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3 analytical acceptance approved by Selin and merged in [PR #17](https://github.com/AsierMarmol/weather-insights/pull/17) (dev `bfd9fd7`); P5.4 Dashboard/chart acceptance approved by Asier and merged in PR #18 (dev `1784b8c`); P5.5 implemented and tested locally on dev `1784b8c`, awaiting Gabriel review and a browser visual check; Phase 5 is not yet accepted.
 
 ## Purpose and dependencies
 
@@ -13,8 +13,8 @@ Verify the integrated app against the teacher rubric. Component tests already be
 | P5.1 | Model/storage acceptance | Alejandra | Christian | P4.1-P4.3 merged | Validate catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity. | Completed locally: three gaps fixed, 21 new tests, 333 total pass, Flake8 clean; commit ac30f13, [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); approved by Christian and merged |
 | P5.2 | API/security/save acceptance | Gabriel | Alejandra | P4.1-P4.3 merged | Exercise input/key/location/network/server/quota/malformed responses, partial batches, cache saves and safe failure messages. | Completed locally: one gap fixed (key file in another encoding), 43 new tests, 376 total pass, Flake8 clean; merged in PR #14 with Selin's approval (Alejandra was the planned reviewer) |
 | P5.3 | Analytical acceptance | Christian | Selin | P4.1-P4.3 merged | Verify all day windows, clock changes, threshold boundaries, missing/stale metrics, driving cap, ties and three distinct analyses. | Completed locally: no analytical defect found, 22 new acceptance tests; 403 passed, 2 skipped, 2 failed (Dashboard timeouts from a storage lookup cost, reported to its owners); approved by Selin and merged in PR #17 (dev `bfd9fd7`) |
-| P5.4 | Dashboard/chart acceptance | Selin | Asier | P4.4 merged | Validate the independent Dashboard: all 83 map markers, hover values, plotted inputs and units, weather-only ranks/ties, interactive filters, windows, freshness and empty/unavailable states against common results. | Completed on `selin/feature` from dev `bfd9fd7`: three Dashboard defects fixed (map centre, wheel zoom, hidden limit label) plus table wording; 3 new tests; 410 passed, 0 skipped (macOS), Flake8 clean; awaiting Asier's review |
-| P5.5 | Searcher/integration and rubric walkthrough | Asier | Gabriel | P5.1-P5.4 | Validate seasonal/manual preference persistence, All options, top-five/full-table consistency, complete user journey, every rubric row and actual team contributions. | Pending |
+| P5.4 | Dashboard/chart acceptance | Selin | Asier | P4.4 merged | Validate the independent Dashboard: all 83 map markers, hover values, plotted inputs and units, weather-only ranks/ties, interactive filters, windows, freshness and empty/unavailable states against common results. | Completed on `selin/feature` from dev `bfd9fd7`: three Dashboard defects fixed (map centre, wheel zoom, hidden limit label) plus table wording; 3 new tests; 410 passed, 0 skipped (macOS), Flake8 clean; approved by Asier and merged in PR #18 |
+| P5.5 | Searcher/integration and rubric walkthrough | Asier | Gabriel | P5.1-P5.4 | Validate seasonal/manual preference persistence, All options, top-five/full-table consistency, complete user journey, every rubric row and actual team contributions. | Implemented/tested locally: 427 passed, 2 skipped on Windows; Flake8 clean. Awaiting Gabriel review and browser layout confirmation; no commit or push |
 
 ## Implementation and acceptance
 
@@ -38,6 +38,8 @@ request review, merge or submit without the relevant authorization.
 
 ## Phase progress log
 
+Dated entries describe their original submission state. The deliverable table and subsequent review entries provide the current status. The P5.3/P5.4 limitations below are historical findings; P5.5 records their current disposition.
+
 | Date | Task | Actual result and evidence | Status |
 | --- | --- | --- | --- |
 | 12 November 2026 | Phase 5 start | Prerequisites checked on GitHub: P4.1 (PR #10, Gabriel), P4.2 (PR #11, Asier) and P4.3 (PR #12, approved by Gabriel and merged into dev `27e088e`). Baseline at `27e088e`: 312 passed, Flake8 zero findings. | Phase 4 accepted |
@@ -45,11 +47,11 @@ request review, merge or submit without the relevant authorization.
 | 12 November 2026 | P5.2 | Gabriel/Claude Code accepted the API/security/save path through the connected app: credentials, input, location, network, server, quota and malformed responses, partial batches, cache saves and safe messages (details below). One actual gap found and fixed. 376 passed; Flake8 zero findings; genuine data byte-identical; no live requests. | Awaiting Alejandra's review |
 | 12 November 2026 | P5.3 | Christian/Claude Code accepted the analytics against windows, daytime, clock changes, thresholds, scoring, ties, both rankings, the three analyses and missing/invalid/stale data, on dev `cda1cc2` (details below). No analytical defect found; 22 regression/acceptance tests added. 403 passed, 2 skipped, 2 failed (Windows; the two failures are Dashboard AppTest 60-second timeouts explained below, not analytical results); Flake8 zero findings; genuine data byte-identical; no live requests. | Awaiting Selin's review |
 | 12 November 2026 | P5.3 review | Selin approved PR #17 and it was merged into dev `bfd9fd7`. Post-merge check with Claude Code on `bfd9fd7` (macOS): full suite 407 passed, 0 skipped; Flake8 zero findings; the new acceptance tests rerun, read and mutation-checked. No analytical defect found (details in the P5.4 section). | Merged |
-| 12 November 2026 | P5.4 | Selin/Claude Code accepted the independent Dashboard on dev `bfd9fd7` against all P5.4 criteria with automated and visual checks (details below). Three visual defects and one wording gap fixed in `dashboard.py`; 3 tests added and 4 strengthened. 410 passed, 0 skipped; Flake8 zero findings; genuine data byte-identical; no live requests. | Awaiting Asier's review |
+| 12 November 2026 | P5.4 | Selin/Claude Code accepted the independent Dashboard on dev `bfd9fd7` against all P5.4 criteria with automated and visual checks (details below). Three visual defects and one wording gap fixed in `dashboard.py`; 3 tests added and 4 strengthened. 410 passed, 0 skipped; Flake8 zero findings; genuine data byte-identical; no live requests. | Approved by Asier; merged in PR #18 |
 
 ## Next action
 
-P5.1, P5.2 and P5.3 are merged (PR #13, #14, #17). Selin's P5.4 Dashboard/chart acceptance is completed on `selin/feature` and awaits Asier's review. After P5.4 is accepted, Asier runs the connected walkthrough (P5.5) with Gabriel reviewing, recording failures and fixes with actual evidence. The storage lookup cost reported in P5.3 remains open for the storage/service owners (Alejandra/Gabriel). Phase 5 is not yet completed.
+P5.1-P5.4 are merged. Review the local P5.5 changes below before authorizing a commit or PR. Gabriel is the reviewer and should confirm the desktop/mobile map layout as well as the code and rubric evidence. After acceptance, Asier starts P6.1; Selin performs P6.2 with Christian reviewing; Asier completes P6.3 with Gabriel reviewing. Phase 5 acceptance and Phase 6 delivery are not claimed complete.
 
 ### P5.1 model/storage acceptance - 12 November 2026
 
@@ -189,4 +191,81 @@ Selin / Claude Code (Anthropic Claude Opus 5.5), on `selin/feature` fast-forward
 - **Map rendering:** country outlines need Plotly's online base map. At phone width, the chart title and Plotly's toolbar overlap.
 - **Genuine data:** genuine forecasts cover 82 destinations from one collection on 12 November 2026; Barcelona has none.
 
-**Status:** completed on `selin/feature`; awaiting Asier's review. Not approved or merged. P5.5 and final delivery are not claimed.
+**Status update:** approved by Asier and merged in PR #18 (dev `1784b8c`), verified on 12 November 2026. P5.5 and final delivery are not claimed.
+
+### P5.5 readiness check - 12 November 2026
+
+GitHub confirms P5.3 PR #17 approved by Selin and merged, and P5.4 PR #18 approved by Asier and merged. Local asier/feature was fast-forwarded to dev `1784b8c` without altering the existing .gitignore edit. Focused verification: 22 analytical acceptance tests passed; Flake8 zero findings. The full suite and visual walkthrough were not rerun in this readiness check. P5.5 is ready for Asier to start with Gabriel as reviewer; the known storage performance issue, slot-boundary risk, mobile layout limitation and actual rubric/contribution evidence remain to be evaluated.
+
+
+### P5.5 integrated acceptance - 12 November 2026
+
+AsierMarmol / OpenAI Codex, on `asier/feature` at current fetched dev `1784b8c`. No commit, push or merge performed. The pre-existing `.gitignore` change is preserved and is not part of this implementation. Actual GitHub approvals were checked: P5.1 Christian, P5.2 Selin (rather than the planned Alejandra), P5.3 Selin and P5.4 Asier.
+
+**Changes and evidence**
+
+- `storage.py` retains validated immutable records per store and reuses them only if freshly read file bytes match. A successful atomic save updates the snapshot; a failed save cannot enter the cache. Every call still reads the file, so same-size edits, another store's append, corruption, deletion and read-permission failures remain visible. Seven new tests in `tests/test_final_acceptance.py` cover these guarantees and the slot-boundary journey. Representative 83-city saved-forecast lookup time on this PC fell from **3.056 s to 0.069 s**. This is a local before/after measurement, not a promise for every computer or dataset. File reads and list scans still grow with history; the supported model remains one writing process per clone.
+- A deterministic service test reproduces a load crossing 09:00 UTC. A city missing the first required slot stays unavailable; both views explain the boundary and advise a new search/refresh. A new window can reuse saved data without further HTTP calls. No interpolation, invented weather, shortened window, score change or automatic retry loop was added. This reproduces provider-like responses offline; it is not a new live provider experiment.
+- `dashboard.py` moves the map heading to a Streamlit subheading outside Plotly's toolbar and adds accessible chart text. AppTest verifies rendering and both warning messages. **Fresh desktop/mobile visual confirmation is outstanding:** the computer-use browser host was unavailable. No new browser screenshot or visual pass is claimed. Plotly's geographical base map still needs browser connectivity to its CDN.
+- Reviewed all tracked directories and Markdown documents. Updated stale current-status/navigation text in the README, phase plans, roles and API contract, retaining historical test and review records. Every local Markdown file link and heading anchor resolves. No required empty/stub implementation remains; the empty `src/weather_app/__init__.py` is a valid package marker. Environment, cache and build metadata directories are generated/ignored, not deliverables.
+
+**Validation**
+
+- Full suite: `.venv\Scripts\python.exe -m pytest -q --tb=short` - **415 passed, 2 skipped in 43.80 s** on Windows/Python 3.14. The skips are POSIX permission checks; they are not missing functional tests. The new regression tests exposed four failures against the pre-fix implementation and all seven pass after the changes.
+- `.venv\Scripts\python.exe -m flake8 src tests scripts app.py` - zero findings.
+- `uv lock --check`, `uv pip check`, and `uv build` to a temporary directory - passed. Both source distribution and wheel build. The supported installation remains `uv sync --locked` from a clone; the wheel alone does not contain app.py or external data. A fresh machine/clean-clone acceptance remains P6.2, and other declared Python versions were not retested here.
+- Genuine tracked data has no Git content changes (Windows checkout line endings explain byte differences from blobs). The normalized CSV still contains **3,324 records across 82 destinations**, with Barcelona absent. No live API requests or new genuine weather writes were made; replay tests use historical timestamps and temporary/read-only data.
+- `variables.env` and `.venv` are ignored; the committed example is blank. The currently configured key was absent from all tracked working files and **215 unique historical blobs**. This checks that key, not every possible unknown secret. The pre-existing `.gitignore` edit was not changed.
+
+**Rubric walkthrough**
+
+| Teacher criterion | Implementation and checked evidence | Remaining acceptance |
+| --- | --- | --- |
+| OOP (2) | `JSONAPIClient` supplies reusable transport/error/retry behavior; `OpenWeatherClient` specializes provider mapping. Public API, protected helpers and private credential/lock state are intentional. Validated immutable models expose meaningful special methods and computed properties. Client/model/storage tests pass. | Gabriel reviews design; every member must explain it. |
+| API robustness (2) | dotenv credentials; pre-request validation; specific authentication/location/network/provider/storage errors; partial batches; successful saves before ranking. P5.2 and integration tests pass. | No fresh live provider or account-quota validation in P5.5; retain earlier genuine evidence. |
+| Data and analytics (2) | Genuine timestamped current/forecast records persist, cache reads create no history. Ranking, cross-location metrics and simultaneous-suitability analysis span comparison and derived metrics. Independent genuine-data tallies and 1-5-day tests pass. | Continue genuine accumulation through normal use; do not describe forecast timestamps as observed multi-day weather history. |
+| Streamlit (2) | Searcher and independent Dashboard; editable/seasonal settings, All filters, top-five/full-table consistency, separate state, all-83 map, three labeled analytical charts, unavailable states and safe recovery verified by AppTest. | Gabriel confirms the new map heading at desktop/mobile widths; usability is not guaranteed by automated tests alone. |
+| Repository and AI record (1) | Installable src layout, locked dependencies, successful builds, linked README and phase records; configured-key audit clean. PROMPTS updated for the actual requester/tool. Existing substantial implementation commits have AI trailers; two trailer-free commits only update review/PR documentation. | Add the Codex trailer when this change is authorized for commit; P6.2 clean clone remains pending. |
+| Team evidence (1) | Non-merge history contains contributions under AsierMarmol, alemedinabarreto, Gabriel Polan Barros Stec, christiansawaya-code and Selin Atalar. Reviewed PR evidence is retained. | Git history cannot prove understanding; each member must explain the complete application. |
+
+**Status:** implementation and automated validation complete locally; awaiting Gabriel review and the noted browser check. No grade, final acceptance, fresh-clone success or submission is asserted. Phase 6 must also confirm source redistribution terms, instructor access and the actual submission channel/receipt.
+
+
+### P5.5 follow-up review - 12 November 2026
+
+Asier requested another complete alignment review and simple improvements before committing. Rechecked the authoritative assignment README and reference summary against the product rules, implementation, tests, sources, all phase documents and AI records. The product stays mainland-Spain/car-only, with separate Searcher preferences and an independent seasonal weather Dashboard. No dependency, framework, database or additional cache was introduced.
+
+- Fixed narrow configuration-validation gaps in `config.py`: noninteger default days/months and malformed provider-override parameters now produce the existing safe validation errors. An unreadable credential file now gives safe guidance, while an existing nonblank environment key bypasses file reads. Twelve parameterized regression cases were added to `test_config.py`; ten failed before the fix. The affected configuration/API-security suite passes all 71 cases.
+- Corrected obsolete function names/shared-state wording in Phase 2/4 and the contract's storage-stop behavior. Simplified README status and explained that changing a loaded API key requires restarting Streamlit, not just refreshing the browser. Kept historical evidence and Phase 6 gates.
+- A fresh isolated environment exposed a historical replay test that incorrectly used later forecast issues at an earlier clock time. `test_app_integration.py` now selects only records retrieved by its 11:34 UTC reference time, preserving the same known answers and no-request assertion. Production behavior and genuine data were not changed by this test fix.
+- Validation in a temporary snapshot of current files, without copying `.venv` or `variables.env`: `uv sync --locked` installed successfully; full suite **427 passed, 2 skipped in 45.44 s**; Flake8 clean. A final small credential-branch simplification was checked with the 71 configuration/security cases and lint. This is an isolated-install rehearsal of uncommitted files, not P6.2 acceptance of a reviewed Git commit.
+- Asier confirmed he was using the app during review. His real CSV grew to **6,604 records across all 83 destinations**, latest retrieval **17:35:30 UTC on 12 November 2026**. The 3,280 new forecast rows form 82 fetch groups; all original 3,324 rows are preserved in order. A frozen copy passed model/schema, catalog-membership, unique-key and coherent-group checks. Barcelona now has saved records. Earlier 82-destination statements describe historical snapshots. The agent made no live requests or synthetic writes to genuine data.
+
+The source counts and route/activity limitations remain explicit. Keep accumulating genuine fetches through normal use; forecasts for several future days are not several days of observed history. The instructor's rubric also requires real team understanding and a clean-clone run; those cannot be established by test counts or role assignments.
+
+### Remaining cross-platform and visual checks
+
+**Two skipped tests (Selin on macOS, or a Linux checkout):**
+
+- `test_saving_keeps_the_files_permissions`: saving preserves an existing Unix mode of `0640`.
+- `test_first_saved_file_follows_the_umask`: a first save under umask `0022` creates mode `0644`.
+
+Windows does not implement these Unix permission semantics. Its real read/write failure paths are covered separately with simulated errors. WSL is not installed on this PC; no OS installation is needed for the project. Selin's prior macOS P5.4 suite passed these checks, but the revised P5.5 version still needs a targeted cross-platform run. After the reviewed changes are available locally, from the repository on macOS/Linux:
+
+```sh
+uv sync --locked
+uv run --locked python -m pytest -q tests/test_model_storage_acceptance.py::test_saving_keeps_the_files_permissions tests/test_model_storage_acceptance.py::test_first_saved_file_follows_the_umask
+```
+
+Expected: **2 passed**, not skipped. Record the tested commit and OS. On WSL, use a checkout in the Linux home filesystem so the test measures Linux permissions.
+
+**Browser appearance (Asier or Gabriel):** browser automation was retried and the browser access host remains unavailable. Automated UI behavior is covered; rendered layout still needs human confirmation. Start one app using `uv run --locked streamlit run app.py`, then:
+
+1. Open Dashboard before a Searcher run. Confirm all 83 markers, a readable heading and separate map toolbar, with no exception.
+2. Inspect both a normal desktop window and a narrow phone-sized viewport (about 390 pixels). Confirm the heading wraps above the map without covering the toolbar; charts, legends, filters and controls remain usable.
+3. Load the overview for 3 days. Hover an available marker: city, activities, average daytime temperature with units, weather rank and score must be readable. Wheel-scrolling the page should not change the map zoom.
+4. Apply Coast and a size filter. All markers remain; nonmatching ones dim and global ranks stay unchanged. Inspect ranking, comparison and all-three-criteria tabs and their tables.
+5. Switch to Searcher, adjust preferences, search and return. Searcher choices and Dashboard's independent window/results must persist. Check 1-day and 5-day choices, explicit loading, and incomplete coverage messages if returned; do not invent a result to force a pass.
+6. Record browser, viewport sizes, tested commit, pass/fail and any screenshots without credentials. Normal live loads append genuine data; visual checks should not run concurrently with data-integrity tests in the same clone.
+
+**Acceptance remains pending** until Gabriel reviews P5.5 and the visual result is recorded. Phase 6 still owns the named clean-clone verification, final source/license check, reviewed main publication, instructor access and submission receipt. No commit, push, review request or merge was performed in this follow-up.

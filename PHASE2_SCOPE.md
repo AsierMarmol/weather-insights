@@ -4,7 +4,7 @@ Updated: 12 November 2026.
 
 ## Current checkpoint
 
-Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1 Searcher and P4.2 Dashboard are approved and merged; P4.3 integration is implemented locally and awaits Gabriel review. Catalog/source limitations remain documented in the reference notes.
+Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 is implemented and tested locally on dev `1784b8c`, awaiting Gabriel review; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Catalog/source limitations remain documented in the reference notes.
 
 ## Deliverables
 
@@ -41,8 +41,8 @@ Suitable periods satisfy all three preferences simultaneously. This explanatory 
 
 ## Views and analyses
 
-- **Searcher (Asier):** shared editable days/weather/activity/size controls; up to five available recommendations plus the full eligible ranking; distances, drive times, score explanation, coverage and unavailable states.
-- **Dashboard (Selin):** interactive destination/activity/size filters and shared day/preferences controls. Consume the same results rather than recalculating scores or fetching separately. *Superseded by P4.4 (12 November 2026):* the Dashboard is an independent weather overview of all 83 destinations on a map with its own 1-5-day window and Load/refresh, seasonal default criteria and a weather-only ranking (weather match %, no driving penalty, shared ranks for ties). It still uses the same service, cache, save path and analytics; see [Phase 4](PHASE4_ANALYTICS_UI.md#p44-independent-spain-weather-dashboard---12-november-2026).
+- **Searcher (Asier):** its own editable days/weather/activity/size controls; up to five available recommendations plus the full eligible ranking; distances, drive times, score explanation, coverage and unavailable states.
+- **Dashboard (Selin):** since P4.4 (12 November 2026), an independent weather overview of all 83 destinations on a map with its own 1-5-day window and Load/refresh, seasonal default criteria and a weather-only ranking (weather match %, no driving penalty, shared ranks for ties). It still uses the same service, cache, save path and analytics; see [Phase 4](PHASE4_ANALYTICS_UI.md#p44-independent-spain-weather-dashboard---12-november-2026).
 - Three analyses: suitability ranking; cross-city weather comparison (mean temperature, maximum precipitation probability and maximum wind over the same daytime periods); count/percentage of periods meeting all preferences. Label aggregations and units explicitly: maximum period probability is not whole-trip probability, and forecast periods are not guaranteed good-weather hours.
 - At least two labeled charts must use genuine fetched/logged data. Save every fresh successful request with retrieval and provider timestamps. Cache displays do not create new records. No historical-trend chart, forecast-versus-reality feature or continuous collector is required.
 
@@ -69,16 +69,16 @@ Schema version 1; kind current/forecast; coordinates and provider identity descr
 | Owner / module | Shared entry points |
 | --- | --- |
 | Alejandra: models.py, storage.py | load_destinations(path) -> list[Destination]; WeatherStore(path).append(records), .load(city_id=None, kind=None), .latest_forecast(city_id) |
-| Gabriel: client.py, config.py, service.py | JSONAPIClient._get_json(path, params); derived OpenWeatherClient.current(destination)/.forecast(destination); WeatherService.current/forecast(destination, force_refresh=False) and .forecast_many(destinations, force_refresh=False); config.get_api_key() and future load_product_defaults() |
+| Gabriel: client.py, config.py, service.py | JSONAPIClient._get_json(path, params); derived OpenWeatherClient.current(destination)/.forecast(destination); WeatherService.current/forecast(destination, force_refresh=False) and .forecast_many(destinations, force_refresh=False); config.get_api_key(), load_product_defaults() and load_location_overrides() |
 | Christian: analytics.py | analyse_destinations(destinations, forecasts_by_city, preferences, run_at_utc) -> full ordered list of result dictionaries |
-| Asier: searcher.py, app.py | initial_preferences(now_utc, defaults), shared controls/search state and service wiring |
-| Selin: dashboard.py | render_dashboard(analysis_rows, catalog_rows); catalog dictionaries use activity lists and canonical names. Since P4.4: render_dashboard_page() over the full catalog, with overview_preferences, weather_ranks, map_points/map_figure |
+| Asier: searcher.py, app.py | initial_preferences(now_utc, defaults), Searcher controls/state and shared service wiring |
+| Selin: dashboard.py | render_dashboard_page() over the full catalog, with overview_preferences, weather_ranks, map_points/map_figure; catalog dictionaries use activity lists and canonical names |
 
 Store a whole forecast response as one fetch group. Latest forecast must be one newest group, never stitched from different issues. Repeated saves of the same (fetch_id, city_id, kind, valid_at_utc) are idempotent; a distinct fresh response gets a new fetch_id. Serialize writes per local process; handle failed/partial writes explicitly. The service saves once, then caches. Do not claim analytical success after failed persistence. Initial JSONL evidence can be imported deliberately without inventing retrieval times; do not mix synthetic fixtures into it.
 
 Analytics is pure: no network, credentials, file writes, UI or implicit clock. Reject invalid preferences and naive/non-UTC run times. Forecast staleness is max(0, run_at - retrieved_at) > three hours; equality is allowed and fresh batch receipts can follow run_at. Unavailable reasons: fetch_failed, invalid_data, stale_forecast, duplicate_periods, missing_periods, missing_metrics (in that precedence). Unavailable rows follow ranked rows, sorted by city_id, with null metrics/pass counts, expected periods retained and evaluated periods zero. No fetch means retrieval time None. Filtered-out cities are omitted.
 
-Shared UI state: search_preferences, search_run_at_utc, search_analysis_rows. The app owns updates; Dashboard filters do not reset preferences. Since P4.4 the Dashboard keeps separate dashboard_* state and never reads or changes search_* results. A new search recomputes coverage for its common time, using cached forecasts only when usable.
+Searcher state: search_preferences, search_run_at_utc, search_analysis_rows. Since P4.4 the Dashboard keeps separate dashboard_* state and never reads or changes search_* results. The two views share the same session service and persisted forecasts. A new search recomputes coverage for its common time, using cached forecasts only when usable.
 
 ### Small worked example
 
@@ -132,7 +132,7 @@ approval or commit/push/merge without authorization.
 
 ## Next action
 
-P2.5 was accepted in PR #9. Continue with P4.1 Searcher (Asier, reviewed by Gabriel), P4.2 Dashboard (Selin, reviewed by Asier), then P4.3 integration. Keep review status honest using [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
+P2.5 was accepted in PR #9, and P4.1-P4.4/P5.1-P5.4 are merged. Gabriel reviews P5.5 next; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Keep review status honest using [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
 
 ### P2.5 verification - 12 November 2026
 

@@ -122,3 +122,54 @@ def test_override_may_only_request_a_city_id(tmp_path):
     )
     with pytest.raises(ValueError, match="positive city id"):
         config.load_location_overrides(path)
+
+
+@pytest.mark.parametrize("months", [[12, "1", 2], [12, True, 2],
+                                    [12, 1.0, 2]])
+def test_months_need_integer_values(tmp_path, months):
+    data = config.load_product_defaults()
+    data["seasonal_temperature_c"]["Winter"]["months"] = months
+    path = tmp_path / "defaults.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="months"):
+        config.load_product_defaults(path)
+
+
+@pytest.mark.parametrize("days", [True, 3.0, "3"])
+def test_default_days_need_an_integer(tmp_path, days):
+    data = config.load_product_defaults()
+    data["default_forecast_days"] = days
+    path = tmp_path / "defaults.json"
+    path.write_text(json.dumps(data), encoding="utf-8")
+    with pytest.raises(ValueError, match="default_forecast_days"):
+        config.load_product_defaults(path)
+
+
+@pytest.mark.parametrize("params", [7, True, ["id"], "id"])
+def test_override_parameters_need_an_object(tmp_path, params):
+    path = tmp_path / "overrides.json"
+    path.write_text(json.dumps({"locations": {
+        "ES-27028": {"request_parameters": params},
+    }}), encoding="utf-8")
+    with pytest.raises(ValueError, match="positive city id"):
+        config.load_location_overrides(path)
+
+
+@pytest.mark.parametrize("in_environment", [False, True])
+def test_key_file_read_failure_is_safe(tmp_path, monkeypatch, in_environment):
+    local = tmp_path / "variables.env"
+    local.write_text("OPENWEATHER_API_KEY=dummy-file-key\n")
+    monkeypatch.setattr(config, "ENV_FILE", local)
+    monkeypatch.delenv("OPENWEATHER_API_KEY", raising=False)
+    if in_environment:
+        monkeypatch.setenv("OPENWEATHER_API_KEY", "dummy-shell-key")
+
+    def denied(path):
+        raise PermissionError("unsafe detail must not be echoed")
+
+    monkeypatch.setattr(config.Path, "read_bytes", denied)
+    if in_environment:
+        assert config.get_api_key() == "dummy-shell-key"
+    else:
+        with pytest.raises(ValueError, match="Cannot read variables.env"):
+            config.get_api_key()
