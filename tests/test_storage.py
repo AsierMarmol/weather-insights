@@ -311,6 +311,7 @@ def test_unwritable_location_is_a_storage_error(tmp_path):
         ("wrong,header\n", "expected header"),
         ("", "expected header"),
         (HEADER + "1,abc", "incomplete row"),
+        (HEADER + "1,abc\n", "line 2: row does not match"),
         (HEADER + "1,not-a-uuid,ES-45168,forecast,,,,,,,,,,1,X\n", "line 2"),
     ],
 )

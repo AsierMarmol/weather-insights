@@ -548,9 +548,9 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 
 **Kept / changed / rejected:** Kept the CSV header, record key, entry points and error classes used by the P3.2 service and P3.3 analytics. Chose to collapse exact duplicate rows on read rather than reject them, because they describe the same genuine record and appends are already idempotent. Rejected automatic repair or rewriting during reads; a conflicting file must be resolved manually, for example from Git history.
 
-**Human review:** Alejandra directed the work. Christian's review of this follow-up is pending; no approval is claimed.
+**Human review:** Alejandra directed the work. Christian (christiansawaya-code) approved PR #8 on GitHub on 12 November 2026.
 
-**Commit / PR:** Commit ef74a86; [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8) into dev, review requested from Christian (christiansawaya-code); not merged.
+**Commit / PR:** Commit ef74a86 (plus docs commits 11a02f4 and 21e9fd8); [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8) into dev, approved by Christian and merged by Asier (`6b0a901`).
 
 
 ---
@@ -657,3 +657,24 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Pending. Gabriel reviews P4.3. Asier's earlier approval covers Selin's P4.2 PR, not these new changes.
 
 **Commit / PR:** Asier authorized the local P4.3 commit on `asier/feature`. Push, PR creation and merge are not included in this authorization; Gabriel's review remains pending.
+
+---
+
+## Phase 5: P5.1 model/storage acceptance (2026-11-12)
+
+**Requested by:** Alejandra Medina (alemedinabarreto).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Pull the latest dev, confirm everything before P5.1 is done, then complete P5.1: validate catalog loading, OOP behavior, persistence/reload, write failures and genuine data continuity, fixing actual gaps instead of repeating development.
+
+**Got:** Confirmed on GitHub that P4.1-P4.3 were approved and merged (PR #10-#12; P4.3 by Gabriel), and fast-forwarded `Alejandra/feature` to dev `27e088e`. Probed the merged models/storage and found three gaps: a non-UTF-8 catalog raised a raw `UnicodeDecodeError`; every save left `weather_records.csv` owner-only (`0o600`) because of the temporary file it was swapped from; a short CSV row produced a misleading integer error. Fixed all three in `storage.py`/`models.py` (catalog `CatalogError`, permissions kept or umask-based for a first file with an exclusively created temporary file, short rows reported as a column mismatch). Added `tests/test_model_storage_acceptance.py` (17 tests) and 4 regression cases in the existing model/storage tests. Tidied the storage docstring line breaks left by the Flake8 reflow. Updated Phase 5 and the stale P4.3 status lines in the shared plans.
+
+**Checked:** Baseline at `27e088e`: 312 passed, Flake8 zero findings. After: 333 passed, Flake8 zero findings. The new regression tests fail against the `27e088e` sources and pass now. Genuine data: 164 rows, 164 unique keys, three P2.5 cities, consistent fetch groups and 40-period latest forecasts; catalog and weather file checksums and permissions unchanged. All writes used pytest temporary copies; no live request was made.
+
+**Kept / changed / rejected:** Kept the CSV schema, record key, entry points and error classes. Rejected accepting a byte-order-marked weather CSV on read, since appending would mix encodings; it is reported instead. Rejected changing other owners' components.
+
+**Human review:** Alejandra directed the work. Christian's review of P5.1 is pending; no approval is claimed.
+
+**Commit / PR:** Commit ac30f13, authorized by Alejandra; [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13) into dev, review requested from Christian (christiansawaya-code); not merged.
+

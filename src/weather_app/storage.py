@@ -2,18 +2,17 @@
 
 ``load_destinations`` reads the nine-column destination catalog.
 ``WeatherStore`` appends normalized weather records to one CSV file and
-reads
-them back. The API service (P3.2) calls ``append`` once for every fresh
-successful response; cached redisplays never call it. Paths default to the
-repository's data folder, independent of the shell's working directory.
+reads them back. The API service (P3.2) calls ``append`` once for every
+fresh successful response; cached redisplays never call it. Paths default
+to the repository's data folder, independent of the shell's working
+directory.
 
 Write strategy: the existing file is copied byte-for-byte to a temporary
-file in
-the same folder, new rows are appended there, the copy is flushed to disk
-and
-then atomically swapped in with ``os.replace``. A failure at any point
-leaves
-the previous file untouched, so genuine records are never truncated.
+file in the same folder, new rows are appended there, the copy is flushed
+to disk and then atomically swapped in with ``os.replace``. The new file
+keeps the previous file's permissions (a first file gets the user's normal
+umask). A failure at any point leaves the previous file untouched, so
+genuine records are never truncated.
 """
 
 from __future__ import annotations
@@ -21,8 +20,8 @@ from __future__ import annotations
 import csv
 import io
 import os
+import secrets
 import shutil
-import tempfile
 import threading
 from collections.abc import Sequence
 from pathlib import Path
@@ -94,6 +93,8 @@ def load_destinations(path: Path = CATALOG_PATH) -> list[Destination]:
         raise CatalogError(
             f"Cannot read catalog {path.name}: {error.strerror}"
         ) from None
+    except UnicodeDecodeError:
+        raise CatalogError(f"{path.name} is not valid UTF-8") from None
     if not destinations:
         raise CatalogError(f"{path.name} contains no destinations")
     return destinations
@@ -197,15 +198,21 @@ class WeatherStore:
         temp_name = None
         try:
             directory.mkdir(parents=True, exist_ok=True)
-            handle = tempfile.NamedTemporaryFile(
-                "wb",
-                dir=directory,
-                prefix=f".{self._path.name}.",
-                suffix=".tmp",
-                delete=False,
+            candidate = directory / (
+                f".{self._path.name}.{secrets.token_hex(8)}.tmp"
             )
-            temp_name = handle.name
-            with handle:
+            # os.open (not tempfile) so a first file gets the umask's normal
+            # permissions instead of tempfile's owner-only 0o600. O_EXCL
+            # never reuses an existing file, and only a file created here
+            # is ever cleaned up.
+            descriptor = os.open(
+                candidate,
+                os.O_WRONLY | os.O_CREAT | os.O_EXCL
+                | getattr(os, "O_BINARY", 0),
+                0o666,
+            )
+            temp_name = candidate
+            with os.fdopen(descriptor, "wb") as handle:
                 if self._path.exists():
                     with self._path.open("rb") as current:
                         shutil.copyfileobj(current, handle)
@@ -216,6 +223,9 @@ class WeatherStore:
                 handle.write(_csv_text(rows))
                 handle.flush()
                 os.fsync(handle.fileno())
+            if self._path.exists():
+                # Keep the saved file's permissions across the swap.
+                shutil.copymode(self._path, temp_name)
             os.replace(temp_name, self._path)
             temp_name = None
         except OSError as error:

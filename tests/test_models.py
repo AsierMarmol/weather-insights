@@ -307,3 +307,13 @@ def test_from_csv_row_rejects_non_integer_or_unsupported_versions(cell):
     row["schema_version"] = cell
     with pytest.raises(ValueError):
         WeatherRecord.from_csv_row(row)
+
+
+@pytest.mark.parametrize("cut", [1, 5, 14])
+def test_from_csv_row_reports_short_rows_as_column_mismatch(cut):
+    # csv.DictReader fills missing trailing cells with None.
+    row = record().to_csv_row()
+    for name in RECORD_FIELDS[cut:]:
+        row[name] = None
+    with pytest.raises(ValueError, match="columns"):
+        WeatherRecord.from_csv_row(row)
