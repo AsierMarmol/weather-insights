@@ -4,7 +4,7 @@ Updated: 12 November 2026.
 
 ## Current checkpoint
 
-Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1 Searcher is implemented locally, awaiting review; Dashboard/integration remain pending. Catalog/source limitations remain documented in the reference notes.
+Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1 Searcher and P4.2 Dashboard are approved and merged; P4.3 integration is implemented locally and awaits Gabriel review. Catalog/source limitations remain documented in the reference notes.
 
 ## Deliverables
 

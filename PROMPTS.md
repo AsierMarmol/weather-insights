@@ -636,3 +636,24 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Selin directed the work and chose to include the `app.py` call. Asier's P4.2 review is pending; no approval is claimed.
 
 **Commit / PR:** Pending Selin's authorization.
+
+
+---
+
+## Phase 4: P4.3 integrated Searcher and Dashboard journey (2026-11-12)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Complete P4.3 after Selin's Dashboard is merged: verify both views share preferences/results correctly, preserve navigation state, reuse weather without duplicate requests/saves, show progress/freshness and handle failures safely.
+
+**Got:** A focused integration update to searcher.py/dashboard.py and 11 app-level tests in tests/test_app_integration.py. Both views now share exclusive All selection behavior; Dashboard's selected weather measure persists across navigation. Updated the existing Searcher empty-selection assertion, usage instructions, phase status/dependencies and next quality-review steps. The existing app router, service/store and analytical engine were reused.
+
+**Checked:** PR #11 was approved by Asier and merged into dev d6d210e. Two new tests reproduced the reset-weather-measure and All-selection gaps before the fixes. Final suite: 312 passed; Flake8 zero findings. Complete journeys verify all five forecast windows, score/chart agreement, unsent preference changes versus executed snapshots, filters, navigation, progress, empty results, partial failures/recovery, storage failure/recovery and expired data refresh. Genuine historical sample passes through the real service/store and both views using a temporary copy and fixed replay clock, with zero HTTP calls. Test fixtures block live HTTP and preserve every repository data file; .gitignore remains untouched.
+
+**Kept / changed / rejected:** Kept original component ownership, source data, scoring and saving rules. Changed only the two reproduced cross-view behavior gaps; used one shared All-normalization helper. Avoided replacing Selin's Dashboard or adding another API path. Existing app wiring already connected the pages, so the work focused on validation and state consistency. Passing integration tests does not claim Phase 5 rubric acceptance or final clean-clone delivery.
+
+**Human review:** Pending. Gabriel reviews P4.3. Asier's earlier approval covers Selin's P4.2 PR, not these new changes.
+
+**Commit / PR:** Asier authorized the local P4.3 commit on `asier/feature`. Push, PR creation and merge are not included in this authorization; Gabriel's review remains pending.

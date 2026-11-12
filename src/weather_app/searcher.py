@@ -132,6 +132,18 @@ def _reset(defaults):
     _seed_widgets(preferences, overwrite=True)
 
 
+def normalize_all_selection(values):
+    """Use the most recently chosen option to make All exclusive."""
+    values = list(values or ())
+    if not values or values[-1] == "All":
+        return ["All"]
+    return [value for value in values if value != "All"]
+
+
+def _keep_all_exclusive(key):
+    st.session_state[key] = normalize_all_selection(st.session_state[key])
+
+
 def _selection(values):
     return () if not values or "All" in values else tuple(values)
 
@@ -181,13 +193,17 @@ def _controls(catalog, defaults):
             "Activities",
             ["All"] + sorted({tag for d in catalog for tag in d.activities}),
             key="_trip_activities",
-            help="Remove All to choose specific activities. Empty means All.",
+            on_change=_keep_all_exclusive,
+            args=("_trip_activities",),
+            help="Choose activities or All. Clearing the selection means All.",
         )
         st.multiselect(
             "Destination size",
             ["All"] + sorted({d.destination_size for d in catalog}),
             key="_trip_sizes",
-            help="Remove All to choose specific sizes. Empty means All.",
+            on_change=_keep_all_exclusive,
+            args=("_trip_sizes",),
+            help="Choose sizes or All. Clearing the selection means All.",
         )
         if not st.session_state._trip_activities:
             st.caption("Activities: All")

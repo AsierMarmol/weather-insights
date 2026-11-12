@@ -44,4 +44,4 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-Run each owner’s acceptance checks and then the connected walkthrough, recording failures and fixes with actual evidence.
+After Gabriel accepts P4.3, run each owner’s acceptance checks and then the connected walkthrough, recording failures and fixes with actual evidence. P4.3 provides 11 integration journeys and a 312-test passing baseline; reuse that evidence and investigate actual remaining rubric gaps rather than rebuilding components. Phase 5 is not yet completed.

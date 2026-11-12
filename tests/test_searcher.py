@@ -150,7 +150,7 @@ def test_empty_selection_means_all_and_mismatched_filters_fetch_nothing(ui):
     app, _, session, _, places, _ = ui
     app.run().multiselect(key="_trip_activities").set_value([]).run()
     assert app.session_state.search_preferences.activities == ()
-    assert any(c.value == "Activities: All" for c in app.caption)
+    assert app.multiselect(key="_trip_activities").value == ["All"]
     # No artificial location or empty data file is needed for empty matches.
     prefs = SearchPreferences(
         days=3,
