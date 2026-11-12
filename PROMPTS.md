@@ -838,3 +838,24 @@ Updated PHASE5, PHASE4, PROJECT_PHASES and README.
 **Human review:** Pending with Gabriel. Selin can run the two Unix permission checks; Asier/Gabriel can complete the documented visual walkthrough. Team understanding and final delivery acceptance remain separate requirements.
 
 **Commit / PR:** On 12 November 2026, Asier authorized committing and pushing the accumulated P5.5 work before starting Phase 6. Submit on `asier/feature` for Gabriel review into `dev`; no merge approval or completed visual/Mac check is claimed.
+
+
+---
+
+## Phase 6: P6.1 delivery documentation and source attribution (2026-11-12)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Proceed to P6.1, Documentation and Delivery. Prepare clear installation and usage instructions, identify the complete repository deliverable, document sources and limitations, and verify the preparation against the teacher guidance. Keep unconfirmed P5.5 checks visible and do not claim later delivery steps complete.
+
+**Got:** Extended the README with macOS setup and safe credential-file creation, the three analytical views and rubric links, and the repository submission route. Expanded Phase 6 with the delivery contents, owner/reviewer checklists and required clean-clone evidence. Added visible OpenWeather text/link/logo and catalog/route credits in the shared sidebar using one unmodified official asset. Updated reference/weather source notes and current phase navigation. Recorded partial desktop evidence without claiming a complete visual pass.
+
+**Checked:** Read the authoritative assignment README and reference summary, existing implementation/phase plans and official provider/source attribution pages. An isolated installation with no copied credentials succeeded using `uv sync --locked`; 18 existing app-integration/final-acceptance tests passed in 19.91 seconds; Flake8 clean. All 75 local Markdown links/anchors resolve; diff whitespace checks pass. Inspected the official logo. Validated a frozen genuine-data snapshot: 6,644 records, all 83 destinations, no duplicate keys, and all 6,604 prior committed rows preserved. No live weather requests were made. This is a targeted Windows check, not a full-suite rerun, Mac result, browser walkthrough or P6.2 approval.
+
+**Kept / changed / rejected:** Kept scoring, provider behavior, dependency versions, credential exclusions and all genuine data unchanged. Preserved pre-existing status edits and the user's 40 newly accumulated forecast rows. Reused phase plans and existing tests instead of creating another delivery document or duplicate test suite. Public source attribution was checked; account-specific data redistribution and unreadable/unconfirmed source terms remain explicit final-delivery checks. Rejected invented approvals, team understanding or final submission claims.
+
+**Human review:** Pending with Gabriel for P6.1. P5.5 is approved/merged in PR #19, but Mac test output and complete desktop/mobile confirmation remain unconfirmed. After review and remaining prerequisites, Selin owns P6.2 with Christian reviewing; Asier owns P6.3 with Gabriel reviewing.
+
+**Commit / PR:** Asier authorized committing and pushing the P6.1 changes on 12 November 2026 to `asier/feature`, including the preserved genuine records and prior status updates. The commit carries `Co-Authored-By: Codex <noreply@openai.com>`. Gabriel review, merging and final submission remain pending.

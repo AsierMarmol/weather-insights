@@ -28,3 +28,10 @@ Further genuine searches during the P5.5 review append newer fetch groups to the
 ## Normal app use during P5.5 - 12 November 2026
 
 At 17:35:30 UTC the CSV contained **6,604 records across all 83 destinations**, including Barcelona. Asier confirmed he was running the app during the review. Compared with the earlier snapshot, 82 new genuine forecast groups added 3,280 rows; all original 3,324 rows are preserved in order. A frozen copy passed WeatherStore schema/model validation, catalog membership, unique record keys and coherent city/kind/retrieval time within each group. Review tests did not create these records or make live requests. These counts are a dated checkpoint and may grow during subsequent use.
+
+
+## Provider credit and delivery review - 12 November 2026
+
+Weather data provided by [OpenWeather](https://openweathermap.org/). Its [attribution guidance](https://openweathermap.org/faq#license) specifies visible provider text, a website link and its logo for plans requiring attribution. The application now displays these in the shared sidebar using the unmodified master RGB logo from the [official archive](https://openweathermap.org/payload/api/files/file/logo_files.zip). The logo is stored at `assets/openweather-logo.jpg` in the repository.
+
+Public attribution guidance was checked during P6.1 preparation. The team's account-specific permission to store and redistribute the retained responses has not been independently confirmed; Asier and Gabriel must resolve that delivery gate before submission. Do not remove or fabricate the genuine dataset to bypass the instructor's requirement. Current and forecast records remain distinguishable, with retrieval timestamps separate from provider valid times.

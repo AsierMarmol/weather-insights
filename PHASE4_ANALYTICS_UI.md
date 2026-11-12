@@ -1,6 +1,6 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-Updated: 12 November 2026. **Implemented and reviewed:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12). P4.4 independent Dashboard approved by Asier and merged in PR #15 (dev 1e43be3). P5.1-P5.4 are merged; P5.5 is implemented/tested locally and awaiting Gabriel review.
+Updated: 12 November 2026. **Implemented and reviewed:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12). P4.4 independent Dashboard approved by Asier and merged in PR #15 (dev 1e43be3). P5.1-P5.4 are merged; P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); Mac and visual results remain unconfirmed.
 
 ## Purpose and dependencies
 

@@ -1,6 +1,6 @@
 # Phase 5 - Quality Review
 
-Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3 analytical acceptance approved by Selin and merged in [PR #17](https://github.com/AsierMarmol/weather-insights/pull/17) (dev `bfd9fd7`); P5.4 Dashboard/chart acceptance approved by Asier and merged in PR #18 (dev `1784b8c`); P5.5 implemented and tested locally on dev `1784b8c`, awaiting Gabriel review and a browser visual check; Phase 5 is not yet accepted.
+Updated: 12 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3 analytical acceptance approved by Selin and merged in [PR #17](https://github.com/AsierMarmol/weather-insights/pull/17) (dev `bfd9fd7`); P5.4 Dashboard/chart acceptance approved by Asier and merged in PR #18 (dev `1784b8c`); P5.5 approved by Gabriel and merged in [PR #19](https://github.com/AsierMarmol/weather-insights/pull/19) (dev `2999dae`); Mac test results and desktop/mobile visual confirmation remain unconfirmed. Phase 5 verification is not yet fully closed.
 
 ## Purpose and dependencies
 
@@ -14,7 +14,7 @@ Verify the integrated app against the teacher rubric. Component tests already be
 | P5.2 | API/security/save acceptance | Gabriel | Alejandra | P4.1-P4.3 merged | Exercise input/key/location/network/server/quota/malformed responses, partial batches, cache saves and safe failure messages. | Completed locally: one gap fixed (key file in another encoding), 43 new tests, 376 total pass, Flake8 clean; merged in PR #14 with Selin's approval (Alejandra was the planned reviewer) |
 | P5.3 | Analytical acceptance | Christian | Selin | P4.1-P4.3 merged | Verify all day windows, clock changes, threshold boundaries, missing/stale metrics, driving cap, ties and three distinct analyses. | Completed locally: no analytical defect found, 22 new acceptance tests; 403 passed, 2 skipped, 2 failed (Dashboard timeouts from a storage lookup cost, reported to its owners); approved by Selin and merged in PR #17 (dev `bfd9fd7`) |
 | P5.4 | Dashboard/chart acceptance | Selin | Asier | P4.4 merged | Validate the independent Dashboard: all 83 map markers, hover values, plotted inputs and units, weather-only ranks/ties, interactive filters, windows, freshness and empty/unavailable states against common results. | Completed on `selin/feature` from dev `bfd9fd7`: three Dashboard defects fixed (map centre, wheel zoom, hidden limit label) plus table wording; 3 new tests; 410 passed, 0 skipped (macOS), Flake8 clean; approved by Asier and merged in PR #18 |
-| P5.5 | Searcher/integration and rubric walkthrough | Asier | Gabriel | P5.1-P5.4 | Validate seasonal/manual preference persistence, All options, top-five/full-table consistency, complete user journey, every rubric row and actual team contributions. | Implemented/tested locally: 427 passed, 2 skipped on Windows; Flake8 clean. Awaiting Gabriel review and browser layout confirmation; no commit or push |
+| P5.5 | Searcher/integration and rubric walkthrough | Asier | Gabriel | P5.1-P5.4 | Validate seasonal/manual preference persistence, All options, top-five/full-table consistency, complete user journey, every rubric row and actual team contributions. | Approved by Gabriel and merged in PR #19. Windows evidence: 427 passed, 2 skipped; Flake8 clean. Mac tests and desktop/mobile visual results unconfirmed |
 
 ## Implementation and acceptance
 
@@ -51,7 +51,7 @@ Dated entries describe their original submission state. The deliverable table an
 
 ## Next action
 
-P5.1-P5.4 are merged. Review the local P5.5 changes below before authorizing a commit or PR. Gabriel is the reviewer and should confirm the desktop/mobile map layout as well as the code and rubric evidence. After acceptance, Asier starts P6.1; Selin performs P6.2 with Christian reviewing; Asier completes P6.3 with Gabriel reviewing. Phase 5 acceptance and Phase 6 delivery are not claimed complete.
+P5.1-P5.5 are merged. Gabriel approved P5.5 in PR #19, but Mac test results and desktop/mobile visual checks are not yet confirmed. Gabriel should update his own feature branch from dev and record the tested commit, commands/results and browser/viewport checks. Asier can prepare P6.1 documentation while this evidence remains open; Selin performs P6.2 with Christian reviewing; Asier completes P6.3 with Gabriel reviewing. Phase 5 acceptance and Phase 6 delivery are not claimed complete.
 
 ### P5.1 model/storage acceptance - 12 November 2026
 
@@ -269,3 +269,15 @@ Expected: **2 passed**, not skipped. Record the tested commit and OS. On WSL, us
 6. Record browser, viewport sizes, tested commit, pass/fail and any screenshots without credentials. Normal live loads append genuine data; visual checks should not run concurrently with data-integrity tests in the same clone.
 
 **Acceptance remains pending** until Gabriel reviews P5.5 and the visual result is recorded. Phase 6 still owns the named clean-clone verification, final source/license check, reviewed main publication, instructor access and submission receipt. No commit, push, review request or merge was performed in this follow-up.
+
+
+### P5.5 review and merge update - 12 November 2026
+
+Gabriel approved commit `9c0bacc` and PR #19 was merged into dev as `2999dae`. His review says "Approved!"; it does not report Mac tests or desktop/mobile visual results. Asier confirmed those results have not yet been confirmed. Earlier dated pending-review statements above describe their original state and are superseded by this update.
+
+Local `asier/feature` was fast-forwarded to the merged dev version. Gabriel should test from his own feature branch updated from dev, record the exact tested commit and report both the Mac suite (including the two Unix permission checks) and desktop/mobile walkthrough. Do not mark these checks passed from approval alone. P6.1 documentation preparation can proceed; final validation and delivery remain pending.
+
+
+### Additional visual evidence - 12 November 2026
+
+Asier supplied a desktop Searcher screenshot and a four-page browser print of Dashboard. The screenshot shows the form, All defaults and 83 matching destinations. The print reports 83/83 ranked destinations and shows the map, activity filter, weather ranking and table. Printed chart/table clipping and pagination do not establish a live-browser defect. These artifacts do not report a tested commit, Mac test output, hover behavior or phone-width interaction, so those remaining checks stay open. The subsequent P6.1 sidebar attribution also needs visual confirmation.
