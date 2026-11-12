@@ -24,7 +24,19 @@ _SEASONS = ("Winter", "Spring", "Summer", "Autumn")
 def get_api_key() -> str:
     """Respect process environment precedence; never include a key in errors.
     """
-    load_dotenv(ENV_FILE, override=False)
+    try:
+        # For example Windows PowerShell 5 "echo ... > file" writes UTF-16,
+        # which is not UTF-8 or, without a byte-order mark, decodes to text
+        # full of NUL characters that would silently hide the key.
+        if ENV_FILE.is_file() and b"\x00" in ENV_FILE.read_bytes():
+            raise UnicodeDecodeError("utf-8", b"", 0, 1, "NUL byte")
+        load_dotenv(ENV_FILE, override=False, encoding="utf-8")
+    except UnicodeDecodeError:
+        if not os.getenv("OPENWEATHER_API_KEY", "").strip():
+            raise ValueError(
+                f"{ENV_FILE.name} is not UTF-8 text. Save it again as UTF-8 "
+                "(in Notepad: Save As > Encoding > UTF-8)."
+            ) from None
     key = os.getenv("OPENWEATHER_API_KEY", "").strip()
     if not key:
         raise ValueError(

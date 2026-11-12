@@ -4,7 +4,7 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher (editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states) was approved and merged. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12: shared results, navigation, consistent All filters, chart-choice persistence and failure/recovery journeys are verified. Phase 5 quality acceptance is in progress (P5.1 model/storage acceptance awaiting Christian's review); Phase 6 delivery remains pending. Source limitations remain documented.
+Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher (editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states) was approved and merged. P4.2 Dashboard was approved by Asier and merged in PR #11. P4.3 integration was approved by Gabriel and merged in PR #12: shared results, navigation, consistent All filters, chart-choice persistence and failure/recovery journeys are verified. Phase 5 quality acceptance is in progress (P5.1 model/storage acceptance awaiting Christian's review; P5.2 API/security/save acceptance completed locally, awaiting Alejandra's review); Phase 6 delivery remains pending. Source limitations remain documented.
 
 Searcher behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. The Dashboard shows ranking, weather comparison and periods meeting all preferences as labeled charts and tables of the same search results. Every fresh successful weather fetch saves automatically.
 
@@ -106,6 +106,7 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 | `uv` is not recognized | Install uv using the official instructions above, then reopen the terminal. |
 | `missing ScriptRunContext` warnings appear after using VS Code's Run Python File button | Launch the app with `uv run --locked streamlit run app.py` in the terminal. Streamlit needs its own runner. |
 | `OPENWEATHER_API_KEY is not set` appears when requesting API access | Fill the key in your local `variables.env` or supply it through the environment. Retry after saving the file. |
+| `variables.env is not UTF-8 text` appears | The file was saved as UTF-16 (for example by Windows PowerShell 5 `echo ... > variables.env` or Notepad's "Unicode" option). Save it again as UTF-8, or create it with the `Copy-Item` command above and edit it. |
 | Port 8501 is already in use | Stop your other server or run `uv run --locked streamlit run app.py --server.port 8502`. Follow the Local URL printed by that process. |
 | `uv sync --locked` reports that the lockfile is outdated | Check that `pyproject.toml` and `uv.lock` came from the same reviewed change. Coordinate dependency updates with the team and include both files in that change. |
 
@@ -138,4 +139,4 @@ Read the [catalog sources](data/reference/README.md), [saved-data record](data/w
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Christian reviews P5.1; the other component owners perform their Phase 5 quality review, followed by the full rubric walkthrough. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Christian reviews P5.1 and Alejandra reviews P5.2; the other component owners perform their Phase 5 quality review, followed by the full rubric walkthrough. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
