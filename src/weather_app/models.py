@@ -263,8 +263,14 @@ class WeatherRecord:
     provider_city_name: str
 
     def __post_init__(self) -> None:
-        if isinstance(self.schema_version, bool) or self.schema_version != SCHEMA_VERSION:
-            raise ValueError(f"schema_version must be {SCHEMA_VERSION}")
+        # A genuine int only: 1.0 or True compare equal to 1 but would serialize
+        # as "1.0"/"True", which from_csv_row() could never read back.
+        if (
+            isinstance(self.schema_version, bool)
+            or not isinstance(self.schema_version, int)
+            or self.schema_version != SCHEMA_VERSION
+        ):
+            raise ValueError(f"schema_version must be the integer {SCHEMA_VERSION}")
         try:
             fetch_id = str(uuid.UUID(_text("fetch_id", self.fetch_id)))
         except ValueError:

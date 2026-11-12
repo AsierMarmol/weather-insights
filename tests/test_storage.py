@@ -288,3 +288,103 @@ def test_concurrent_appends_in_one_process_are_serialized(store):
     assert len(store.load()) == 24
     assert len({r.fetch_id for r in store.load()}) == 8
 
+
+
+# --- schema version regression ----------------------------------------------------
+
+
+def test_integer_schema_version_saves_and_reloads(store):
+    records = forecast(WeatherRecord.new_fetch_id())
+    assert all(type(r.schema_version) is int for r in records)
+    store.append(records)
+    lines = store.path.read_text(encoding="utf-8").splitlines()[1:]
+    assert all(line.startswith("1,") for line in lines)
+    assert store.load() == records
+
+
+@pytest.mark.parametrize("version", [1.0, True, "1", 2])
+def test_rejected_schema_versions_never_reach_an_existing_store(store, version):
+    store.append(forecast(WeatherRecord.new_fetch_id()))
+    before = store.path.read_bytes()
+    with pytest.raises(ValueError, match="schema_version"):
+        WeatherRecord(**{**current(WeatherRecord.new_fetch_id()).__dict__, "schema_version": version})
+    with pytest.raises(ValueError):
+        store.append([{"schema_version": version}])
+    assert store.path.read_bytes() == before
+    assert len(store.load()) == 3
+
+
+def test_saved_row_with_float_schema_version_is_reported(store):
+    row = current(WeatherRecord.new_fetch_id()).to_csv_row()
+    row["schema_version"] = "1.0"
+    store.path.parent.mkdir(parents=True)
+    store.path.write_text(HEADER + ",".join(row[f] for f in RECORD_FIELDS) + "\n", encoding="utf-8")
+    with pytest.raises(StorageError, match="line 2"):
+        store.load()
+
+
+# --- duplicate keys already in a saved file -----------------------------------------
+
+
+def write_rows(store, *records):
+    """Write records straight to the file, bypassing append() (simulates a bad merge/edit)."""
+    store.path.parent.mkdir(parents=True, exist_ok=True)
+    lines = [",".join(r.to_csv_row()[f] for f in RECORD_FIELDS) for r in records]
+    store.path.write_text(HEADER + "\n".join(lines) + "\n", encoding="utf-8")
+    return store.path.read_bytes()
+
+
+def conflicting_pair():
+    [original] = forecast(WeatherRecord.new_fetch_id(), periods=1, temperature_c=20.0)
+    [changed] = forecast(original.fetch_id, periods=1, temperature_c=27.5)
+    assert original.key == changed.key and original != changed
+    return original, changed
+
+
+def test_saved_rows_with_same_key_and_different_values_are_rejected(store):
+    original, changed = conflicting_pair()
+    write_rows(store, original, current(WeatherRecord.new_fetch_id()), changed)
+    with pytest.raises(StorageError, match=r"line 4: conflicting values for the record on line 2"):
+        store.load()
+    with pytest.raises(StorageError, match="conflicting"):
+        store.load(city_id="ES-40194")  # filters cannot hide the inconsistency
+    with pytest.raises(StorageError, match="conflicting"):
+        store.latest_forecast("ES-45168")
+
+
+def test_appending_to_a_conflicting_file_fails_without_changing_it(store):
+    original, changed = conflicting_pair()
+    before = write_rows(store, original, changed)
+    for batch in ([current(WeatherRecord.new_fetch_id())], [original], [changed]):
+        with pytest.raises(StorageError, match="conflicting"):
+            store.append(batch)
+        assert store.path.read_bytes() == before
+    assert sorted(p.name for p in store.path.parent.iterdir()) == [store.path.name]
+
+
+def test_identical_duplicate_rows_are_returned_once_and_left_in_place(store):
+    records = forecast(WeatherRecord.new_fetch_id(), periods=2)
+    before = write_rows(store, records[0], records[1], records[0])
+    assert store.load() == records
+    assert store.latest_forecast("ES-45168") == records
+    # Retrying the save is still idempotent and does not "repair" the file.
+    assert store.append(records) == 0
+    assert store.path.read_bytes() == before
+    # New genuine records are appended after the untouched existing bytes.
+    extra = current(WeatherRecord.new_fetch_id())
+    assert store.append([extra]) == 1
+    assert store.path.read_bytes().startswith(before)
+    assert store.load() == records + [extra]
+
+
+def test_retries_stay_idempotent_and_distinct_fetches_stay_separate_after_fix(store):
+    first = forecast(WeatherRecord.new_fetch_id())
+    second = forecast(WeatherRecord.new_fetch_id())  # same provider times, new fetch
+    assert store.append(first) == 3
+    assert store.append(first) == 0
+    assert store.append(second) == 3
+    assert store.append(first + second) == 0
+    saved = store.load()
+    assert len(saved) == 6
+    assert {r.fetch_id for r in saved} == {first[0].fetch_id, second[0].fetch_id}
+    assert store.latest_forecast("ES-45168") == second
