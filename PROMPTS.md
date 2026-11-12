@@ -451,3 +451,23 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** User approved the simplification and data-investigation removal. Christian's P2.4/catalog review and Gabriel's specification/API reviews remain pending.
 
 **Commit / PR:** Not created. Changes remain local; no commit, push or merge was performed.
+
+---
+
+## Phase 3: P3.1 models, catalog loading and weather-record storage (2026-11-12)
+
+**Requested by:** Alejandra Medina (alemedinabarreto).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Synchronize the personal branch with the latest dev, then implement the owned P3.1 deliverable from PHASE3_CORE_DATA.md against the P2.4 shared specification: validated domain models with a meaningful special method and computed property, the nine-column catalog loader, and safe CSV saving/reloading of normalized weather records, with tests and documentation.
+
+**Got:** `src/weather_app/models.py`: frozen keyword-only dataclasses `Destination`, `SearchPreferences` and `WeatherRecord` that validate types, finite values, coordinate/percentage ranges, allowed activity/size labels, UUID fetch IDs and timezone-aware times (normalized to UTC); properties `drive_hours`, `horizon`, `lead_time` and `key`; `__str__`/`__repr__` and chronological `__lt__`; exact CSV serialization with blank cells for missing values. `src/weather_app/storage.py`: `load_destinations()`, `WeatherStore.append/load/latest_forecast`, `CatalogError` and `StorageError`, repository-rooted default paths, idempotent retries, conflict detection, atomic copy-append-replace writes, a per-file process lock held in a name-mangled class attribute, and newest-single-group forecast selection. `tests/test_models.py` and `tests/test_storage.py`.
+
+**Checked:** Baseline before changes: 25 offline tests passed and both starter views passed AppTest. After changes: `uv run --locked python -m pytest -q` passed 107 tests (82 new). The real catalog loads 83 destinations with 14/26/43 size counts and unchanged Lugo values. Storage tests use pytest temporary directories only and cover round trips, filters, retries, distinct fetches, conflicts, byte-for-byte preservation, newest-group selection, failed replace, unwritable paths, damaged/partial files and concurrent appends. Optionally compared the private handoff fixtures against the models (header, three catalog rows, preferences and 12 synthetic records accepted); they are not a repository or test dependency. No live API request was made and no `weather_records.csv` was created.
+
+**Kept / changed / rejected:** Kept the P2.4 field names, CSV header, entry-point signatures and `None`-not-zero rule. Added `append()` returning the count of new rows, and explicit error classes for P3.2 to map to the `storage`/`invalid_data` codes. Rejected the earlier unpublished local prototype (single-snapshot OpenWeatherMap client, comfort index and collector) because it predates the agreed scope and overlaps Gabriel's P3.2; it remains on a separate local branch and is not part of this change. Deferred importing the retained JSONL evidence until P3.2 provides the provider mapping, so original retrieval times are preserved without a second mapping implementation.
+
+**Human review:** Alejandra directed the work and approved proceeding while Christian's P2.4/catalog review is outstanding. Christian's P3.1 review is pending; no approval is claimed.
+
+**Commit / PR:** Pending.

@@ -4,7 +4,7 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup is complete. Phase 2 product rules, 83-city catalog, API contract and shared specification are prepared; peer/source reviews remain open. The application currently displays Searcher and Dashboard headings only. Production weather retrieval, storage, ranking, controls and charts remain pending.
+Phase 1 setup is complete. Phase 2 product rules, 83-city catalog, API contract and shared specification are prepared; peer/source reviews remain open. The application currently displays Searcher and Dashboard headings only. Domain models, catalog loading and the weather-record store (P3.1) are implemented and awaiting review; production weather retrieval, ranking, controls and charts remain pending.
 
 Planned behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. Dashboard provides ranking, weather comparison and periods meeting all preferences, with at least two real-data charts. Every fresh successful weather fetch saves automatically.
 
@@ -90,7 +90,7 @@ uv run --locked python -c "import weather_app; print('weather_app import OK')"
 uv run --locked python -m pytest -q
 ```
 
-Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration and the diagnostic; production analytics and application features remain pending. Synthetic tests do not write to the genuine weather dataset.
+Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading and storage; production API, analytics and application features remain pending. Synthetic tests do not write to the genuine weather dataset.
 
 ## Troubleshooting
 
@@ -108,8 +108,8 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 | Location | Purpose |
 | --- | --- |
 | app.py | Streamlit entry point; currently two starter views |
-| src/weather_app/ | Installable package: configuration plus model/client/storage/analytics placeholders |
-| tests/ | Offline diagnostic/configuration tests; component tests added with implementation |
+| src/weather_app/ | Installable package: configuration, domain models (`models.py`) and catalog/weather storage (`storage.py`); client/analytics placeholders |
+| tests/ | Offline diagnostic, configuration, model and storage tests (temporary files only); further component tests added with implementation |
 | scripts/verify_weather_access.py | Optional bounded live diagnostic, not the production service |
 | data/reference/ | Nine-column catalog, product defaults, provider overrides and source notes |
 | data/weather/ | Genuine timestamped responses and run summaries; normal application CSV comes with storage implementation |
