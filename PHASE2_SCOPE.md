@@ -4,7 +4,7 @@ Updated: 12 November 2026.
 
 ## Current checkpoint
 
-Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample; Gabriel's review is pending. UI features remain unimplemented. Catalog/source limitations remain documented in the reference notes.
+Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1 Searcher is implemented locally, awaiting review; Dashboard/integration remain pending. Catalog/source limitations remain documented in the reference notes.
 
 ## Deliverables
 
@@ -14,7 +14,7 @@ Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christia
 | P2.2 | Complete destination catalog and sources | Asier | Christian | P2.1 | 83 rows/nine columns checked; Christian approved the catalog foundation in PR #3; retain documented source/access limitations |
 | P2.3 | Weather access and provider contract | Asier | Gabriel | P2.1 | Historical live checks passed; WEATHER_API_CONTRACT.md prepared; reviewed by Gabriel (12 November 2026) |
 | P2.4 | Shared data and calculation specification | Asier | Christian | P2.1 + P2.2 + P2.3 | Schema, component inputs/outputs and worked example approved by Christian in PR #3 |
-| P2.5 | Verify the shared fetch/save/readback path | Asier | Gabriel | P3.1 + P3.2 | Verification passed: 3 cities, 123 new genuine records; reload/cache/idempotence and 1-5-day replay passed; awaiting Gabriel review |
+| P2.5 | Verify the shared fetch/save/readback path | Asier | Gabriel | P3.1 + P3.2 | Verification passed: 3 cities, 123 new genuine records; reload/cache/idempotence and 1-5-day replay passed; approved by Gabriel and Christian, merged in PR #9 |
 
 Reviewed P2.1-P2.4 allow component development. P2.5 is a deferred integration check after the Phase 3 components exist; it does not block their construction or require a second client/store. Complete it before accepting Phase 3 and starting live UI integration. Keep task IDs for continuity.
 
@@ -132,7 +132,7 @@ approval or commit/push/merge without authorization.
 
 ## Next action
 
-Gabriel reviews P2.5's saved-data evidence and checks. Christian reviews the new multi-city analytics replay. After acceptance, Asier builds P4.1 Searcher and Selin builds P4.2 Dashboard, followed by P4.3 integration. Keep review status honest using [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
+P2.5 was accepted in PR #9. Continue with P4.1 Searcher (Asier, reviewed by Gabriel), P4.2 Dashboard (Selin, reviewed by Asier), then P4.3 integration. Keep review status honest using [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
 
 ### P2.5 verification - 12 November 2026
 
@@ -152,7 +152,7 @@ Replayed the sample at `2026-11-12T11:29:04.669987+00:00` with autumn preference
 
 **Validation:** full offline suite 237 passed; whitespace checks passed; credentials remain excluded.
 
-**Status: verification passed; Gabriel's P2.5 review pending.** Christian can review the multi-city analytical evidence without fetching again. Optional historical JSONL import remains deferred: original evidence is retained separately and the actual application CSV now accumulates genuine data. No UI feature or final rubric acceptance is claimed.
+**Status: approved by Gabriel and Christian and merged in PR #9 (12 November 2026).** The multi-city evidence remains replayable without fetching again. Optional historical JSONL import remains deferred: original evidence is retained separately and the actual application CSV now accumulates genuine data. No UI feature or final rubric acceptance is claimed.
 
 
 ### P2.5 pre-commit validation - 12 November 2026
@@ -162,3 +162,5 @@ Rechecked against the instructor's README and the phase acceptance map. Full off
 The configured key was absent from tracked working-tree files; the credential file is untracked/ignored and its example is blank. No extra live request was made. Corrected stale catalog-review wording, documented read-only genuine-data tests and made the development clone command select `dev`. The existing `.gitignore` edit remains untouched and is not part of P2.5. No blocking defect was found for this checkpoint; Gabriel review and Christian's multi-city analytical acceptance remain pending before Phase 4 acceptance. No commit or push was made.
 
 P2.5 pre-commit lint follow-up: the initial validation did not include Flake8. After Asier flagged the editor diagnostics, a full scan found 529 formatting findings, including 517 long lines. Wrapped code/comments/docstrings and corrected whitespace in 17 Python files. All 18 Python syntax trees match the pre-format version after normalizing docstring whitespace; Flake8 now reports zero findings and all 237 tests pass. Added Flake8 to locked development dependencies and the README verification commands. No data, business-rule or `.gitignore` change was made by this cleanup; review remains pending.
+
+12 November acceptance update: PR #9 was approved by Gabriel and Christian and merged into dev as f61c850. The P2.5 review gate is complete; earlier pending-review notes are historical.
