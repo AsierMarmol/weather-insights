@@ -616,3 +616,23 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Pending. Gabriel reviews P4.1; earlier PR #9 approvals cover P2.5, not this new implementation.
 
 **Commit / PR:** Asier authorized committing and publishing P4.1 from `asier/feature` to `dev` for Gabriel review. Selin owns the separate P4.2 Dashboard work. Review and merge remain pending.
+
+---
+
+## Phase 4: P4.2 Dashboard (2026-11-12)
+
+**Requested by:** Selin Atalar (selin-atalar).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Update the personal branch from the latest dev, check that every prerequisite of P4.2 is actually complete, and then implement the owned P4.2 Dashboard: interactive ranking, weather comparison and all-preferences views of the shared search results with at least two labeled real-data charts, explicit missing/unavailable states and tests, without a second fetching or scoring path. Selin chose to include the one-line `app.py` Dashboard call for Asier to review.
+
+**Got:** `src/weather_app/dashboard.py`: `render_dashboard(analysis_rows, catalog_rows)`, `render_dashboard_page()` over the Searcher's shared state, pure helpers `prepare_frame`, `filter_frame`, `search_context`, and Plotly builders `ranking_chart`, `comparison_chart` and `all_preferences_chart`. It reuses `analytics.RESULT_FIELDS`/`FORECAST_MAX_AGE` and the Searcher's `MESSAGES` and `utc_now`. `app.py`: the Dashboard placeholder is replaced by `render_dashboard_page()`. `tests/test_dashboard.py` (42 tests). Updated PHASE4_ANALYTICS_UI.md, PROJECT_PHASES.md and README.md.
+
+**Checked:** Prerequisites on GitHub before coding: P3.1 (PR #4, #8), P3.2 (PR #6), P3.3 (PR #5, #7) and P2.5 (PR #9) approved by their named reviewers and merged; P4.1 merged in PR #10 with Gabriel's approval. The feature branch fast-forwarded to dev `b166b50`. Full suite 301 passed (259 before plus 42 new); Flake8 zero findings. Tests cover contract validation, ANY/AND filters, chart data and units, AppTest interactions, freshness/changed-settings notices, a read-only replay of the genuine P2.5 forecasts through the real analytics engine (Seville, Toledo, Segovia with independently tallied scores), and an `app.py` search-to-Dashboard journey with fake HTTP and a temporary store showing the Dashboard makes no requests and writes no records. The genuine CSV checksum was unchanged. Visually checked with the genuine replay in a throwaway harness outside the repository. No live API request was made.
+
+**Kept / changed / rejected:** Kept the P2.4 entry point and field names. The Dashboard never re-sorts or re-scores; shared rank is the row's position in the engine's order. It labels results with `search_result_preferences` (the settings actually searched), not unsent control edits. Dashboard filter choices are copied to plain session keys so they survive navigation, because Streamlit discards widget state for hidden widgets. An earlier draft written against the specification before P3.2/P3.3 existed was revised to reuse the merged components; its local backup is outside Git. The unrelated 10 November local API-client prototype was not used because it overlaps Gabriel's P3.2.
+
+**Human review:** Selin directed the work and chose to include the `app.py` call. Asier's P4.2 review is pending; no approval is claimed.
+
+**Commit / PR:** Pending Selin's authorization.
