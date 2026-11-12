@@ -1,6 +1,6 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-Updated: 12 November 2026. **Not started.**
+Updated: 12 November 2026. **In progress:** P4.1 implemented locally, awaiting Gabriel review; P4.2 and P4.3 pending.
 
 ## Purpose and dependencies
 
@@ -10,7 +10,7 @@ Deliver Searcher and Dashboard on the same data and calculations, then connect t
 
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| P4.1 | Complete Searcher | Asier | Gabriel | Phase 3 accepted incl. P2.5 | Editable seasonal preferences, rolling 1-5 days, All filters from catalog values, five leading results/full ranking, useful errors and tests. | Pending |
+| P4.1 | Complete Searcher | Asier | Gabriel | Phase 3 accepted incl. P2.5 | Editable seasonal preferences, rolling 1-5 days, All filters from catalog values, five leading results/full ranking, useful errors and tests. | Implemented; 22 new tests pass; Gabriel review pending |
 | P4.2 | Complete Dashboard | Selin | Asier | Phase 3 accepted incl. P2.5 | Interactive ranking, weather comparison and simultaneous-preference metrics; at least two labeled real-data charts, missing states and tests. | Pending |
 | P4.3 | Integrate the app | Asier | Gabriel | P4.1 + P4.2 | Shared search state, navigation, data reuse, progress/freshness and partial errors verified end to end. | Pending |
 
@@ -38,8 +38,21 @@ request review, merge or submit without the relevant authorization.
 
 | Date | Task | Actual result and evidence | Status |
 | --- | --- | --- | --- |
-| Not started | Phase 4 | No completed implementation/acceptance results | Pending |
+| 12 November 2026 | P4.1 | Asier/Codex implemented searcher.py and connected app.py; 22 Searcher tests and 259 total tests pass; Flake8 zero findings. PR #9 approvals/merge confirmed first. Genuine data unchanged; no new live requests. | Awaiting Gabriel review |
 
 ## Next action
 
-P2.5 verification has passed locally; Gabriel's review and Christian's multi-city analytical acceptance remain pending. After that gate, Asier builds P4.1 and Selin builds P4.2 using the shared services; Asier then connects the two in P4.3 and verifies the user journey. No view implementation is claimed complete.
+Gabriel reviews P4.1. Selin can build P4.2 using the existing analytical results; Asier reviews it and then completes P4.3 shared navigation/state integration. Dashboard and charts are still pending.
+
+
+### P4.1 implementation and state contract
+
+`searcher.initial_preferences(now_utc, defaults)` derives the initial season from Europe/Madrid; only first use or explicit reset applies it. Valid manual choices persist across reruns, navigation and season changes. Activities/sizes derive from the real catalog and visibly default to All. Empty selections mean All; All overrides any other selected values as explained beside the controls. Invalid temperature ranges disable Search.
+
+`search_destinations` filters before asking the actual WeatherService for forecasts and delegates all scoring to analytics. It captures one common UTC search time and refreshes cached forecasts once when they no longer cover the requested window. The service remains the only fetch/save path. No network occurs on initial load, control edits, reset or navigation. Fresh searches save automatically and show progress; key/network/quota/provider/storage/location failures use safe distinct messages.
+
+The view displays up to five available destinations, the full eligible ranking (including unavailable reasons), travel units, score explanation, window/preferences, coverage and data age. Changed controls leave the old results explicitly labeled until another search. Old results show a warning after three hours. The three-day historical genuine replay renders Seville 83.9, Toledo 50.8 and Segovia 46.9; this is a test replay at the original search time, not fresh weather.
+
+Shared session keys: `search_preferences` (current controls), `search_run_at_utc`, `search_analysis_rows`, `search_result_preferences` (preferences used for those results), `search_errors` and `search_cached_count`. `weather_service` is lazily created once per session. P4.2/P4.3 must consume the result snapshot and its preferences together, rather than implying that unsent control changes have recomputed scores. No Dashboard implementation or final integrated acceptance is claimed.
+
+Validation: 259 tests passed, including 22 new checks for season/Madrid-month boundaries, navigation/reset persistence, lazy requests, filters, top-five/full-ranking agreement, save/cache reuse, safe failures, empty matches, incomplete cached coverage, historical genuine replay and age warnings. Tests block live HTTP and assert the genuine CSV is unchanged. Flake8 reports zero findings. P4.1 publication for Gabriel review is authorized; review and merge remain pending. Selin owns the separate P4.2 implementation.

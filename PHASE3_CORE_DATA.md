@@ -1,6 +1,6 @@
 # Phase 3 - Core Application and Automatic Data Saving
 
-Updated: 12 November 2026. **In progress:** P3.1, P3.2 and P3.3 reviewed and merged into dev (PR #4, PR #6, PR #5); P3.3 integration reviewed and merged in PR #7; P3.1 validation follow-up reviewed and merged in PR #8; P2.5 verification passed locally and awaits Gabriel review.
+Updated: 12 November 2026. **Core accepted for Phase 4:** P3.1, P3.2 and P3.3 reviewed and merged into dev (PR #4, PR #6, PR #5); P3.3 integration reviewed and merged in PR #7; P3.1 validation follow-up reviewed and merged in PR #8; P2.5 was approved by Gabriel and Christian and merged in PR #9. Final integrated acceptance remains Phase 5.
 
 ## Purpose and dependencies
 
@@ -10,9 +10,9 @@ Build models/storage, the reusable API/save service and the analytical engine. R
 
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| P3.1 | Models, catalog loading and persistence | Alejandra | Christian | P2.4 | Validated models with useful special method/computed property; safe CSV append/reload, preserved genuine records and meaningful tests. | Approved by Christian and merged into dev in PR #4 (12 November 2026); validation follow-up approved by Christian and merged in [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8); Phase 3 acceptance waits for P2.5 review; JSONL import limit below still open |
-| P3.2 | Production API and request/save service | Gabriel | Alejandra | P2.4; integration after P3.1 | Generic/provider inheritance and deliberate encapsulation; safe credentials, normalization, partial failures, pacing/cache, single automatic save path and tests. | Approved by Alejandra and merged into dev in PR #6 (12 November 2026); Phase 3 acceptance waits for P2.5 review |
-| P3.3 | Analytics and ranking engine | Christian | Selin | P2.4; real-data integration after P3.1 + P3.2 | Complete coverage/time/filter/scoring/tie rules, three analyses and independently checked tests on synthetic and genuine inputs. | Engine approved by Selin and merged in PR #5; service integration approved by Selin and merged in PR #7; Phase 3 acceptance waits for P2.5 review |
+| P3.1 | Models, catalog loading and persistence | Alejandra | Christian | P2.4 | Validated models with useful special method/computed property; safe CSV append/reload, preserved genuine records and meaningful tests. | Approved by Christian and merged into dev in PR #4 (12 November 2026); validation follow-up approved by Christian and merged in [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8); P2.5 accepted in PR #9; optional historical JSONL import remains deferred |
+| P3.2 | Production API and request/save service | Gabriel | Alejandra | P2.4; integration after P3.1 | Generic/provider inheritance and deliberate encapsulation; safe credentials, normalization, partial failures, pacing/cache, single automatic save path and tests. | Approved by Alejandra and merged into dev in PR #6 (12 November 2026); P2.5 accepted in PR #9 |
+| P3.3 | Analytics and ranking engine | Christian | Selin | P2.4; real-data integration after P3.1 + P3.2 | Complete coverage/time/filter/scoring/tie rules, three analyses and independently checked tests on synthetic and genuine inputs. | Engine approved by Selin and merged in PR #5; service integration approved by Selin and merged in PR #7; P2.5 accepted in PR #9 |
 
 ## Implementation and acceptance
 
@@ -52,6 +52,6 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-PR #7 and PR #8 are approved and merged. P2.5 passed on Toledo, Segovia and Seville; see [the evidence](PHASE2_SCOPE.md#p25-verification---12-november-2026). Gabriel reviews P2.5 and Christian reviews the new multi-city analytical replay before Phase 3 acceptance. P4 wiring uses `forecasts_from_service()` with one shared service. Christian's foundation approval is recorded in PR #3; historical pending entries above retain their original context.
+PR #7 and PR #8 are approved and merged. P2.5 passed on Toledo, Segovia and Seville; see [the evidence](PHASE2_SCOPE.md#p25-verification---12-november-2026). Gabriel and Christian approved P2.5 in merged PR #9, satisfying the Phase 4 dependency gate. P4 wiring uses `forecasts_from_service()` with one shared service. Christian's foundation approval is recorded in PR #3; historical pending entries above retain their original context.
 
 12 November checkpoint: Asier/Codex verified P2.5 with 123 new genuine records (164 total), cache/readback/idempotence and all five analytical windows. No core code changed. Gabriel review pending; Christian can now review genuine multi-city results. Optional JSONL import remains deferred; the original data is retained.

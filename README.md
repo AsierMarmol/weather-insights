@@ -4,9 +4,9 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-Phase 1 setup is complete. Phase 2 product rules, 83-city catalog, API contract and shared specification are prepared; the foundation was approved in PR #3; documented source limitations remain visible. P2.5's three-city save/readback/cache verification passed locally and awaits Gabriel review. The application currently displays Searcher and Dashboard headings only. Domain models, catalog loading and the weather-record store (P3.1) and the pure analytics/ranking engine (P3.3) are reviewed and merged. The OpenWeatherMap client and request/save service (P3.2) are reviewed and merged, and the analytics engine reads their results, but they are not yet connected to the views; controls and charts remain pending.
+Phase 1 setup and the reviewed Phase 2/3 foundation are complete for interface development. Gabriel and Christian approved P2.5 in merged PR #9. P4.1 Searcher is implemented locally and awaiting Gabriel review: editable preferences, catalog filters, top-five recommendations, full ranking, coverage/freshness and safe unavailable states use the existing service and analytics. P4.2 Dashboard/charts and P4.3 integration remain pending. Source limitations remain documented.
 
-Planned behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. Dashboard provides ranking, weather comparison and periods meeting all preferences, with at least two real-data charts. Every fresh successful weather fetch saves automatically.
+Searcher behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. The planned Dashboard will provide ranking, weather comparison and periods meeting all preferences, with at least two real-data charts. Every fresh successful weather fetch saves automatically.
 
 ## Requirements
 
@@ -57,7 +57,7 @@ The guard preserves an existing credential file. Open `variables.env` locally an
 OPENWEATHER_API_KEY=
 ```
 
-The key can remain blank while you explore the starter interface. Configure it before deliberately running the live API diagnostic or later application requests.
+The key can remain blank while you explore the Searcher controls. Configure it before clicking Search destinations or deliberately running the live API diagnostic.
 
 `variables.env` and common secret-file variants are excluded by `.gitignore`. Keep `variables.env.example` blank and safe to publish. Keep real keys out of commits, screenshots, chat, logs, and the app interface. The configuration uses `python-dotenv` to load this file from the project root; an existing `OPENWEATHER_API_KEY` environment variable takes precedence.
 
@@ -81,7 +81,11 @@ uv run --locked streamlit run app.py
 
 If Streamlit asks for an email during its welcome prompt, you can leave it blank and press Enter. Follow the **Local URL** printed in the terminal, usually [http://localhost:8501](http://localhost:8501).
 
-Switch between **Searcher** and **Dashboard** in the sidebar. Both currently show starter headings; empty views are expected at this stage. Stop the app with **Ctrl + C** in its terminal.
+In **Searcher**, choose the next 1-5 days, comfortable temperature range, maximum precipitation probability and wind. Activities and size default to **All**; remove All before choosing specific values (an empty selection also means All). Click **Search destinations** to request forecasts for matching cities. A full 83-city search can take a few minutes because requests are paced. Each fresh successful response saves automatically; suitable saved forecasts are reused.
+
+The top five recommendations and full ranking use identical scores. Unavailable cities have an explanation rather than a zero score. Results show their search window, preferences, forecast age and coverage. Editing controls does not fetch automatically; click Search again to update results. **Reset to seasonal defaults** resets preferences explicitly; normal reruns/navigation preserve your choices. Driving estimates are one-way from Madrid Km0 and do not include live traffic.
+
+**Dashboard** currently shows a P4.2 placeholder. Stop the app with **Ctrl + C** in its terminal.
 
 ## Verify the installation
 
@@ -93,7 +97,7 @@ uv run --locked python -m pytest -q
 uv run --locked flake8 src tests scripts app.py
 ```
 
-Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading, storage, the analytics engine, the API client and the request/save service. Simulated requests and writes use fake HTTP and temporary files; genuine-data replay tests read fixed saved fetch groups without modifying them. Interactive application features remain pending. Synthetic tests do not write to the genuine weather dataset. Run Flake8 before committing; a successful run prints no findings. Keep Python lines within 79 characters and wrap long expressions, comments and docstrings rather than suppressing the checks.
+Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading, storage, the analytics engine, the API client and the request/save service. Simulated requests and writes use fake HTTP and temporary files; genuine-data replay tests read fixed saved fetch groups without modifying them. Searcher interaction tests use headless AppTest with fake HTTP/temp stores or a read-only historical replay; Dashboard and end-to-end integration remain pending. Synthetic tests do not write to the genuine weather dataset. Run Flake8 before committing; a successful run prints no findings. Keep Python lines within 79 characters and wrap long expressions, comments and docstrings rather than suppressing the checks.
 
 ## Troubleshooting
 
@@ -110,8 +114,8 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 
 | Location | Purpose |
 | --- | --- |
-| app.py | Streamlit entry point; currently two starter views |
-| src/weather_app/ | Installable package: configuration (`config.py`), domain models (`models.py`), catalog/weather storage (`storage.py`), OpenWeather client (`client.py`), request/save service (`service.py`) and analytics/ranking engine (`analytics.py`) |
+| app.py | Navigation and P4.1 Searcher entry point; Dashboard placeholder |
+| src/weather_app/ | Installable package: configuration (`config.py`), domain models (`models.py`), catalog/weather storage (`storage.py`), OpenWeather client (`client.py`), request/save service (`service.py`) analytics/ranking engine (`analytics.py`) and Searcher controls/presentation (`searcher.py`) |
 | tests/ | Offline diagnostic, configuration, model, storage, analytics, client and service tests (fake HTTP and temporary files only); further component tests added with implementation |
 | scripts/verify_weather_access.py | Optional bounded live diagnostic, not the production service |
 | data/reference/ | Nine-column catalog, product defaults, provider overrides and source notes |
@@ -134,4 +138,4 @@ Read the [catalog sources](data/reference/README.md), [saved-data record](data/w
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Gabriel reviews P2.5 and Christian checks the new multi-city analytical evidence; after acceptance, Asier and Selin build the Searcher and Dashboard. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Gabriel reviews P4.1 Searcher; Selin builds P4.2 Dashboard, reviewed by Asier. P4.3 connects both accepted views. Pending functionality is not claimed complete by passing setup/diagnostic tests. A final clean-clone run and real contributions from all five remain delivery requirements.

@@ -595,3 +595,24 @@ Historical status: the seven original entries dated 2026-11-05 retain their revi
 **Human review:** Pending. This formatting follow-up accompanies the local P2.5 work; no teammate approval is claimed.
 
 **Commit / PR:** Included in the authorized P2.5 submission from `asier/feature` to `dev`; review and merge remain pending.
+
+
+---
+
+## Phase 4: P4.1 Searcher (2026-11-12)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Confirm the P2.5 PR is merged, update from dev and implement P4.1 Searcher: seasonal editable weather preferences, rolling 1-5-day window, catalog-derived All filters, top-five recommendations/full ranking, meaningful failures and tests, using the existing service and analytical engine.
+
+**Got:** src/weather_app/searcher.py with initial_preferences, lazy session service, search orchestration and native Streamlit controls/results. app.py routes Searcher to it and clearly retains the Dashboard placeholder. Updated phase navigation, accepted P2.5/core status, README usage and shared result-state documentation. No alternative API client, store or score calculation was introduced.
+
+**Checked:** PR #9 is merged (f61c850) and has Gabriel/Christian approvals; feature branch fast-forwarded first. Full suite 259 passed, including 22 new tests in tests/test_searcher.py. Headless AppTest covers initial defaults/no fetch, edited preference persistence across navigation and season changes, reset, invalid input, empty filters/matches, filter-before-fetch, top-five/full-table agreement, cache reuse, partial/all failures, safe missing credentials, corrupt references and old-result warnings. An incomplete cached window refreshes once. Read-only genuine replay gives the expected three-city ranking and scores. Flake8 zero findings. Tests block live requests and preserve the genuine CSV; no fresh weather was fetched during development.
+
+**Kept / changed / rejected:** Kept the car-only scope, common UTC window, shared normalization/save path and pure analytics. Current controls and executed-result preferences are stored separately so old results are never labeled with unsubmitted settings. Explicit search triggers requests; normal UI reruns do not. Cached incomplete coverage refreshes through the same service once. Dashboard/charts and final integration remain with P4.2/P4.3. Preserved the existing local .gitignore change.
+
+**Human review:** Pending. Gabriel reviews P4.1; earlier PR #9 approvals cover P2.5, not this new implementation.
+
+**Commit / PR:** Asier authorized committing and publishing P4.1 from `asier/feature` to `dev` for Gabriel review. Selin owns the separate P4.2 Dashboard work. Review and merge remain pending.
