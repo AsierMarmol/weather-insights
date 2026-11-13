@@ -331,3 +331,32 @@ def test_reference_file_failure_displays_guidance(ui, monkeypatch):
     app.run()
     assert not app.exception and not factory.called
     assert "reference files" in app.error[0].value
+
+
+def test_storage_guidance_persists_and_refresh_recovers(ui, monkeypatch):
+    from weather_app.storage import StorageError
+
+    app, service, session, _, places, _ = ui
+    append = service.store.append
+    monkeypatch.setattr(
+        service.store, "append",
+        Mock(side_effect=StorageError(
+            "private diagnostic", os_error=OSError(28, "private diagnostic")
+        )),
+    )
+    app.run().button(key="run_search").click().run()
+    app.run()  # A normal rerun must not hide recovery guidance.
+    assert "local storage failed" in " ".join(e.value for e in app.error)
+    assert "no space left" in " ".join(e.value for e in app.markdown)
+    assert "40 fetched weather records" in " ".join(
+        e.value for e in app.warning
+    )
+    assert "private diagnostic" not in str(app)
+    assert len(session.calls) == 1
+    monkeypatch.setattr(service.store, "append", append)
+    app.button(key="run_search").click().run()
+    assert not app.exception
+    assert not app.session_state.search_storage_failure
+    assert service.unsaved_record_count == 0
+    assert len(session.calls) == len(places)
+    assert len(service.store.load()) == 40 * len(places)

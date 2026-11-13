@@ -18,11 +18,13 @@ genuine records are never truncated.
 from __future__ import annotations
 
 import csv
+import errno
 import io
 import os
 import secrets
 import shutil
 import threading
+import time
 from collections.abc import Sequence
 from pathlib import Path
 
@@ -58,7 +60,52 @@ class CatalogError(ValueError):
 
 
 class StorageError(RuntimeError):
-    """Weather records could not be safely saved or read back."""
+    """Storage failure with safe UI guidance, never raw file contents."""
+
+    def __init__(self, message, *, os_error=None, invalid_file=False):
+        super().__init__(message)
+        winerror = getattr(os_error, "winerror", None)
+        number = getattr(os_error, "errno", None)
+        if winerror in {32, 33}:
+            guidance = (
+                "The weather file is locked by another program. Close "
+                "any spreadsheet using it, then retry in this session."
+            )
+        elif number in {errno.EACCES, errno.EPERM} or winerror == 5:
+            guidance = (
+                "Permission was denied. Check write access to "
+                "data/weather and close programs holding the CSV open."
+            )
+        elif number == errno.ENOSPC or winerror == 112:
+            guidance = "The disk has no space left. Free space, then retry."
+        elif invalid_file:
+            guidance = (
+                "The weather CSV is invalid or incomplete. Preserve a "
+                "copy and repair it before retrying; do not delete history."
+            )
+        else:
+            guidance = (
+                "The weather file could not be read or saved. Check "
+                "data/weather/weather_records.csv and its folder access."
+            )
+        if type(winerror) is int:
+            guidance += f" (Windows error {winerror}.)"
+        elif type(number) is int:
+            guidance += f" (OS error {number}.)"
+        self.guidance = guidance
+
+
+def _retry_file_lock(action, *args):
+    """Bound Windows access/lock retries; never replace a file in place."""
+    for attempt in range(3):
+        try:
+            return action(*args)
+        except OSError as error:
+            if getattr(error, "winerror", None) not in {5, 32, 33}:
+                raise
+            if attempt == 2:
+                raise
+            time.sleep(0.1 * (attempt + 1))
 
 
 def load_destinations(path: Path = CATALOG_PATH) -> list[Destination]:
@@ -241,12 +288,12 @@ class WeatherStore:
             if self._path.exists():
                 # Keep the saved file's permissions across the swap.
                 shutil.copymode(self._path, temp_name)
-            os.replace(temp_name, self._path)
+            _retry_file_lock(os.replace, temp_name, self._path)
             temp_name = None
         except OSError as error:
             raise StorageError(
                 f"Could not save weather records to {self._path.name}:"
-                f" {error.strerror or error}"
+                f" {error.strerror or error}", os_error=error
             ) from None
         finally:
             if temp_name is not None:
@@ -302,14 +349,15 @@ class WeatherStore:
 
     def _read_all(self) -> list[WeatherRecord]:
         try:
-            raw = self._path.read_bytes()
+            raw = _retry_file_lock(self._path.read_bytes)
         except FileNotFoundError:
             self.__validated_raw = None
             self.__validated_records = ()
             return []
         except OSError as error:
             raise StorageError(
-                f"Could not read {self._path.name}: {error.strerror or error}"
+                f"Could not read {self._path.name}: {error.strerror or error}",
+                os_error=error,
             ) from None
         # WeatherRecord values are frozen. Return a fresh list so callers
         # cannot mutate the validated sequence. Compare contents, not mtime:
@@ -320,17 +368,18 @@ class WeatherStore:
             text = raw.decode("utf-8")
         except UnicodeDecodeError:
             raise StorageError(
-                f"{self._path.name} is not valid UTF-8"
+                f"{self._path.name} is not valid UTF-8", invalid_file=True
             ) from None
         if text and not text.endswith("\n"):
             raise StorageError(
                 f"{self._path.name} ends with an incomplete row; restore it"
-                " from Git before saving more records"
+                " from Git before saving more records", invalid_file=True
             )
         reader = csv.DictReader(io.StringIO(text, newline=""))
         if tuple(reader.fieldnames or ()) != RECORD_FIELDS:
             raise StorageError(
-                f"{self._path.name} does not have the expected header"
+                f"{self._path.name} does not have the expected header",
+                invalid_file=True,
             )
         # Duplicate keys are checked here so no caller (load, latest_forecast
         # or
@@ -346,7 +395,8 @@ class WeatherStore:
                 record = WeatherRecord.from_csv_row(row)
             except ValueError as error:
                 raise StorageError(
-                    f"{self._path.name} line {line}: {error}"
+                    f"{self._path.name} line {line}: {error}",
+                    invalid_file=True,
                 ) from None
             earlier = first_line.get(record.key)
             if earlier is None:
@@ -359,7 +409,7 @@ class WeatherStore:
                     f" {record.kind} valid at"
                     f" {format_utc(record.valid_at_utc)}, fetch"
                     f" {record.fetch_id}); resolve the file manually before"
-                    " using it"
+                    " using it", invalid_file=True
                 )
         self.__validated_raw = raw
         self.__validated_records = tuple(records)

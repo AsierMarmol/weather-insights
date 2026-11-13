@@ -248,7 +248,9 @@ def test_storage_failure_never_charts_unsaved_results(journey, monkeypatch):
     monkeypatch.setattr(service.store, "append", real_append)
     app.button(key="dashboard_load").click().run()
     assert len(charts(app)) == 4 and service.unsaved_record_count == 0
-    assert len(service.store.load()) == 160
+    # Recover the first response without requesting it twice.
+    assert len(session.calls) == 3
+    assert len(service.store.load()) == 120
 
 
 def test_expired_results_warn_in_both_views_and_refresh_explicitly(journey):

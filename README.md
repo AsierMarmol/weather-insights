@@ -4,13 +4,13 @@ A five-person Python/Streamlit project recommending mainland-Spain car trips fro
 
 ## Current status
 
-The Searcher and independent Dashboard are implemented. Phases 1-4 and P5.1-P5.4 are reviewed and merged. P5.5 improvements are implemented and tested locally, awaiting Gabriel review and a browser layout check. Phase 6 delivery remains pending. See [Project phases](PROJECT_PHASES.md) for PR history, owners and remaining gates.
+The Searcher and independent Dashboard are implemented. Phases 1-4 and P5.1-P5.4 are reviewed and merged. P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`). Mac test results and desktop/mobile visual confirmation remain unconfirmed. P6.1 delivery documentation is pushed for review; a storage-recovery follow-up is tested locally and awaits review before final delivery; P6.2 clean-clone verification and P6.3 submission remain pending. See [Project phases](PROJECT_PHASES.md) for PR history, owners and remaining gates.
 
 Searcher behavior: rolling next 1-5 days (default 3), adjustable seasonal temperature preferences, rain <=30%, wind <=25 km/h and All activity/size filters. Weather matching earns points; driving time subtracts up to five. Searcher shows five leading recommendations and the full ranking. The Dashboard is an independent weather overview: a map of all 83 destinations ranked by weather alone for its own next 1-5 days, with weather comparison and all-criteria charts. Every fresh successful weather fetch saves automatically.
 
 ## Requirements
 
-These instructions use **Windows PowerShell**.
+Use **Windows PowerShell** or **macOS Terminal** as labeled below. Shared `uv` commands work in both; no environment activation is needed.
 
 - [Git](https://git-scm.com/downloads) for cloning and collaboration.
 - [uv](https://docs.astral.sh/uv/getting-started/installation/) for Python and dependency management. Setup was verified with uv 0.12.23.
@@ -27,11 +27,19 @@ Open a new terminal after installation so `uv` is available.
 
 ## Get the project and install dependencies
 
-Run these commands from a folder where you want to keep your clone:
+On Windows, run these commands from a folder where you want to keep your clone:
 
 ```powershell
 git clone --branch dev https://github.com/AsierMarmol/weather-insights.git
 Set-Location -LiteralPath .\weather-insights
+uv sync --locked
+```
+
+On macOS, after installing Git and uv using their official instructions:
+
+```bash
+git clone --branch dev https://github.com/AsierMarmol/weather-insights.git
+cd weather-insights
 uv sync --locked
 ```
 
@@ -51,7 +59,15 @@ if (-not (Test-Path -LiteralPath .\variables.env)) {
 }
 ```
 
-The guard preserves an existing credential file. Open `variables.env` locally and enter your personal [OpenWeatherMap API key](https://openweathermap.org/appid) after the equals sign:
+On macOS:
+
+```bash
+if [ ! -e variables.env ]; then
+    cp variables.env.example variables.env
+fi
+```
+
+Both guards preserve an existing credential file. Open `variables.env` locally and enter your personal [OpenWeatherMap API key](https://openweathermap.org/appid) after the equals sign:
 
 ```dotenv
 OPENWEATHER_API_KEY=
@@ -65,7 +81,7 @@ The key can remain blank while you explore the Searcher controls. Configure it b
 
 1. Open this repository folder in VS Code.
 2. Press **Ctrl + Shift + P** and select **Python: Select Interpreter**.
-3. Choose the workspace interpreter ending in `.venv\Scripts\python.exe`.
+3. Choose the workspace interpreter ending in `.venv\Scripts\python.exe` on Windows or `.venv/bin/python` on macOS. On macOS, open the command palette with **Cmd + Shift + P**.
 
 It may be labeled **weather-app (3.14.x)** because `weather-app` is the package name. Python code imports the package as `weather_app`.
 
@@ -108,6 +124,7 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 | `OPENWEATHER_API_KEY is not set` appears when requesting API access | Fill the key in your local `variables.env` or supply it through the environment. If replacing a previously loaded/rejected key, stop Streamlit with Ctrl+C and restart it; a browser refresh does not clear the process environment or session client. |
 | `variables.env is not UTF-8 text` appears | The file was saved as UTF-16 (for example by Windows PowerShell 5 `echo ... > variables.env` or Notepad's "Unicode" option). Save it again as UTF-8, or create it with the `Copy-Item` command above and edit it. |
 | A load crossed a daytime forecast-slot boundary | Run Search again or Refresh overview to start a new window. The app keeps strict coverage rules; it never invents missing periods or quietly shortens the window. Suitable saved forecasts are reused. |
+| Weather loading stops with a storage error | Read the storage guidance above the results. Close Excel or another program holding the CSV, check folder permissions or free disk space as indicated, then use Search destinations or Refresh weather overview in the same session. Collected records waiting to save are shown explicitly; keep the tab/app running until saved. Windows access/lock failures get at most three file-operation attempts with 0.1/0.2-second waits. Other failures are not retried automatically. Never delete the genuine data to hide an error. |
 | Map country outlines are missing | Plotly loads its geographical base map from its CDN. Check browser connectivity; the map is not guaranteed to render fully offline. |
 | `Cannot read variables.env` appears | Check access to your credential file. A supplied nonblank process environment key takes precedence and does not require reading the file. |
 | Port 8501 is already in use | Stop your other server or run `uv run --locked streamlit run app.py --server.port 8502`. Follow the Local URL printed by that process. |
@@ -118,7 +135,8 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 
 | Location | Purpose |
 | --- | --- |
-| app.py | Navigation between the Searcher and Dashboard views |
+| app.py | Navigation between the Searcher and Dashboard views, with shared source attribution |
+| assets/openweather-logo.jpg | Unmodified official provider logo; attribution source below |
 | src/weather_app/ | Installable package: configuration (`config.py`), domain models (`models.py`), catalog/weather storage (`storage.py`), OpenWeather client (`client.py`), request/save service (`service.py`) analytics/ranking engine (`analytics.py`), Searcher controls/presentation (`searcher.py`) and Dashboard views/charts (`dashboard.py`) |
 | tests/ | Offline diagnostic, configuration, model, storage, analytics, client, service, Searcher and Dashboard tests (fake HTTP and temporary files only); acceptance tests include storage cache invalidation, strict slot boundaries and complete app journeys |
 | scripts/verify_weather_access.py | Optional bounded live diagnostic, not the production service |
@@ -129,6 +147,28 @@ Expect Python 3.14.x, compatible dependencies, a successful package import and p
 | WEATHER_API_CONTRACT.md | Provider fields, requests and safe save/error rules |
 | PROMPTS.md | Actual AI collaboration record |
 | pyproject.toml / uv.lock / .python-version | Package/dependencies and shared Python selection |
+
+## Analytics and course evidence
+
+The app uses logged OpenWeather forecasts for three distinct analyses across **cross-location comparison** and **derived metrics**. An observed historical trend is not claimed.
+
+| Analysis | What it means | Where to see it |
+| --- | --- | --- |
+| Weather/trip ranking | Percentage of temperature, precipitation and wind checks passed across daytime forecast slots; Searcher subtracts a capped driving-time penalty, Dashboard uses weather only | Searcher recommendations and Dashboard Weather ranking |
+| Cross-location weather comparison | Mean daytime temperature (C), highest single-slot rain probability (%) and maximum wind (km/h), over the same window | Dashboard Weather comparison |
+| Simultaneous suitability | Percentage of slots meeting all three weather preferences at once; this differs from the average of separate checks | Dashboard All three criteria |
+
+The rolling window starts at the time of the load. Daytime is 09:00 inclusive to 18:00 exclusive in Europe/Madrid, sampled at the provider's three-hour slots. A forecast timestamp describes a prediction, not an observation collected in the future. Retrieval timestamps record when the app actually fetched the data. Missing/stale coverage produces an unavailable result, never fabricated values.
+
+The [Phase 5 rubric walkthrough](PHASE5_QUALITY_REVIEW.md#p55-integrated-acceptance---12-november-2026) maps all six grading criteria to code and tests: reusable client inheritance, deliberate encapsulation, model special methods/properties, safe API handling, timestamped persistence, charts and team/AI evidence. The [shared specification](PHASE2_SCOPE.md#p24-shared-data-and-calculation-specification) owns exact formulas and schema.
+
+## Sources and delivery
+
+Weather data provided by [OpenWeather](https://openweathermap.org/). The application displays its official logo and link in the sidebar; the unmodified logo comes from the [official logo archive](https://openweathermap.org/payload/api/files/file/logo_files.zip), linked by the [attribution FAQ](https://openweathermap.org/faq#license). The asset is provider branding, not a project-owned logo.
+
+Destination references use [GeoNames](https://www.geonames.org/export/) and tourism sources; route estimates use OSRM with **[OpenStreetMap contributors](https://www.openstreetmap.org/copyright)** data. See [catalog credits and limitations](data/reference/README.md#sources-and-limits) and [weather provenance](data/weather/README.md) for details. Provider/source terms remain applicable; this project does not grant a new license over third-party data or branding.
+
+The submission is the **GitHub repository URL**, with the reviewed final version on `main`. Use the [Phase 6 delivery checklist](PHASE6_DELIVERY.md#delivery-contents-and-final-checklist) to retain the code, locked setup, reference inputs, genuine accumulated data and AI records. An isolated wheel or a copied virtual environment is not the deliverable. Clean-clone acceptance, instructor submission channel/access and final review remain pending; public hosting is optional.
 
 ## Team workflow
 
@@ -142,4 +182,4 @@ Read the [catalog sources](data/reference/README.md), [saved-data record](data/w
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Gabriel reviews P5.5, including the outstanding desktop/mobile map check. Local automated acceptance: 427 tests passed and 2 Windows-inapplicable permission tests skipped; Flake8 clean. The store reuses validated records only when freshly read file bytes match, reducing repeated CSV parsing while detecting edits and read errors. The supported deployment is an editable installation from the repository; the built wheel alone does not include app.py or the external data files. Phase 6 still requires the delivery README/package, a clean-clone run, the reviewed main branch and actual submission. Git history contains contributions from all five members; each person must still be able to explain the application.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Next: Gabriel reviews the prepared P6.1 documentation and confirms the remaining Mac tests and desktop/mobile map check on the merged version. Latest local automated acceptance (13 November): 438 tests passed and 2 Windows-inapplicable permission tests skipped; Flake8 clean. The store reuses validated records only when freshly read file bytes match, reducing repeated CSV parsing while detecting edits and read errors. The supported deployment is an editable installation from the repository; the built wheel alone does not include app.py or the external data files. Phase 6 still requires approval of the prepared delivery documentation, a clean-clone run, the reviewed main branch and actual submission. Git history contains contributions from all five members; each person must still be able to explain the application.

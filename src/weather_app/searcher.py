@@ -116,9 +116,51 @@ def search_destinations(catalog, preferences, service, run_at, progress=None):
             for city, result in results.items()
             if result["error"]
         },
+        "storage_failure": next(
+            (
+                {
+                    "guidance": r["error"].get("storage_guidance", ""),
+                    "skipped": sum(
+                        bool(v["error"] and v["error"].get("skipped"))
+                        for v in results.values()
+                    ),
+                }
+                for r in results.values()
+                if r["error"] and r["error"]["code"] == "storage"
+                and not r["error"].get("skipped")
+            ), None,
+        ),
         "cached": sum(r["from_cache"] for r in results.values()),
         "eligible": len(eligible),
     }
+
+
+def render_storage_failure(failure):
+    """Show safe file guidance; never display a raw provider/CSV exception."""
+    if not failure:
+        return
+    st.error("Weather loading stopped because local storage failed.")
+    st.write(failure.get("guidance") or MESSAGES["storage"])
+    skipped = failure.get("skipped", 0)
+    if skipped:
+        st.caption(
+            f"{skipped} remaining destinations were not requested after "
+            "the storage failure; they did not each fail separately."
+        )
+    service = st.session_state.get("weather_service")
+    pending = service.unsaved_record_count if service is not None else 0
+    if pending:
+        st.warning(
+            f"{pending} fetched weather records are waiting to be saved "
+            "in this session. Keep this tab and app running. After fixing "
+            "the file issue, use Search destinations or Refresh weather "
+            "overview; saving is retried before any new request."
+        )
+    else:
+        st.info(
+            "After fixing the file issue, use Search destinations or "
+            "Refresh weather overview to retry."
+        )
 
 
 def forecast_boundary_crossed(rows, run_at, days):
@@ -284,6 +326,7 @@ def _render_results(catalog, current_preferences, defaults):
         st.info("Choose your preferences, then search for a weather match.")
         return
     state = st.session_state
+    render_storage_failure(state.get("search_storage_failure"))
     rows = state.search_analysis_rows
     searched = state.search_result_preferences
     if current_preferences != searched:
@@ -477,6 +520,7 @@ def render_searcher():
             state.search_analysis_rows = result["rows"]
             state.search_result_preferences = preferences
             state.search_errors = result["errors"]
+            state.search_storage_failure = result.get("storage_failure")
             state.search_cached_count = result["cached"]
             for code in sorted(set(result["errors"].values())):
                 st.warning(MESSAGES.get(code, "Weather is unavailable."))

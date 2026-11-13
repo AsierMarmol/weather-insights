@@ -4,7 +4,7 @@ Updated: 12 November 2026.
 
 ## Current checkpoint
 
-Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 is implemented and tested locally on dev `1784b8c`, awaiting Gabriel review; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Catalog/source limitations remain documented in the reference notes.
+Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); Mac and visual results remain unconfirmed; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Catalog/source limitations remain documented in the reference notes.
 
 ## Deliverables
 
@@ -55,7 +55,7 @@ Use standard-library dataclasses, one normalized weather CSV and simple result d
 | Destination | Nine catalog fields; numeric coordinates/route values; activities tuple; computed drive_hours and useful repr/str |
 | SearchPreferences | days, temperature_min_c, temperature_max_c, max_precipitation_probability_pct, max_wind_kmh, activities tuple, destination_sizes tuple; empty tuples mean All |
 | WeatherRecord | Exactly the CSV fields below; aware UTC datetimes internally; optional numeric metrics are None; one UUID fetch_id for each fresh HTTP response |
-| Service result | records list, from_cache bool, error None or safe code/message; codes: invalid_input, authentication, location_not_found, rate_limited, network, provider, invalid_data, storage |
+| Service result | records list, from_cache bool, error None or code/message with optional storage_guidance/skipped metadata (see API contract); codes: invalid_input, authentication, location_not_found, rate_limited, network, provider, invalid_data, storage |
 | Analysis result | city_id, status, reason, run_at_utc, days, forecast_retrieved_at_utc, expected_periods, evaluated_periods, temperature_passes, precipitation_passes, wind_passes, weather_match_pct, travel_penalty, final_score, suitable_period_count, all_preferences_pct, mean_temperature_c, max_precipitation_probability_pct, max_wind_kmh |
 
 Application store: `data/weather/weather_records.csv`, created by P3.2 and extended by P2.5:
@@ -132,7 +132,7 @@ approval or commit/push/merge without authorization.
 
 ## Next action
 
-P2.5 was accepted in PR #9, and P4.1-P4.4/P5.1-P5.4 are merged. Gabriel reviews P5.5 next; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Keep review status honest using [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
+P2.5 was accepted in PR #9, and P4.1-P4.4/P5.1-P5.4 are merged. Gabriel confirms the remaining P5.5 Mac and visual checks while Asier prepares P6.1; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Keep review status honest using [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
 
 ### P2.5 verification - 12 November 2026
 

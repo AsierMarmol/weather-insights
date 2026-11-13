@@ -623,14 +623,19 @@ def test_failed_saves_never_rank_unsaved_weather(page, monkeypatch):
         searcher.MESSAGES["storage"] in hover
         for _, hover, _, _ in markers.values()
     )
+    assert "local storage failed" in _texts(app.error)
+    assert "82 remaining destinations were not requested" in _texts(
+        app.caption
+    )
+    assert "40 fetched weather records" in _texts(app.warning)
     monkeypatch.setattr(service.store, "append", real_append)
     _load(app)
     assert service.unsaved_record_count == 0
     assert "83 of 83" in _texts(app.markdown)
-    # The kept first response is saved once on retry; its city is then
-    # fetched again as a distinct response. Nothing is saved twice.
-    assert len(session.calls) == 84
-    assert len(service.store.load()) == 84 * 40
+    # Recover the kept response before any new HTTP; reuse it for ranking.
+    assert len(session.calls) == 83
+    assert len(service.store.load()) == 83 * 40
+    assert "local storage failed" not in _texts(app.error)
 
 
 def test_missing_key_explains_setup_and_keeps_the_map(page):
