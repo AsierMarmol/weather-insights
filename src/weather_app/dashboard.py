@@ -716,6 +716,7 @@ def _load(catalog, defaults, days: int) -> None:
             "rows": result["rows"],
             "errors": result["errors"],
             "cached": result["cached"],
+            "storage_failure": result.get("storage_failure"),
             "run_at": run_at,
             "preferences": preferences,
         }
@@ -976,6 +977,7 @@ def render_dashboard_page() -> None:
             )
         else:
             errors = overview["errors"]
+            searcher.render_storage_failure(overview.get("storage_failure"))
             _render_status(overview, frame, next_preferences, len(catalog))
     else:
         st.info(

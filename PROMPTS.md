@@ -859,3 +859,27 @@ Updated PHASE5, PHASE4, PROJECT_PHASES and README.
 **Human review:** Pending with Gabriel for P6.1. P5.5 is approved/merged in PR #19, but Mac test output and complete desktop/mobile confirmation remain unconfirmed. After review and remaining prerequisites, Selin owns P6.2 with Christian reviewing; Asier owns P6.3 with Gabriel reviewing.
 
 **Commit / PR:** Asier authorized committing and pushing the P6.1 changes on 12 November 2026 to `asier/feature`, including the preserved genuine records and prior status updates. The commit carries `Co-Authored-By: Codex <noreply@openai.com>`. Gabriel review, merging and final submission remain pending.
+
+
+---
+
+## Phase 5: P5.5 storage-error diagnosis and recovery follow-up (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Investigate the Dashboard's local weather-file error, fix confirmed storage/recovery defects, and provide actionable guidance rather than leaving destinations with an unexplained generic failure. Preserve all genuine weather records and validate the changes before publication.
+
+**Got:** Added bounded retries for Windows access/lock errors during reads and atomic replacement, with safe explanations for locks/access denial, disk space, invalid CSV and other I/O errors. Preserved pending fetched batches and retried saving before cache lookup or new HTTP. Both views now retain the first safe storage explanation, skipped-destination count and pending-record warning. Updated the shared result contract, troubleshooting and affected phase/delivery dependencies. Added ten storage recovery cases and one Searcher UI regression; strengthened Dashboard recovery assertions and corrected the older integration expectation that required a redundant fetch.
+
+**Checked:** The reported CSV loaded successfully with 8,004 records across 83 destinations; the original failing OS code was unavailable. Reproduced Windows error 5 with a real open handle on a temporary file, then verified bounded recovery after releasing it. Seven initial regression cases failed before implementation. Focused storage/service checks passed after the fix. The first full run found an old expectation for four responses where recovery now needs three; corrected it and verified the HTTP count as well as saved rows. Final isolated Windows suite: 438 passed, 2 POSIX tests skipped in 94.63 seconds; Flake8 clean; 75 local documentation links valid; diff checks clean. No live HTTP was used and the genuine CSV checksum stayed unchanged throughout this work.
+
+**Kept / changed / rejected:** Kept atomic replacement, original-file preservation, strict validation, save-before-ranking, scoring and the existing genuine history. Limited retries to three attempts for Windows errors 5/32/33 with 0.1/0.2-second waits; permanent errors remain visible. Safe UI text does not expose raw exception or CSV contents. Rejected deleting history, inventing ranks, suppressing persistent errors, redundant recovery fetches and claiming the reproduced file lock proves the original incident's cause.
+
+**Human review:** Pending with Gabriel. The original failure's precise cause remains unconfirmed; the updated diagnostic is available if it recurs. Live browser recovery and Mac-specific checks remain to be confirmed on the reviewed version. P6.2 must include this follow-up.
+
+**Commit / PR:** On 13 November 2026, Asier authorized a final full test run, committing and pushing this fix with the accumulated genuine data, and opening a PR combining P6.1 and the fix into dev for Gabriel review. Include `Co-Authored-By: Codex <noreply@openai.com>`. Approval and merging remain pending.
+
+
+**Pre-publication verification:** Final pre-publication rerun on 13 November 2026: 438 passed, 2 POSIX-only tests skipped in 88.18 seconds; Flake8 clean; isolated locked install, dependency check and source/wheel builds passed. All 75 local Markdown links resolve. The frozen data contains 8,004 records across all 83 destinations; all 6,644 rows in the previous commit remain intact, with 1,360 additional genuine forecast records. No live API requests were made.

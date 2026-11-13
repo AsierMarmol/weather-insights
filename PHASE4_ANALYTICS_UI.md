@@ -101,3 +101,8 @@ Limitations: a first full load fetches up to 83 forecasts at the shared 40-reque
 ### Post-merge verification - 12 November 2026
 
 PR #15 was approved by Asier and merged into dev `1e43be3`. Local Windows revalidation: **383 passed, 2 skipped** (POSIX permission checks), Flake8 zero findings. The full offline suite took 296.93 seconds and includes the all-83 Dashboard journeys. Application code and tests match the merged version; local collected weather data was preserved. This verifies the automated baseline, not a new visual review or completion of P5.3/P5.4/P5.5. Older awaiting-review notes above describe submission-time status.
+
+
+### Storage-recovery follow-up - 13 November 2026
+
+Searcher and Dashboard now show shared safe storage guidance, the number of destinations skipped after the first storage failure, and collected records still waiting to save. Refresh retries retained saves before new requests. This is the P5.5 recovery follow-up, not a scoring or chart redesign; see Phase 5 for tests and pending review. Confirm the guidance on desktop/mobile before delivery.

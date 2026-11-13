@@ -14,8 +14,8 @@ Error codes: invalid_input, authentication, location_not_found,
 rate_limited,
 network, provider, invalid_data, storage. A failed save is reported as
 ``storage`` with no records, so unsaved data is never used for analysis; the
-fetched batch is kept in memory and saved first on the next successful
-write.
+fetched batch is kept in memory and saving is retried before the next
+cache lookup or HTTP request.
 """
 
 from __future__ import annotations
@@ -41,6 +41,12 @@ def _failure(code: str, message: str) -> dict:
         "from_cache": False,
         "error": {"code": code, "message": message},
     }
+
+
+def _storage_failure(error: StorageError, message: str) -> dict:
+    result = _failure("storage", message)
+    result["error"]["storage_guidance"] = error.guidance
+    return result
 
 
 class WeatherService:
@@ -155,6 +161,7 @@ class WeatherService:
                     f"{destination.city}: not requested because an earlier"
                     f" request failed ({stopped['code']}).",
                 )
+                result["error"]["skipped"] = True
             else:
                 result = self.forecast(
                     destination, force_refresh=force_refresh
@@ -204,13 +211,26 @@ class WeatherService:
         params = self.client.request_parameters(destination)
         key = (kind, destination.city_id, tuple(sorted(params.items())))
 
+        # Recover fetched data before any cache lookup or new HTTP request.
+        # Otherwise a refresh would fetch this city again unnecessarily.
+        try:
+            with self.__lock:
+                self.__flush_unsaved()
+        except StorageError as error:
+            return _storage_failure(
+                error, f"{place}: collected weather is still waiting to save."
+            )
+        except ValueError:
+            return _failure(
+                "invalid_data", "Collected weather conflicts with saved data."
+            )
+
         if not force_refresh:
             try:
                 reused = self._reusable(kind, key, destination)
             except StorageError as error:
-                return _failure(
-                    "storage",
-                    f"{place}: saved weather could not be read. {error}",
+                return _storage_failure(
+                    error, f"{place}: saved weather could not be read. {error}"
                 )
             if reused:
                 return _result(reused, from_cache=True)
@@ -226,8 +246,8 @@ class WeatherService:
         try:
             self._save(records)
         except StorageError as error:
-            return _failure(
-                "storage",
+            return _storage_failure(
+                error,
                 f"{place}: weather was fetched but could not be saved, so it"
                 f" is not used yet. {error}",
             )

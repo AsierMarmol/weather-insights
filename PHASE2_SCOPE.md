@@ -55,7 +55,7 @@ Use standard-library dataclasses, one normalized weather CSV and simple result d
 | Destination | Nine catalog fields; numeric coordinates/route values; activities tuple; computed drive_hours and useful repr/str |
 | SearchPreferences | days, temperature_min_c, temperature_max_c, max_precipitation_probability_pct, max_wind_kmh, activities tuple, destination_sizes tuple; empty tuples mean All |
 | WeatherRecord | Exactly the CSV fields below; aware UTC datetimes internally; optional numeric metrics are None; one UUID fetch_id for each fresh HTTP response |
-| Service result | records list, from_cache bool, error None or safe code/message; codes: invalid_input, authentication, location_not_found, rate_limited, network, provider, invalid_data, storage |
+| Service result | records list, from_cache bool, error None or code/message with optional storage_guidance/skipped metadata (see API contract); codes: invalid_input, authentication, location_not_found, rate_limited, network, provider, invalid_data, storage |
 | Analysis result | city_id, status, reason, run_at_utc, days, forecast_retrieved_at_utc, expected_periods, evaluated_periods, temperature_passes, precipitation_passes, wind_passes, weather_match_pct, travel_penalty, final_score, suitable_period_count, all_preferences_pct, mean_temperature_c, max_precipitation_probability_pct, max_wind_kmh |
 
 Application store: `data/weather/weather_records.csv`, created by P3.2 and extended by P2.5:

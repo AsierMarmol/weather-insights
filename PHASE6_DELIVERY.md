@@ -1,6 +1,6 @@
 # Phase 6 - Documentation and Delivery
 
-Updated: 12 November 2026. **P6.1 prepared locally; awaiting review and remaining acceptance evidence:** P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`). Mac tests and desktop/mobile visual results remain unconfirmed; these remain open acceptance checks. Packaging checks and the successful P5.5 isolated-install rehearsal do not substitute for P6.2 clean-clone acceptance of a reviewed commit. Include the [remaining cross-platform and visual checks](PHASE5_QUALITY_REVIEW.md#remaining-cross-platform-and-visual-checks) in the review evidence.
+Updated: 13 November 2026. **P6.1 pushed; review and storage-recovery follow-up pending:** P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`). Mac tests and desktop/mobile visual results remain unconfirmed; these remain open acceptance checks. Packaging checks and the successful P5.5 isolated-install rehearsal do not substitute for P6.2 clean-clone acceptance of a reviewed commit. Include the [remaining cross-platform and visual checks](PHASE5_QUALITY_REVIEW.md#remaining-cross-platform-and-visual-checks) in the review evidence.
 
 ## Purpose and dependencies
 
@@ -10,7 +10,7 @@ Package the verified local Streamlit application and genuine dataset, validate a
 
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
-| P6.1 | Delivery package and README | Asier | Gabriel | Phase 5 | Current setup/run guide, code/catalog/defaults/provider overrides, genuine saved weather data, source credits and actual AI/contribution records. | Prepared locally; Gabriel review and source/account confirmations pending |
+| P6.1 | Delivery package and README | Asier | Gabriel | Phase 5 | Current setup/run guide, code/catalog/defaults/provider overrides, genuine saved weather data, source credits and actual AI/contribution records. | Prepared and pushed; Gabriel review and source/account confirmations pending |
 | P6.2 | Clean-clone verification | Selin | Christian | P6.1 | Named version installs, imports, tests and runs using README only; no copied environment or credentials; real results recorded. | Pending |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | P6.2 | Authorized protected-branch PR workflow, instructor access, confirmed submission channel/deadline and actual receipt. | Pending |
 
@@ -42,7 +42,7 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-Gabriel reviews the prepared P6.1 documentation and attribution change while recording the remaining Mac and desktop/mobile checks on the merged P5.5 version. Final acceptance still requires those results. After P6.1, Selin verifies a clean clone in P6.2 (Christian reviews), then Asier completes P6.3 (Gabriel reviews). Retain the repository-based install instructions: standalone wheel installation does not include the app entry point or external reference/weather data. Confirm source redistribution terms, each member's understanding, instructor access and submission channel before delivery.
+Complete and review the P5.5 storage-recovery follow-up before P6.2. Gabriel reviews P6.1 and the follow-up while recording the remaining Mac and desktop/mobile checks on the merged P5.5 version. Final acceptance still requires those results. After P6.1, Selin verifies a clean clone in P6.2 (Christian reviews), then Asier completes P6.3 (Gabriel reviews). Retain the repository-based install instructions: standalone wheel installation does not include the app entry point or external reference/weather data. Confirm source redistribution terms, each member's understanding, instructor access and submission channel before delivery.
 
 ## P4.4 delivery dependency
 
@@ -96,3 +96,8 @@ After the prepared P6.1 change is reviewed and merged, use a new directory and o
 ## P6.1 local preparation - 12 November 2026
 
 Asier requested the next phase step; OpenAI Codex prepared the documentation and provider attribution. Existing local status edits and newly accumulated weather records were preserved. No live API request was made, and the weather dataset was not edited by this work. Verification: isolated `uv sync --locked` succeeded; 18 existing app-integration/final-acceptance tests passed in 19.91 seconds; Flake8 reported no findings. All 75 local Markdown links/anchors resolve and `git diff --check` passes. The official logo was visually inspected and copied without modification. A frozen CSV snapshot passed WeatherStore model/schema validation, catalog membership, unique keys and preservation of all 6,604 previously committed rows: 6,644 records across 83 destinations (4 current and 6,640 forecast), including 40 newly accumulated forecast rows. These counts are a dated snapshot. This targeted Windows run is not a full-suite rerun, a Mac test result or P6.2 clean-clone approval; no live desktop/mobile visual result is claimed. After preparation, Asier authorized a commit and push to `asier/feature` on 12 November 2026. Gabriel review, merging and submission remain pending.
+
+
+### Delivery dependency update - 13 November 2026
+
+A user-reported storage failure reopened P5.5 follow-up work. The recovery change must be reviewed and included in the version Selin tests in P6.2; an earlier P6.1 commit alone does not include it. P6.2/P6.3 remain pending. See the latest Phase 5 entry for diagnosis, tests and remaining live verification.
