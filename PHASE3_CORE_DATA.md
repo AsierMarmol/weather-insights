@@ -1,8 +1,8 @@
 # Phase 3 - Core Application and Automatic Data Saving
 
-> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
 
-Updated: 12 November 2026. **Core accepted for Phase 4:** P3.1, P3.2 and P3.3 reviewed and merged into dev (PR #4, PR #6, PR #5); P3.3 integration reviewed and merged in PR #7; P3.1 validation follow-up reviewed and merged in PR #8; P2.5 was approved by Gabriel and Christian and merged in PR #9. Final integrated acceptance remains Phase 5.
+Historical core baseline, 12 November 2026. **Core accepted for Phase 4:** P3.1, P3.2 and P3.3 reviewed and merged into dev (PR #4, PR #6, PR #5); P3.3 integration reviewed and merged in PR #7; P3.1 validation follow-up reviewed and merged in PR #8; P2.5 was approved by Gabriel and Christian and merged in PR #9. Final integrated acceptance remains Phase 5.
 
 ## Purpose and dependencies
 

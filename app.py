@@ -20,7 +20,7 @@ legacy = any(p is not None and not hasattr(p, "scoring_mode")
              for p in (old_search, old_overview))
 if (previous is not None and previous != VERSION) or legacy:
     for key in list(st.session_state):
-        if key.startswith("search_") or key in {
+        if (isinstance(key, str) and key.startswith("search_")) or key in {
             "dashboard_overview", "dashboard_error",
             "dashboard_attempted_days"
         }:

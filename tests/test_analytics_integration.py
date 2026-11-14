@@ -8,6 +8,7 @@ worked out by hand, not recomputed with the engine's formulas.
 
 from __future__ import annotations
 
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -35,15 +36,14 @@ NOW = datetime(2026, 11, 12, 6, 0, tzinfo=UTC)
 
 
 def prefs(days=1, **overrides):
-    values = dict(
+    base = SearchPreferences(
         days=days,
         temperature_min_c=16,
         temperature_max_c=24,
         max_precipitation_probability_pct=30,
         max_wind_kmh=25,
     )
-    values.update(overrides)
-    return SearchPreferences(**values)
+    return replace(base, **overrides)
 
 
 @pytest.fixture
@@ -126,9 +126,10 @@ def test_saved_records_reload_into_the_same_analysis(service):
     assert from_store[0]["evaluated_periods"] == 15
 
 
-def test_adapter_rejects_malformed_results():
+@pytest.mark.parametrize("invalid_results", [[]])
+def test_adapter_rejects_malformed_results(invalid_results):
     with pytest.raises(ValueError, match="invalid_input"):
-        forecasts_from_service([])
+        forecasts_from_service(invalid_results)
     with pytest.raises(ValueError, match="invalid_input"):
         forecasts_from_service({"ES-45168": {"records": []}})
 

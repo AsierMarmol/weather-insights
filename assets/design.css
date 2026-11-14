@@ -84,6 +84,9 @@
 .wi-trip-heading {display:flex;align-items:flex-start;gap:13px;margin-bottom:12px;}
 .wi-trip-number {font-family:'Fraunces',Georgia,serif;font-size:1.4rem;line-height:1.25;color:#a27739;min-width:26px;}
 .wi-trip-heading h3 {font-family:'DM Sans',sans-serif;font-size:1rem;font-weight:700;line-height:1.35;margin:0;color:#203b3b;}
+.wi-trip-title {display:flex;align-items:center;flex-wrap:wrap;gap:8px;}
+.wi-wind-alert {display:inline-flex;align-items:center;gap:5px;color:#b42318;font-size:.75rem;font-weight:600;}
+.wi-wind-dot {width:8px;height:8px;border-radius:50%;background:#b42318;flex-shrink:0;}
 .wi-trip-heading p {font-size:.75rem;color:#647a76;margin:3px 0 0;line-height:1.35;}
 .wi-trip-facts {display:flex;flex-wrap:wrap;gap:7px;margin:0;}
 .wi-trip-chip {background:#f0f4ed;border-radius:8px;padding:8px 10px;min-width:0;max-width:100%;}

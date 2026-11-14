@@ -7,10 +7,15 @@ The independent reviewed-version clean-clone gate remains P6.2.
 | Step | Deliverable | Owner | Reviewer | Dependency and current status |
 | --- | --- | --- | --- | --- |
 | P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Gabriel's report recorded below (dev `d1c3bdf`, macOS); Alejandra's report and Christian's review pending; before P6.3 |
+| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version, Gabriel's report and Christian's review remain pending |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
 
 ## Next action
+
+The locally validated [typing and warning-marker follow-ups](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026) require Alejandra's review
+and merge into dev before the final P6.2 runs. Its automated checks do
+not replace either independent acceptance report.
+
 
 **Gabriel and Alejandra each perform P6.2, reviewed by Christian.** Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21)
 and it merged into dev as `3444728`. Clone reviewed dev into a new directory,
@@ -56,9 +61,9 @@ reviewed dev commit independently, using separate fresh directories, their
 own environments and personal API keys. Both reports are required; this
 assignment does not mark either run complete. Use only README instructions. Record `git rev-parse HEAD`, operating system, Python/uv versions and actual results. Do not copy another clone's environment or credentials.
 
-1. Clone reviewed dev and run `uv sync --locked`, package import, `uv pip check`, the full offline test suite and Flake8 as documented in README. Keep the app stopped during tests. On macOS the two Unix permission tests should run, not be dismissed as Windows skips.
+1. Clone reviewed dev and run `uv sync --locked`, package import, `uv pip check`, the full offline test suite, Flake8 and `uv run --locked pyright` as documented in README. If using VS Code, select the new clone's `.venv` and check Pylance too. Keep the app stopped during tests. On macOS the two Unix permission tests should run, not be dismissed as Windows skips.
 2. Configure a personal key locally and start Streamlit. Check Landing and Dashboard before Searcher, automatic Dashboard loading, the all-83 map, hover, executive tables, Destination-score-versus-driving scatter and daily heatmap; verify 1/5-day selection, navigation and independent state. Check the agreed delivery viewport; this local audit excludes phone/Mac acceptance. Live loads create real saved records and count against the account quota.
-3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
+3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. When a top-five high-wind alert appears, verify that the affected cards carry the red dot and High wind label. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
 4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes the candidate, both reports must cover the final reviewed version before P6.2 is closed. Preserve new real records and inspect the diff before proposing them for commit.
 
 ### P6.2 report - Gabriel, 14 November 2026
@@ -273,3 +278,60 @@ passed on identical files. P6.2 remains open for Gabriel and Alejandra,
 reviewed by Christian;
 P6.3 remains open for Asier, reviewed by Gabriel. Approval alone is not a
 Mac/browser test report or final submission.
+
+
+## P6.2 Alejandra clean-clone run — 14 November 2026
+
+Tester: Alejandra Medina (alemedinabarreto). AI collaborator: Claude Code
+(Anthropic Claude Opus 5.5). Reviewer: Christian (pending). This run tested
+dev `d1c3bdfb5cd30a68fb66af4051b7b764d512f8f9` (PR #22) in a new folder
+(`git clone --branch dev`), with no copied environment, key or settings, on
+macOS 15.7.8 (arm64), Python 3.14.7, uv 0.12.9 and Git 2.50.1. A personal key
+was configured locally in the ignored `variables.env`. **PR #23 merged
+afterwards (`f26e908`) and changes code, so this run does not cover the final
+candidate; Alejandra must repeat P6.2 on the final reviewed dev commit.**
+
+The clone was placed outside the iCloud-synced Desktop. Inside iCloud Desktop,
+macOS can hide `.venv` `.pth` files and break the package import; this is a
+local environment issue, not an application defect.
+
+Automated (app stopped): `uv sync --locked` passed; `uv pip check` 44
+packages compatible; package import OK; `pytest -q -ra` **524 passed, 1
+skipped** in 30.80 s (skip: `test_storage_recovery.py:122`, Windows file
+sharing). Both POSIX permission tests ran and passed. Flake8 reported no
+findings. The genuine CSV checksum was unchanged by the suite.
+
+Live checks with `uv run --locked streamlit run app.py` (headless flag only to
+skip the welcome-email prompt), read through page text and chart data in
+Claude Code's built-in browser:
+
+- Landing showed Autumn 16–24 °C, matching `product_defaults.json`; navigation
+  worked. Searcher defaults: 3 days, 16–24 °C, Low rain (reference 30%),
+  Moderate wind (reference 25 km/h), All activities and sizes.
+- Dashboard loaded automatically before Searcher use. All five windows
+  worked with 83/83 ranked: 3 days and 1 day first, then 5, 4 and 2 days from
+  saved forecasts. In every window the map and scatter agreed on all 83
+  Destination scores; leader, top five, driving bands and KPI average matched.
+  Heatmap daily averages equalled their day means and sorted the rows; at one
+  day the heatmap equalled the whole-window score for all 83.
+- Searcher: Gentle/Medium categories, Coast (37) and Medium city (26) matched
+  catalog counts; a specific choice replaced All; Reset restored defaults and
+  labelled the old results. Five cards matched an offline recompute with the
+  app's analytics on the same saved data. No high-wind notice appeared
+  correctly: three lower-ranked cities reached 39 km/h, no top-five city did.
+- Dashboard (2 days) and Searcher (5 days) kept independent settings across
+  navigation.
+- The 1-day change fetched and saved fresh forecasts for all 83 cities; later
+  window changes and searches reused them without new rows.
+
+Not verified: the two canvas tables (Searcher full ranking, Dashboard
+catalogue), map tiles/colours, hovers and layout, because the browser pane was
+hidden; no live failure paths (covered by offline tests). Documentation notes,
+not application failures: README and plans still called `3444728` the current
+reviewed version at `d1c3bdf`; the Searcher menu says "Next 1 days".
+
+Genuine data: the run saved 3,320 forecast rows (83 cities × 40 periods,
+retrieved 14 November 2026 21:03:10–21:04:12 UTC, one fetch group per city).
+They were appended unchanged to the dev data after PR #23's 3,480 rows,
+using `WeatherStore.append`: 29,567 records, all keys unique, no existing row
+changed.

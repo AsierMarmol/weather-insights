@@ -244,7 +244,7 @@ def search_context(frame: pd.DataFrame) -> dict | None:
 
 def _reason(city_id: str, code: str | None, errors: Mapping) -> str:
     code = errors.get(city_id, code)
-    return searcher.MESSAGES.get(code, "Forecast unavailable.")
+    return searcher.MESSAGES.get(code or "", "Forecast unavailable.")
 
 
 # ---------------------------------------------------------------------------
@@ -529,7 +529,7 @@ def _render_status(overview, frame, next_preferences, total) -> None:
         f"window · {overview['cached']} saved forecast(s) reused."
     )
     oldest = context["oldest_retrieved_at_utc"] if context else None
-    if oldest is not None:
+    if context is not None and oldest is not None:
         st.caption(
             f"Forecasts retrieved {_madrid(oldest)} to "
             f"{_madrid(context['newest_retrieved_at_utc'])}."
@@ -679,7 +679,7 @@ def render_dashboard_page() -> None:
         )
 
     summary = executive_summary(
-        overview["rows"] if frame is not None else [], catalog
+        overview["rows"] if overview and frame is not None else [], catalog
     )
     render_kpis(summary)
     with st.container(border=True, key="map_panel"):
@@ -713,12 +713,12 @@ def render_dashboard_page() -> None:
             "use each day's weather, so can differ from the window score. "
             "Scores are not probabilities or safety ratings."
         )
-    if frame is None:
+    if frame is None or overview is None:
         return
 
     shown = frame
     available = shown[shown["status"] == AVAILABLE]
-    unavailable = shown[shown["status"] == UNAVAILABLE]
+    unavailable = shown.loc[shown["status"] == UNAVAILABLE, :]
     if shown.empty:
         st.warning(
             "No destination results were loaded. Refresh the overview "

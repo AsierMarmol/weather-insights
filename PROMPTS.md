@@ -2004,3 +2004,104 @@ Pre-publication verification confirmed the code/configuration and genuine data
 still match the integrated 523-pass/2-skip candidate. Only documentation status
 changed afterward. Full-suite results remain the 82.90-second integration run;
 no new application-test run is claimed for these editorial changes.
+
+
+## Phase 5 follow-up: resolve Pylance diagnostics before delivery (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Verify the project interpreter, review the Pylance diagnostics,
+fix genuine typing or validation issues without changing intended behaviour,
+then rerun type checks, affected tests, the full suite and lint. Do not hide
+errors by disabling warnings or adding blanket Any/type-ignore annotations.
+
+**Got:** Guided project `.venv` selection and language-server restart; the
+requester reported 218 remaining editor diagnostics. Reproduced 217 with
+Pyright. Updated numeric validation typing, nullable/mixed data, CSV model
+construction, session-state/context narrowing, HTTP interfaces and request
+parameters. Updated fixtures to construct validated dataclasses, retained
+invalid-input/immutability assertions, and checked Plotly's serialized output
+and pandas index types. Added pinned Pyright and the shared basic configuration
+so teammates and the instructor can reproduce the check using README.
+
+**Checked:** A fresh locked frozen copy passed 523 tests, with 2 POSIX-only
+Windows skips, in 158.27 seconds. The final pandas assertion passed the entire
+executive test file afterward; type checking and lint passed again. All 38
+Python files pass Pyright and the installed Pylance bundled-stub cross-check.
+Dependency checks passed. No synthetic weather was written into genuine data;
+no live API or new visual/Mac/phone result is claimed. Phase 5 holds the evidence.
+
+**Kept / changed / rejected:** Preserved scores, app behaviour, runtime
+dependency versions and genuine observations. Kept negative tests and precise
+runtime validation; rejected global suppression and invented pass results.
+All earlier PROMPTS entries remain unchanged.
+
+**Human review / commit:** Prepared locally for requester review. No staging,
+commit, push or merge performed. Gabriel and Alejandra still perform P6.2 on
+the final reviewed dev version, with Christian reviewing their reports.
+
+
+## Phase 4 follow-up: identify high-wind recommendations (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Mark the recommendations affected by the high-wind alert with a
+red dot so users can identify the destinations the warning refers to.
+
+**Got:** Added a red dot and visible "High wind" label beside each affected
+top-five destination name, with a short hover explanation. The banner and
+card markers use the same set of destination IDs, calculated once from the
+existing 39+ km/h daytime-slot condition. Updated the Phase 4 behavior record.
+
+**Checked:** AppTest checks cover just below 39, exactly 39, higher wind and
+an affected destination outside the top five; they verify individual marked
+cards and the banner agree, without additional HTTP requests. A fresh locked
+copy passed the full suite (525 passed, 2 skipped), Pyright, Flake8 and dependency
+checks. Tests left the frozen inputs unchanged. No new browser visual check
+or live API result is claimed.
+
+**Kept / changed / rejected:** Preserved scores, ordering, weather data and
+the Dashboard. The text label makes the warning understandable without
+relying on red alone. No new alert threshold or scoring penalty was added.
+
+**Human review / commit:** Prepared locally for requester review; not committed
+or pushed. The final reviewed dev candidate still needs the P6.2 clone checks.
+
+---
+
+## Phase 6: P6.2 Alejandra clean-clone verification (2026-11-14)
+
+**Requested by:** Alejandra Medina (alemedinabarreto).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Perform P6.2 from a new clone of dev following README only, run the
+locked install, dependency check, import, full tests and Flake8, check the app
+live, report honestly without changing code or tests; then add the clone
+results and the genuine records created to the feature branch and commit.
+
+**Got:** A clean-clone run on dev `d1c3bdf` (macOS 15.7.8, Python 3.14.7,
+uv 0.12.9): 524 passed, 1 Windows-only skip, both POSIX permission tests
+passing, Flake8 clean, and the live Landing, Dashboard (all five windows) and
+Searcher checks recorded in [Phase 6](PHASE6_DELIVERY.md#p62-alejandra-clean-clone-run--14-november-2026).
+The 3,320 genuine forecast rows saved during the run were appended to the
+latest dev data through `WeatherStore.append`.
+
+**Checked:** Score agreement across map, scatter, top five, driving bands and
+heatmap from chart data in every window; Searcher cards against an offline
+recompute; append-only data diff with unique keys. The canvas tables, map
+tiles, hovers and layout were not inspected; no failure paths were provoked live.
+
+**Kept / changed / rejected:** No code, tests or scoring changed. The run is
+recorded against `d1c3bdf`; it is not relabelled as covering `f26e908`.
+
+**Human review:** Christian's review of the P6.2 reports is pending. P6.2 is
+not complete: Alejandra repeats it on the final reviewed dev commit, and
+Gabriel's report is still required.
+
+**Commit / PR:** Committed on `Alejandra/feature`, authorized by Alejandra;
+not pushed or merged.

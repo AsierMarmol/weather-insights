@@ -259,7 +259,7 @@ def test_models_are_validated_immutable_values():
     record = WeatherStore().latest_forecast("ES-45168")[0]
     for value in (toledo, record):
         with pytest.raises(FrozenInstanceError):
-            value.city_id = "ES-00000"
+            setattr(value, "city_id", "ES-00000")
         assert value == replace(value) and hash(value) == hash(replace(value))
     with pytest.raises(ValueError):
         replace(toledo, car_duration_min=-1)
@@ -282,9 +282,10 @@ def test_models_are_validated_immutable_values():
 def test_store_lock_is_private_and_shared_per_file(tmp_path):
     path = tmp_path / "weather_records.csv"
     first, second = WeatherStore(path), WeatherStore(str(path))
-    assert first._WeatherStore__lock is second._WeatherStore__lock
-    assert first._WeatherStore__lock is not WeatherStore()._WeatherStore__lock
+    lock = getattr(first, "_WeatherStore__lock")
+    assert lock is getattr(second, "_WeatherStore__lock")
+    assert lock is not getattr(WeatherStore(), "_WeatherStore__lock")
     assert not hasattr(first, "lock") and not hasattr(first, "_lock")
     with pytest.raises(AttributeError):
-        first.path = path  # read-only property
+        setattr(first, "path", path)  # read-only property
     assert repr(first) == f"WeatherStore({str(path.resolve())!r})"

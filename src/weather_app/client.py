@@ -16,6 +16,7 @@ Clients only fetch and map; ``service.WeatherService`` owns saving and caching.
 from __future__ import annotations
 
 import math
+from typing import Protocol, TypeGuard, TypedDict
 import threading
 import time
 import unicodedata
@@ -153,6 +154,26 @@ class RateLimiter:
 OPENWEATHER_RATE_LIMITER = RateLimiter(max_calls=55, period_s=60.0)
 
 
+class HTTPResponse(Protocol):
+    status_code: int
+
+    def json(self) -> object: ...
+
+
+class HTTPSession(Protocol):
+    def get(self, url: str, *, params: dict,
+            timeout: tuple[float, float],
+            allow_redirects: bool) -> HTTPResponse: ...
+
+    def close(self) -> None: ...
+
+
+class LocationParameters(TypedDict):
+    id: int
+    units: str
+    lang: str
+
+
 # --- generic JSON API base
 
 
@@ -174,7 +195,7 @@ class JSONAPIClient:
         *,
         api_key: str,
         api_key_parameter: str,
-        session: requests.Session | None = None,
+        session: HTTPSession | None = None,
         rate_limiter: RateLimiter | None = None,
         timeout: tuple[float, float] = (5.0, 20.0),
         max_retries: int = 1,
@@ -364,7 +385,7 @@ def _name_key(value: str) -> str:
     )
 
 
-def _finite(value: object) -> bool:
+def _finite(value: object) -> TypeGuard[float]:
     return (
         isinstance(value, (int, float))
         and not isinstance(value, bool)
@@ -428,7 +449,7 @@ class OpenWeatherClient(JSONAPIClient):
         self,
         api_key: str,
         *,
-        session: requests.Session | None = None,
+        session: HTTPSession | None = None,
         overrides: Mapping[str, dict] | None = None,
         rate_limiter: RateLimiter | None = None,
         clock: Callable[[], datetime] | None = None,
@@ -470,7 +491,7 @@ class OpenWeatherClient(JSONAPIClient):
 
     def request_parameters(
         self, destination: Destination
-    ) -> dict[str, object]:
+    ) -> LocationParameters:
         """The exact provider parameters (without the key) used for a
         destination.
 
@@ -482,14 +503,13 @@ class OpenWeatherClient(JSONAPIClient):
         self._require_destination(destination)
         override = self._overrides.get(destination.city_id, {})
         if "request_parameters" in override:
-            params: dict[str, object] = dict(override["request_parameters"])
+            provider_id = override["request_parameters"]["id"]
         else:
             raise InvalidInputError(
                 "No verified provider city ID is configured for "
                 f"{destination.city}.")
-        params["units"] = self.UNITS
-        params["lang"] = self.LANGUAGE
-        return params
+        return {"id": provider_id, "units": self.UNITS,
+                "lang": self.LANGUAGE}
 
     def current(self, destination: Destination) -> WeatherRecord:
         """Fetch and map current conditions (one record; precipitation
