@@ -1,27 +1,23 @@
 # Phase 6 - Documentation and Delivery
 
 Updated 14 November 2026. The original P6.1 preparation/publication history is
-retained below; current P4.5 adoption is pending review/publication. Package/install rehearsals
-do not complete the reviewed-version clean-clone gate.
+retained below. P4.5/P6.1 was approved by Gabriel and merged in PR #21.
+The independent reviewed-version clean-clone gate remains P6.2.
 
 | Step | Deliverable | Owner | Reviewer | Dependency and current status |
 | --- | --- | --- | --- | --- |
-| P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Documentation prepared and requester preview review confirmed; catalogue provenance clarified; Gabriel review pending |
-| P6.2 | Clean-clone verification | Selin | Christian | After adopted P4.5/P6.1 reviewed commit; pending |
+| P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
+| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | At the end of preparation, after final documentation/fixes merge; before P6.3 |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
 
 ## Next action
 
-The requester confirmed final preview review on 14 November. Documentation
-is prepared against [current acceptance](PHASE5_QUALITY_REVIEW.md#provider-identity-and-diagnostic-follow-up--14-november-2026).
-The provider-identity and diagnostic follow-up is locally tested; the
-scoring and interface are unchanged. Complete Gabriel's review of the
-documented sources and delivery candidate. The requester authorized a
-commit, push and PR into dev with Gabriel as reviewer on 14 November.
-Approval and merge remain pending. After a reviewed merge, test the exact
-reviewed commit from a fresh directory. Until then, teammates should review
-the feature branch; dev does not yet contain this update. Local Streamlit is the delivery target; hosting is optional.
-The full repository is needed: a wheel alone lacks app.py and external data/assets.
+**Gabriel and Alejandra each perform P6.2, reviewed by Christian.** Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21)
+and it merged into dev as `3444728`. Clone reviewed dev into a new directory,
+record the exact commit and follow README only. [Post-commit validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
+passed against identical files but does not close this independent gate.
+Local Streamlit is the delivery target; hosting is optional. The full
+repository is needed: a wheel alone lacks app.py and external data/assets.
 
 ## Delivery contents and final checklist
 
@@ -48,17 +44,22 @@ Do not include real credential files, copied virtual environments, caches, tempo
 - [x] Add visible OpenWeather text/link/logo and reference source credits without changing calculations.
 - [x] Requester confirmed the Free Current Weather + 5-day/3-hour Forecast plan; public ODbL/attribution conditions checked and weather-data notice added.
 - [x] Clarify AI-assisted destination selection separately from numeric/weather sources; remove the unsupported INE selection-data confirmation gate.
-- [ ] Gabriel reviews the P6.1 diff and reports the tested commit. Review has not been requested by this local preparation.
+- [x] Gabriel approved PR #21 for commit `8b1210e`; merged into dev as `3444728`. His approval does not report a separate test run; automated evidence is recorded in Phase 5.
 - [x] Record current Windows/VS Code validation in Phase 5. Phone/Mac checks are outside this audit at the user's request; no cross-platform result is inferred.
 
-### P6.2 clean-clone acceptance - Selin, reviewed by Christian
+### P6.2 clean-clone acceptance - Gabriel and Alejandra, reviewed by Christian
 
-After the prepared P6.1 change is reviewed and merged, use a new directory and only README instructions. Record `git rev-parse HEAD`, operating system, Python/uv versions and actual results. Do not copy another clone's environment or credentials.
+P6.1 is reviewed and merged in PR #21. Run P6.2 at the end of preparation,
+after the final documentation cleanup and any fixes are reviewed and merged,
+before P6.3 publication/submission. Gabriel and Alejandra each test the same
+reviewed dev commit independently, using separate fresh directories, their
+own environments and personal API keys. Both reports are required; this
+assignment does not mark either run complete. Use only README instructions. Record `git rev-parse HEAD`, operating system, Python/uv versions and actual results. Do not copy another clone's environment or credentials.
 
 1. Clone reviewed dev and run `uv sync --locked`, package import, `uv pip check`, the full offline test suite and Flake8 as documented in README. Keep the app stopped during tests. On macOS the two Unix permission tests should run, not be dismissed as Windows skips.
 2. Configure a personal key locally and start Streamlit. Check Landing and Dashboard before Searcher, automatic Dashboard loading, the all-83 map, hover, executive tables, Destination-score-versus-driving scatter and daily heatmap; verify 1/5-day selection, navigation and independent state. Check the agreed delivery viewport; this local audit excludes phone/Mac acceptance. Live loads create real saved records and count against the account quota.
 3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
-4. Record limitations and any fixes with their retest results in this phase. Christian reviews this evidence. Preserve new real records and inspect the diff before proposing them for commit.
+4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes the candidate, both reports must cover the final reviewed version before P6.2 is closed. Preserve new real records and inspect the diff before proposing them for commit.
 
 ### P6.3 final publication - Asier, reviewed by Gabriel
 
@@ -169,3 +170,14 @@ Historical source-confirmation and earlier test snapshots above remain intact.
 Next: requester review/commit, authorized push and PR review into dev; then
 P6.2 on the actual reviewed commit, followed by P6.3. Copying files into the
 feature working tree does not complete any of those publication/review gates.
+
+
+## P6.1 review and merge — 14 November 2026
+
+Gabrielstec approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21), which merged commit `8b1210e` into dev as
+`3444728`. This supersedes the pending-publication status in the dated
+preparation/integration checkpoints above. [Post-commit verification](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
+passed on identical files. P6.2 remains open for Gabriel and Alejandra,
+reviewed by Christian;
+P6.3 remains open for Asier, reviewed by Gabriel. Approval alone is not a
+Mac/browser test report or final submission.

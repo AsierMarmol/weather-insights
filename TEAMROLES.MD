@@ -1,16 +1,16 @@
 # Team roles
 
-> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
 
 One owner builds each complete component, including its tests, documentation and fixes. Another member reviews it. Roles do not imply work or reviews have already happened. Phase 1 was completed by Asier and is not reassigned.
 
 | Owner | Whole deliverables | Main files | Reviewer |
 | --- | --- | --- | --- |
 | Asier | Product rules, complete catalog and sources, API feasibility, shared specification; verify shared fetch/save; Searcher and integration; delivery | P2.1-P2.5, reference data, app.py/searcher.py, P4.1/P4.3, P5.5, P6.1/P6.3 | Gabriel; Christian for catalog/P2.4 |
-| Alejandra | Domain models, catalog loader and persistence; model/storage acceptance | models.py, storage.py and tests; P3.1/P5.1 | Christian |
-| Gabriel | Reusable JSON base/OpenWeather subclass, configuration, request/cache/save service and API acceptance | client.py, config.py, service.py and tests; P3.2/P5.2 | Alejandra |
+| Alejandra | Domain models, catalog loader and persistence; model/storage acceptance; independent final clean-clone test | models.py, storage.py and tests; P3.1/P5.1/P6.2 | Christian |
+| Gabriel | Reusable JSON base/OpenWeather subclass, configuration, request/cache/save service and API acceptance; independent final clean-clone test | client.py, config.py, service.py and tests; P3.2/P5.2/P6.2 | Alejandra for API; Christian for P6.2 |
 | Christian | Common-window scoring, rankings, comparisons, all-preferences metrics and analytical acceptance | analytics.py and tests; P3.3/P5.3 | Selin |
-| Selin | Complete interactive Dashboard/charts and UI acceptance; final clean-clone verification | dashboard.py and tests; P4.2/P4.4/P5.4/P6.2 | Asier for UI; Christian for clean clone |
+| Selin | Complete interactive Dashboard/charts and UI acceptance | dashboard.py and tests; P4.2/P4.4/P5.4 | Asier |
 
 ## Dependencies and boundaries
 
@@ -30,7 +30,8 @@ Use actual Git identities and actual AI attribution. Every member must make mean
 
 AsierMarmol implemented the experimental redesign with OpenAI Codex, including
 cross-component scoring, provider mapping and integration changes. Original
-component ownership remains; it does not reattribute these changes. Proposed
-reviews: Christian for analytics/data, Selin for Dashboard/presentation, Gabriel
-for integration. After adoption, Selin owns P6.2 (Christian reviews); Asier owns
-P6.3 (Gabriel reviews). Current evidence/status is in [PROJECT_PHASES.md](PROJECT_PHASES.md).
+component ownership remains; it does not reattribute these changes. Gabriel
+approved the integration in PR #21, now merged into dev. Earlier proposed
+specialist reviews are not claimed as completed. Gabriel and Alejandra each
+perform the final P6.2 clean-clone test after preparation is complete; Christian
+reviews both independent reports. Asier owns P6.3 (Gabriel reviews). Current evidence/status is in [PROJECT_PHASES.md](PROJECT_PHASES.md).
