@@ -96,7 +96,7 @@ def _available(city_id, passes, suitable, penalty, mean_t, max_p, max_w,
 
 
 def _unavailable(city_id, reason="fetch_failed"):
-    row = {
+    row: dict[str, str | float | None] = {
         name: None
         for name in (
             "temperature_passes", "precipitation_passes", "wind_passes",
@@ -218,6 +218,7 @@ def test_prepare_frame_rejects_rows_outside_contract(change, message):
 
 def test_search_context_reports_window_and_forecast_age(frame):
     context = search_context(frame)
+    assert context is not None
     assert context["run_at_utc"] == RUN_AT_DT
     assert context["window_end_utc"] == RUN_AT_DT + timedelta(hours=24)
     assert context["oldest_age"] == timedelta(minutes=90)
@@ -242,10 +243,11 @@ def test_map_shows_all_83_destinations_before_loading():
         assert "°C" not in point["hover"]
         assert "Destination rank" not in point["hover"]
     figure = map_figure(points)
-    assert [trace.type for trace in figure.data] == ["scattermap"] * 3
-    assert sum(len(trace.lat) for trace in figure.data[:2]) == 83
-    assert figure.data[1].marker.color == NO_DATA_COLOUR
-    assert figure.data[1].name == "Weather not loaded"
+    traces = figure.to_plotly_json()["data"]
+    assert [trace["type"] for trace in traces] == ["scattermap"] * 3
+    assert sum(len(trace["lat"]) for trace in traces[:2]) == 83
+    assert traces[1]["marker"]["color"] == NO_DATA_COLOUR
+    assert traces[1]["name"] == "Weather not loaded"
     tile_map = figure.layout.map
     assert tile_map.center.lat == pytest.approx(39.834, abs=0.01)
     assert tile_map.center.lon == pytest.approx(-2.938, abs=0.01)
@@ -253,11 +255,11 @@ def test_map_shows_all_83_destinations_before_loading():
     assert tile_map.style['sources']['osm']['tiles'] == [OSM_TILE_URL]
     assert 'openstreetmap.org/copyright' in (
         tile_map.style['sources']['osm']['attribution'])
-    origin = figure.data[2]
-    assert list(origin.lat) == [MADRID_ORIGIN['lat']]
-    assert list(origin.lon) == [MADRID_ORIGIN['lon']]
-    assert origin.customdata == ('madrid-origin',)
-    assert 'not a ranked destination' in origin.hovertext[0]
+    origin = figure.to_plotly_json()["data"][2]
+    assert list(origin["lat"]) == [MADRID_ORIGIN['lat']]
+    assert list(origin["lon"]) == [MADRID_ORIGIN['lon']]
+    assert list(origin["customdata"]) == ['madrid-origin']
+    assert 'not a ranked destination' in origin["hovertext"][0]
     assert all(35.8 < p["latitude"] < 43.9 for p in points)
     assert all(-9.4 < p["longitude"] < 3.4 for p in points)
 
@@ -287,21 +289,21 @@ def test_map_hover_shows_city_activities_temperature_rank_and_score(frame):
     )
     assert points[without_row]["status"] == "not_loaded"
     figure = map_figure(list(points.values()))
-    ranked, grey, origin = figure.data
-    assert list(ranked.customdata) == ["ES-45168", "ES-40194", "ES-41091"]
-    assert list(ranked.marker.color) == pytest.approx(
+    ranked, grey, origin = figure.to_plotly_json()["data"]
+    assert list(ranked["customdata"]) == ["ES-45168", "ES-40194", "ES-41091"]
+    assert list(ranked["marker"]["color"]) == pytest.approx(
         [100 - 61 / 60, 200 / 3 - 75 / 60, 200 / 3 - 5]
     )
-    assert len(ranked.lat) + len(grey.lat) == 83
-    assert grey.name == "No destination rank"
+    assert len(ranked["lat"]) + len(grey["lat"]) == 83
+    assert grey["name"] == "No destination rank"
 
 
 def test_map_keeps_all_catalogue_markers_fully_visible():
     points = map_points(CATALOG_ROWS)
     figure = map_figure(points)
-    grey = figure.data[1]
-    assert set(grey.customdata) == {row["city_id"] for row in CATALOG_ROWS}
-    assert grey.marker.opacity == 0.95
+    grey = figure.to_plotly_json()["data"][1]
+    assert set(grey["customdata"]) == {row["city_id"] for row in CATALOG_ROWS}
+    assert grey["marker"]["opacity"] == 0.95
 
 
 # --------------------------------------------------------------- charts
@@ -321,6 +323,7 @@ def varied_handler(clock, failures=None):
     def handle(url, params):
         response = base(url, params)
         if url.endswith("/forecast") and response.status_code == 200:
+            assert isinstance(response._payload, dict)
             coord = response._payload["city"]["coord"]
             place = by_coordinates.get((coord["lat"], coord["lon"]))
             if place is not None and place.city_id in HOT:

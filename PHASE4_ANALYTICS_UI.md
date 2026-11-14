@@ -3,7 +3,7 @@
 > **Current version:** P4.5's Canva-inspired interface and executive
 > analytics were approved by Gabriel and merged in [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21).
 > [SCORING.md](SCORING.md) defines the current formula;
-> [Phase 5 latest checks](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026) records verification.
+> [Phase 5 latest checks](PHASE5_QUALITY_REVIEW.md#final-pre-clone-validation--14-november-2026) records verification.
 > Earlier dated baseline records retain their historical status.
 
 
@@ -137,6 +137,8 @@ duplicated panels. The original OOP, API, safe persistence and package remain.
 - Landing, responsive theme/navigation, local assets and truthful source credits.
 - Searcher: preferred weather categories, compact top five, complete ranking,
   one Trip score, h:mm travel, and high-wind notice only for affected top five.
+  A red dot and "High wind" label identify each affected card; the banner
+  and markers share the same destination IDs (39+ km/h in a daytime slot).
 - Dashboard: independent 1–5-day selector, automatic initial/window load,
   manual retry, all-83 OSM map, fixed score colours, five KPI cards, deterministic
   summary, top five, score-versus-driving scatter, driving bands, daily heatmap

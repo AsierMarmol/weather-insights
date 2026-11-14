@@ -19,7 +19,7 @@ FETCH_ID = "5f0c6a3e-8f43-4a43-9c51-3c2f1a1b2c3d"
 
 
 def toledo(**changes):
-    values = dict(
+    base = Destination(
         city_id="ES-45168",
         city="Toledo",
         region="Castilla-La Mancha",
@@ -30,24 +30,22 @@ def toledo(**changes):
         activities=("History and heritage", "Food and gastronomy"),
         destination_size="Small city or town",
     )
-    values.update(changes)
-    return Destination(**values)
+    return replace(base, **changes)
 
 
 def preferences(**changes):
-    values = dict(
+    base = SearchPreferences(
         days=3,
         temperature_min_c=16,
         temperature_max_c=24,
         max_precipitation_probability_pct=30,
         max_wind_kmh=25,
     )
-    values.update(changes)
-    return SearchPreferences(**values)
+    return replace(base, **changes)
 
 
 def record(**changes):
-    values = dict(
+    base = WeatherRecord(
         fetch_id=FETCH_ID,
         city_id="ES-45168",
         kind="forecast",
@@ -63,8 +61,7 @@ def record(**changes):
         provider_city_id=2510409,
         provider_city_name="Toledo",
     )
-    values.update(changes)
-    return WeatherRecord(**values)
+    return replace(base, **changes)
 
 
 # --- Destination
@@ -100,7 +97,7 @@ def test_destination_catalog_row_uses_activity_list():
 def test_destination_is_immutable_and_comparable():
     destination = toledo()
     with pytest.raises(FrozenInstanceError):
-        destination.city = "Madrid"
+        setattr(destination, "city", "Madrid")
     assert destination == toledo()
     assert len({destination, toledo()}) == 1
 
@@ -312,7 +309,7 @@ def test_from_csv_row_rejects_non_integer_or_unsupported_versions(cell):
 @pytest.mark.parametrize("cut", [1, 5, 14])
 def test_from_csv_row_reports_short_rows_as_column_mismatch(cut):
     # csv.DictReader fills missing trailing cells with None.
-    row = record().to_csv_row()
+    row: dict[str, str | None] = dict(record().to_csv_row())
     for name in RECORD_FIELDS[cut:]:
         row[name] = None
     with pytest.raises(ValueError, match="columns"):

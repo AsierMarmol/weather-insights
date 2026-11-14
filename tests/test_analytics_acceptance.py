@@ -11,6 +11,7 @@ from __future__ import annotations
 
 import csv
 from collections import defaultdict
+from typing import cast
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -42,15 +43,14 @@ SYNTHETIC_FETCH = "00000000-0000-4000-8000-0000000000c3"
 
 
 def prefs(days=1, **overrides):
-    values = dict(
+    base = SearchPreferences(
         days=days,
         temperature_min_c=16,
         temperature_max_c=24,
         max_precipitation_probability_pct=30,
         max_wind_kmh=25,
     )
-    values.update(overrides)
-    return SearchPreferences(**values)
+    return replace(base, **overrides)
 
 
 def record(city_id, valid_at, temp, pop, wind, *, retrieved, fetch_id=None):
@@ -386,21 +386,21 @@ def test_genuine_catalog_replay_matches_an_independent_tally(genuine, days):
         assert got["max_wind_kmh"] == pytest.approx(want["max_w"])
         penalty = min(CATALOG[city].car_duration_min / 30, 15)
         assert got["final_score"] == pytest.approx(
-            max(want["match"] - penalty, 0))
+            max(cast(float, want["match"]) - penalty, 0))
 
     # Searcher order: final desc, match desc, minutes asc, city_id asc.
     ok = [c for c, w in expected.items() if w["reason"] is None]
     trip = sorted(ok, key=lambda c: (
-        -max(expected[c]["match"]
+        -max(cast(float, expected[c]["match"])
              - min(CATALOG[c].car_duration_min / 30, 15), 0),
-        -expected[c]["match"], CATALOG[c].car_duration_min, c))
+        -cast(float, expected[c]["match"]), CATALOG[c].car_duration_min, c))
     assert [r["city_id"] for r in rows[:len(ok)]] == trip
     assert all(r["status"] == "unavailable" for r in rows[len(ok):])
 
     # Dashboard: driving-adjusted competition ranks, city_id within ties.
     # Every catalogued destination remains in this view.
     want_ranks = _competition_ranks({
-        c: max(expected[c]["match"]
+        c: max(cast(float, expected[c]["match"])
                - min(CATALOG[c].car_duration_min / 30, 15), 0) for c in ok})
     assert destination_ranks(rows) == want_ranks
     frame = prepare_frame(rows, CATALOG_ROWS)

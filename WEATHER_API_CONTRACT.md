@@ -1,6 +1,6 @@
 # Weather API contract
 
-> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
 
 P2.3 owner: Asier. Reviewer: Gabriel. Access checked on 11 November 2026; foundation reviewed by Gabriel in PR #3 on 12 November 2026. Production API/service accepted through P5.2 (PR #14). This document owns provider mapping and request rules. [Phase 2](PHASE2_SCOPE.md) owns product rules and the shared application schema; [SCORING.md](SCORING.md) owns the current formulas.
 

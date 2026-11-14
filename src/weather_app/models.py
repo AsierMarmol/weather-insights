@@ -13,6 +13,8 @@ from weather_app.scoring import RAIN_BANDS, WIND_BANDS, SEASONAL_BANDS
 import math
 import re
 import uuid
+from typing import Literal, cast, overload
+from collections.abc import Mapping
 from dataclasses import dataclass, fields
 from datetime import datetime, timedelta, timezone
 
@@ -63,6 +65,18 @@ _CITY_ID = re.compile(r"ES-\d{5}")
 
 
 # --- shared validation helpers
+
+
+@overload
+def _number(
+    name: str, value: object, *, optional: Literal[False] = False
+) -> float: ...
+
+
+@overload
+def _number(
+    name: str, value: object, *, optional: Literal[True]
+) -> float | None: ...
 
 
 def _number(
@@ -394,33 +408,45 @@ class WeatherRecord:
         return row
 
     @classmethod
-    def from_csv_row(cls, row: dict[str, str]) -> WeatherRecord:
+    def from_csv_row(cls, raw: Mapping[str, str | None]) -> WeatherRecord:
         """Rebuild a validated record from one CSV row."""
         # A short row leaves None values; a long one adds a None key.
-        if set(row) != set(RECORD_FIELDS) or None in row.values():
+        if set(raw) != set(RECORD_FIELDS) or None in raw.values():
             raise ValueError("row does not match the weather record columns")
-        values: dict[str, object] = {}
+        row = cast(Mapping[str, str], raw)
         try:
-            values["schema_version"] = int(row["schema_version"])
-            values["provider_city_id"] = int(row["provider_city_id"])
+            schema_version = int(row["schema_version"])
+            provider_city_id = int(row["provider_city_id"])
         except (TypeError, ValueError):
             raise ValueError(
                 "schema_version and provider_city_id must be integers"
             ) from None
-        for name in ("fetch_id", "city_id", "kind", "provider_city_name"):
-            values[name] = row[name]
-        for name in _TIME_FIELDS:
-            values[name] = parse_utc(name, row[name])
-        for name in _FLOAT_FIELDS:
-            text = (row[name] or "").strip()
+
+        def number(name: str) -> float | None:
+            text = row[name].strip()
             if not text:
-                values[name] = None
-                continue
+                return None
             try:
-                values[name] = float(text)
+                return float(text)
             except ValueError:
                 raise ValueError(f"{name} is not a number") from None
-        return cls(**values)
+
+        return cls(
+            schema_version=schema_version,
+            provider_city_id=provider_city_id,
+            fetch_id=row["fetch_id"], city_id=row["city_id"], kind=row["kind"],
+            provider_city_name=row["provider_city_name"],
+            retrieved_at_utc=parse_utc("retrieved_at_utc",
+                                       row["retrieved_at_utc"]),
+            valid_at_utc=parse_utc("valid_at_utc", row["valid_at_utc"]),
+            latitude=_number("latitude", number("latitude")),
+            longitude=_number("longitude", number("longitude")),
+            temperature_c=number("temperature_c"),
+            wind_kmh=number("wind_kmh"),
+            precipitation_probability_pct=number(
+                "precipitation_probability_pct"),
+            humidity_pct=number("humidity_pct"), cloud_pct=number("cloud_pct"),
+        )
 
     def __lt__(self, other: object) -> bool:
         """Chronological order, so ``sorted(records)`` follows valid time."""

@@ -12,6 +12,11 @@ The independent reviewed-version clean-clone gate remains P6.2.
 
 ## Next action
 
+The locally validated [typing and warning-marker follow-ups](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026) require Alejandra's review
+and merge into dev before the final P6.2 runs. Its automated checks do
+not replace either independent acceptance report.
+
+
 **Gabriel and Alejandra each perform P6.2, reviewed by Christian.** Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21)
 and it merged into dev as `3444728`. Clone reviewed dev into a new directory,
 record the exact commit and follow README only. [Post-commit validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
@@ -56,9 +61,9 @@ reviewed dev commit independently, using separate fresh directories, their
 own environments and personal API keys. Both reports are required; this
 assignment does not mark either run complete. Use only README instructions. Record `git rev-parse HEAD`, operating system, Python/uv versions and actual results. Do not copy another clone's environment or credentials.
 
-1. Clone reviewed dev and run `uv sync --locked`, package import, `uv pip check`, the full offline test suite and Flake8 as documented in README. Keep the app stopped during tests. On macOS the two Unix permission tests should run, not be dismissed as Windows skips.
+1. Clone reviewed dev and run `uv sync --locked`, package import, `uv pip check`, the full offline test suite, Flake8 and `uv run --locked pyright` as documented in README. If using VS Code, select the new clone's `.venv` and check Pylance too. Keep the app stopped during tests. On macOS the two Unix permission tests should run, not be dismissed as Windows skips.
 2. Configure a personal key locally and start Streamlit. Check Landing and Dashboard before Searcher, automatic Dashboard loading, the all-83 map, hover, executive tables, Destination-score-versus-driving scatter and daily heatmap; verify 1/5-day selection, navigation and independent state. Check the agreed delivery viewport; this local audit excludes phone/Mac acceptance. Live loads create real saved records and count against the account quota.
-3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
+3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. When a top-five high-wind alert appears, verify that the affected cards carry the red dot and High wind label. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
 4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes the candidate, both reports must cover the final reviewed version before P6.2 is closed. Preserve new real records and inspect the diff before proposing them for commit.
 
 ### P6.3 final publication - Asier, reviewed by Gabriel

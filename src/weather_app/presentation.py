@@ -81,11 +81,19 @@ def render_landing(now):
         ]) + '</section>')
 
 
-def recommendation_cards(rows, places):
+def recommendation_cards(rows, places, high_wind_ids):
     """Compact catalog facts and existing trip scores, in engine order."""
     cards = []
     for rank, row in enumerate(rows, start=1):
         place = places[row['city_id']]
+        wind_alert = (
+            '<span class="wi-wind-alert" '
+            'title="Forecast wind reaches 39 km/h or more '
+            'in a daytime slot during this trip window">'
+            '<span class="wi-wind-dot" aria-hidden="true"></span>'
+            'High wind</span>'
+            if row['city_id'] in high_wind_ids else ''
+        )
         facts = [
             ('Departure', 'Madrid, Spain'),
             ('Region', place.region),
@@ -104,7 +112,8 @@ def recommendation_cards(rows, places):
         cards.append(
             '<article class="wi-trip-card"><div class="wi-trip-heading">'
             f'<span class="wi-trip-number">{rank:02d}</span><div>'
-            f'<h3>{escape(place.city)}</h3>'
+            '<div class="wi-trip-title">'
+            f'<h3>{escape(place.city)}</h3>{wind_alert}</div>'
             f'<p>{escape(place.region)} · '
             f'{escape(place.destination_size)}</p></div></div>'
             f'<dl class="wi-trip-facts">{chips}</dl></article>'

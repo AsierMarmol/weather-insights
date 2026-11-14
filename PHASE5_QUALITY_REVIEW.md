@@ -2,10 +2,10 @@
 
 > **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
 
-Updated: 14 November 2026. **Current committed-version audit: 523 passed,
-two POSIX-only Windows skips in 157.67 seconds; lint clean.**
-[Post-commit validation](#post-commit-validation--14-november-2026) records
-the latest run. Earlier semantic/cleanup/integration results retain their
+Updated: 14 November 2026. **Current local candidate: 525 passed,
+two POSIX-only Windows skips; type checks and lint clean.**
+The [delivery-readiness recheck](#delivery-readiness-recheck--14-november-2026)
+records the latest run. Typing and warning-marker changes require Alejandra's review and merge into dev. Earlier semantic/cleanup/integration results retain their
 dated timings and datasets. Gabriel approved PR #21 and it is merged into dev.
 P6.2 independent clean-clone acceptance and P6.3 delivery remain open.
 The original P5.1–P5.5 table and dated entries below are historical evidence.
@@ -668,3 +668,157 @@ P6.2 clean-clone checks are assigned to Gabriel and Alejandra for the end
 of preparation, with Christian reviewing their independent reports.
 The following documentation cleanup records the actual approval/merge and
 current results; it does not change code, tests, data or PROMPTS.md.
+
+
+## Type-checking follow-up — 14 November 2026
+
+Owner: Asier; AI collaborator: OpenAI Codex. Prepared on top of `f5283eb`;
+not committed or reviewed yet. Pylance's 218 editor diagnostics revealed a
+gap in the previous test/lint-only validation. Pyright reproduced 217 on all
+38 Python files with the project's virtual environment. These were static
+diagnostics, not 218 failed runtime tests.
+
+Changes describe validated numbers, optional fields, mixed-value analytical
+rows, CSV parsing, HTTP test-double interfaces and the provider request shape.
+Session-state string operations and optional Dashboard context are narrowed
+before use. Test fixtures still run model validation; malformed-input and
+immutability tests remain. Plotly checks inspect the generated chart payload,
+and the pandas row test asserts its integer index. Targeted casts follow
+existing runtime checks; no blanket Any, type-ignore or disabled rules were
+added. Scoring rules, reference inputs and genuine weather data are unchanged.
+
+Added locked Pyright 1.1.414 and shared basic configuration, plus README and
+P6.2 instructions. All previous runtime dependency versions remain locked.
+
+- Fresh frozen copy and `uv sync --locked --offline`: passed.
+- Full offline suite: **523 passed, 2 POSIX-only skips in 158.27 seconds**.
+  Includes AppTest journeys, saved-data replay, error injection and bounded
+  stress simulations. Tests did not alter any snapshot input file.
+- The final pandas index assertion was then checked with the complete
+  executive test file; all its tests passed. Full type checks and lint were
+  repeated after that assertion.
+- Pyright: **38 files, zero errors or warnings**. A separate check using the
+  installed Pylance bundled stubs, including pandas, also reported zero.
+- Flake8 and dependency compatibility: passed. No live API, new browser,
+  phone or Mac test is claimed. P6.2 remains independent and pending.
+
+Reproduce with the commands in README after installing the locked environment.
+This follow-up fixes validation coverage; it does not close P6.2 or publish
+changes. Earlier audit records remain evidence for their dated versions.
+
+
+## Final pre-clone validation — 14 November 2026
+
+Audited the local candidate based on `f5283eb`, including the typing follow-up,
+in a new frozen copy with its own locked environment. No application changes
+were needed. Corrected remaining active Phase 2/3/API specification headings
+and validation links; dated historical records and PROMPTS.md were preserved.
+PR #22 is merged, but this local typing follow-up is not yet committed/pushed.
+
+| Requirement | Evidence checked |
+| --- | --- |
+| OOP | Reusable JSONAPIClient/OpenWeatherClient inheritance; deliberate visibility; immutable models; sorting/representation and computed properties |
+| API and robustness | dotenv and private credentials; distinct errors; validated identity/inputs; city-local failures continue; account/storage failures stop safely; bounded retries and saved-data cache |
+| Data and analytics | Genuine timestamped history; comparison/ranking, score-versus-driving/time bands and daily score heatmap; derived Trip/Destination metrics; one calculation path per view |
+| Streamlit | Three views; interactive preferences/windows; labeled map, scatter and daily heatmap; independent state, missing-data and recovery behaviour covered by AppTest |
+| Package and records | src package, locked setup, README, retained diagnostic, AI log/trailers, blank credential example, ignored environments/caches |
+| Team | Five author identities in Git; independent P6.2 and everyone's ability to explain the app remain human acceptance requirements |
+
+Cross-checked the applicable course practices: environments/locking; packages
+and import safety; meaningful classes/inheritance; encapsulation/properties/
+special methods; APIs and credentials; specific errors and partial batches;
+ETL/provenance/joins; timezone-aware windows; numeric/missing-data handling;
+strings/identity validation; Streamlit reruns/state/charts; and reproducible
+checks that reject deliberate faults. All 13 supplied class-source hashes
+still match the earlier reviewed inventory. Exercise-only algorithms and
+unnecessary extra folders/dependencies were not introduced.
+
+Fresh evidence:
+
+- **523 passed, 2 skipped in 158.94 seconds**; skips are POSIX permissions on
+  Windows. The suite includes the three bounded stress simulations, 1–5-day
+  interaction tests, genuine replays and failure injection.
+- Pyright covers all 38 Python files with zero errors/warnings; Flake8 and
+  dependency compatibility passed. The prior typing follow-up also verified
+  Pylance's bundled pandas definitions.
+- Locked fresh environment, source/wheel builds, installed-wheel module imports
+  and keyless Streamlit startup/health passed. This is local automated evidence,
+  not Gabriel's or Alejandra's independent clone acceptance.
+- Frozen data: **22,767 rows**, 83 destinations, 654 fetch groups; unique keys,
+  consistent provider mapping and canonical cross-view scores. Historical
+  replay at its saved reference time ranks 83/83 for every 1–5-day window.
+- **1,000 varied scoring cases and 83,000 rank checks** passed. Three deliberate
+  bad formulas were rejected by the unchanged tests. Provider-mapping changes
+  invalidate old cached identities, and a wrong-location diagnostic fails.
+- All 148 local Markdown links resolve after the final editorial update.
+  No zero-byte tracked files, generated/cache/secret paths, bare exception
+  catches or constant-true test assertions were found. The personal local key
+  was absent from candidate files and 323 reachable history blobs; it was
+  checked privately without disclosure. The two commits without AI trailers
+  are small historical documentation/status edits, not code implementations.
+- The requester used the live app during testing. A separate atomic capture
+  contained **26,247 rows**: 3,480 genuine additions, preserving all earlier
+  bytes, without duplicate keys or new provider-ID mismatches. The capture
+  also reconciles all 83 destinations in every 1–5-day historical replay window.
+  Later appends
+  are outside that capture and must be checked before the final commit.
+
+No new automated live-provider or visual/Mac/phone acceptance is claimed.
+The requester's current manual app use is separate and not recorded as a pass
+without their confirmation. No staging, commit, push, merge or submission was
+performed. Next: review/commit/push this candidate and genuine additions, obtain
+the PR review/merge, then Gabriel and Alejandra independently test that same
+final dev commit under P6.2; Christian reviews both reports before P6.3.
+
+
+### High-wind card marker follow-up — 14 November 2026
+
+After the pre-clone audit above, Phase 4 gained a red dot and "High wind"
+label on affected Searcher top-five cards. One shared set of destination IDs
+drives both markers and the existing alert. A fresh locked frozen copy passed
+the full suite: **525 passed, 2 skipped**; Pyright, Flake8 and dependency checks
+also passed. The two skips remain POSIX file-permission checks on Windows.
+The four UI cases verify threshold boundaries and exclusion outside the top
+five. No genuine data was modified by these checks. Browser visual review
+and P6.2 acceptance on the final merged dev version remain separate checks.
+
+
+## Delivery readiness recheck — 14 November 2026
+
+Revalidated the complete current working candidate based on `f5283eb`,
+including typing fixes and high-wind card markers, in a fresh locked copy.
+No code changes were needed. The rubric/course-practice mapping in the
+[pre-clone audit](#final-pre-clone-validation--14-november-2026) still applies;
+the 13 course-source files match the reviewed inventory. This audit leaves
+PROMPTS.md and the original data unchanged.
+
+- Full suite: **525 passed, 2 POSIX-only Windows skips**, in approximately
+  160.3 seconds, including all three bounded stress simulations.
+- All 38 Python files pass basic Pyright; a separate check with installed
+  Pylance stubs reports zero errors/warnings. Flake8 and dependency checks pass.
+- Fresh locked install, source/wheel builds, installed-wheel imports of all
+  12 modules and keyless Streamlit startup/health pass. No copied credentials
+  or existing virtual environment were required.
+- Frozen genuine dataset: **26,247 records, 83 destinations, 741 fetch groups**.
+  Keys are unique, fetch metadata is coherent and latest provider identities
+  match the catalogue mapping. At its saved reference time, all 83 rank for
+  each 1–5-day window and map/driving-band scores match the canonical results.
+- Independent calculations pass 1,000 varied scoring cases and 83,000 ranking
+  comparisons. Unchanged tests reject perfect-wind, zero-travel-penalty and
+  missing-worst-quarter mutations. Changed mappings invalidate old cache;
+  wrong-location payloads fail validation even with HTTP 200.
+- All 149 local Markdown links resolve before this report. No tracked empty
+  files, secret/cache paths, bare exceptions or constant-true assertions were
+  found. The configured local credential is absent from tracked candidate
+  files and 323 reachable Git blobs; checked privately without displaying it.
+- The provided screenshot confirms the high-wind label is visible on the
+  affected recommendation. It is not a complete browser walkthrough. No new
+  live-provider requests, Mac or phone test result is claimed.
+
+Ready for review/commit of this local candidate, not final submission yet.
+The final changes and genuine additions must be reviewed and merged before
+Gabriel and Alejandra independently test the same final dev commit (P6.2),
+with Christian reviewing both reports. P6.3 remains Asier's final publication
+and submission, reviewed by Gabriel. No staging, commit, push or merge was
+performed by this audit. Source/access/channel confirmation and the team's
+ability to explain the work remain human delivery checks.

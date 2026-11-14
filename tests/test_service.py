@@ -227,6 +227,7 @@ def test_missing_metric_is_saved_as_blank_not_zero(tmp_path):
 
     def handler(url, params):
         response = base(url, params)
+        assert isinstance(response._payload, dict)
         del response._payload["list"][0]["pop"]
         return response
 

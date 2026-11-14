@@ -14,6 +14,7 @@ spec = importlib.util.spec_from_file_location(
     "api_verification",
     Path(__file__).resolve().parents[1] / "scripts/verify_weather_access.py",
 )
+assert spec is not None and spec.loader is not None
 verification = importlib.util.module_from_spec(spec)
 spec.loader.exec_module(verification)
 
@@ -305,6 +306,7 @@ def test_diagnostic_exit_requires_location_validation(
         if "q" in params:
             return FakeResponse(404)
         payload = base_handler(url, params).json()
+        assert isinstance(payload, dict)
         place = payload["city"] if url.endswith("/forecast") else payload
         if fault == "name":
             place["name"] = "Wrong nearby district"

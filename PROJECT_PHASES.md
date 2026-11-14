@@ -2,14 +2,17 @@
 
 ## Current checkpoint
 
-**P4.5/P6.1 approved and merged; next is P6.2 clean-clone verification.**
+**P4.5/P6.1 approved and merged; typing fixes and warning markers validated locally before P6.2.**
+The [type-checking follow-up](PHASE5_QUALITY_REVIEW.md#type-checking-follow-up--14-november-2026) passes locally;
+Alejandra reviews these changes before merge and the final P6.2 tests.
 Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21) on 14 November 2026; it merged into dev
 as `3444728`. Its files match audited feature commit `8b1210e` exactly.
 [Phase 4](PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign)
-summarizes the changes; [Phase 5](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
+summarizes the changes; [Phase 5](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026)
 records the latest checks and limitations. [SCORING.md](SCORING.md) owns the
 two-score model. [PROMPTS.md](PROMPTS.md#phase-4-extension-and-delivery-development-record)
-preserves the development sequence. The update is available by cloning dev.
+preserves the development sequence. The PR #21 redesign is available on dev;
+the typing and warning-marker follow-ups require Alejandra's review before merge.
 
 | Phase | Outcome | Current state |
 | --- | --- | --- |
@@ -26,7 +29,7 @@ preserves the development sequence. The update is available by cloning dev.
    documentation changes and any fixes are reviewed and merged, each clones
    the same reviewed dev commit into a fresh
    directory, follow README only, use a personal key, and record the exact
-   commit, environment, tests/lint and agreed visual checks. Do not copy an
+   commit, environment, tests/type checks/lint and agreed visual checks. Do not copy an
    existing environment or credentials. The [post-commit audit](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
    passed 523 tests with two Windows POSIX skips; it is supporting evidence,
    not independent P6.2 acceptance. No new phone/Mac result is claimed.

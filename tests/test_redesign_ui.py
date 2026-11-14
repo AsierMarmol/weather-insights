@@ -79,8 +79,8 @@ def test_scatter_preserves_units_and_heatmap_keeps_missing_cells():
         car_duration_min=150, weather_match_pct=80, final_score=75,
         destination='Toledo', car_distance_km=74, rank=1,
     )])
-    assert list(figure.data[0].x) == [2.5]
-    assert list(figure.data[0].y) == [75]
+    assert list(figure.to_plotly_json()["data"][0]["x"]) == [2.5]
+    assert list(figure.to_plotly_json()["data"][0]["y"]) == [75]
     assert list(figure.layout.yaxis.range) == [0, 100]
     assert figure.layout.yaxis.fixedrange is True
     heat = heatmap_table_html([dict(
@@ -160,7 +160,9 @@ def test_duration_display_keeps_hours_minutes_and_sort_order():
     assert duration_text(None) == '—'
     assert duration_column([601, 61, None, 270]) == [
         '10:01', '01:01', None, '04:30']
-    assert sorted(duration_column([601, 61, 270])) == [
+    durations = duration_column([601, 61, 270])
+    assert all(value is not None for value in durations)
+    assert sorted(value for value in durations if value is not None) == [
         '01:01', '04:30', '10:01']
     assert duration_column([6001, 601]) == ['100:01', '010:01']
 
