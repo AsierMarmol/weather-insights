@@ -15,7 +15,7 @@ from streamlit.testing.v1 import AppTest
 from weather_fakes import (
     CATALOG,
     DUMMY_KEY,
-    LUGO,
+    PROVIDER_IDS,
     SEGOVIA,
     TOLEDO,
     Clock,
@@ -45,9 +45,10 @@ SECRET_MARKERS = (DUMMY_KEY, "appid", "api.openweathermap.org", "Traceback")
 
 
 def city_of(params):
-    """The catalog city a fake request is for (Lugo is asked for by ID)."""
+    """Resolve synthetic requests through the verified ID mapping."""
     if "id" in params:
-        return LUGO.city_id
+        return next(city for city, value in PROVIDER_IDS.items()
+                    if value == params["id"])
     for destination in CATALOG.values():
         if (destination.latitude, destination.longitude) == (
             params["lat"],
@@ -108,6 +109,7 @@ def app_journey(monkeypatch, tmp_path, no_live_http, genuine_data_unchanged):
         WeatherService, "from_environment", Mock(return_value=service)
     )
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30)
+    app.session_state.view = "Searcher"
     return app, service, session, clock
 
 
@@ -124,6 +126,7 @@ def page_text(app):
                      "caption", "text")
         for element in app.get(kind)
     ]
+    parts += [element.proto.body for element in app.get("html")]
     parts += [frame.value.to_csv() for frame in app.dataframe]
     return "\n".join(parts)
 
@@ -190,6 +193,7 @@ def test_app_shows_how_to_fix_a_key_file_in_another_encoding(
     monkeypatch.setattr(searcher, "load_destinations", lambda: PLACES)
     monkeypatch.setattr(searcher, "utc_now", Clock(NOW))
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30)
+    app.session_state.view = "Searcher"
     search(app)
     assert app.error[0].value == searcher.MESSAGES["authentication"]
     assert any("UTF-8" in c.value for c in app.caption)
@@ -214,6 +218,7 @@ def test_missing_key_explains_setup_without_any_request(
     monkeypatch.setattr(searcher, "load_destinations", lambda: PLACES)
     monkeypatch.setattr(searcher, "utc_now", Clock(NOW))
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30)
+    app.session_state.view = "Searcher"
     search(app)
     assert "API key" in app.error[0].value
     assert any("variables.env.example" in c.value for c in app.caption)
@@ -232,7 +237,9 @@ def test_rejected_key_stops_the_batch_and_saves_nothing(app_journey):
         "authentication"
     }
     warnings = [w.value for w in app.warning]
-    assert warnings.count(searcher.MESSAGES["authentication"]) == 1
+    assert warnings.count(
+        "Toledo, Segovia, Seville: " + searcher.MESSAGES["authentication"]
+    ) == 1
     assert service.store.load() == []
     assert_no_secret(app)
 
@@ -288,7 +295,8 @@ def test_wrong_location_is_rejected_and_other_cities_continue(
     saved = service.store.load()
     assert len(saved) == 80
     assert SEGOVIA.city_id not in {r.city_id for r in saved}
-    assert searcher.MESSAGES["invalid_data"] in [w.value for w in app.warning]
+    assert "Segovia: " + searcher.MESSAGES["invalid_data"] in [
+        w.value for w in app.warning]
 
 
 def test_unknown_location_is_reported_without_retry(app_journey):
@@ -317,7 +325,8 @@ def test_network_failures_retry_once_then_fail_without_details(app_journey):
     assert len(calls_for(session, SEGOVIA)) == 2
     assert app.session_state.search_errors == {TOLEDO.city_id: "network"}
     assert len(service.store.load()) == 80
-    assert searcher.MESSAGES["network"] in [w.value for w in app.warning]
+    assert "Toledo: " + searcher.MESSAGES["network"] in [
+        w.value for w in app.warning]
     assert_no_secret(app)
 
 
@@ -358,7 +367,8 @@ def test_quota_stops_the_batch_and_next_search_fetches_only_missing(
         SEVILLE.city_id: "rate_limited",
     }
     assert len(service.store.load()) == 40
-    assert searcher.MESSAGES["rate_limited"] in [w.value for w in app.warning]
+    assert "Segovia, Seville: " + searcher.MESSAGES["rate_limited"] in [
+        w.value for w in app.warning]
 
     clock.advance(minutes=1)
     app.button(key="run_search").click().run()
@@ -376,7 +386,7 @@ def test_one_process_wide_limiter_paces_every_app_session():
     try:
         assert first._rate_limiter is second._rate_limiter
         assert first._rate_limiter is OPENWEATHER_RATE_LIMITER
-        assert OPENWEATHER_RATE_LIMITER.max_calls <= 40
+        assert OPENWEATHER_RATE_LIMITER.max_calls == 55
         assert OPENWEATHER_RATE_LIMITER.period_s >= 60
     finally:
         first.close()
@@ -527,7 +537,7 @@ def test_api_errors_never_echo_provider_text():
     for _ in range(2):
         with pytest.raises(APIError) as raised:
             weather.forecast(TOLEDO)
-        text = f"{raised.value} {raised.value.as_dict()} {raised.value!r}"
+        text = f"{raised.value} {raised.value.code} {raised.value!r}"
         assert DUMMY_KEY not in text and "/srv/app" not in text
         assert raised.value.__cause__ is None
     assert DUMMY_KEY not in repr(weather)

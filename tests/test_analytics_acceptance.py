@@ -14,6 +14,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from dataclasses import replace
+from scoring_reference import reference_score
 
 from weather_app.analytics import (
     analyse_destinations,
@@ -21,10 +23,9 @@ from weather_app.analytics import (
 )
 from weather_app.config import load_product_defaults
 from weather_app.dashboard import (
-    filter_frame,
     overview_preferences,
     prepare_frame,
-    weather_ranks,
+    destination_ranks,
 )
 from weather_app.models import SearchPreferences, WeatherRecord
 from weather_app.storage import (
@@ -262,16 +263,16 @@ def test_unrounded_final_score_decides_before_weather_match():
     near[4] = record(SEGOVIA, times[4], 20, 0, 26, retrieved=run_at,
                      fetch_id="00000000-0000-4000-8000-0000000000c5")
     rows = analyse_destinations(
-        [CATALOG[SEVILLE], CATALOG[SEGOVIA]],
+        [replace(CATALOG[SEVILLE], car_duration_min=80.4), CATALOG[SEGOVIA]],
         {SEVILLE: good, SEGOVIA: near}, prefs(3), run_at,
     )
     assert [r["city_id"] for r in rows] == [SEGOVIA, SEVILLE]
-    assert rows[0]["final_score"] == pytest.approx(2600 / 27 - 75 / 60)
-    assert rows[1]["final_score"] == pytest.approx(95)
+    assert rows[0]["final_score"] == pytest.approx(97.34444444444445)
+    assert rows[1]["final_score"] == pytest.approx(97.32)
     assert round(rows[0]["final_score"], 1) == round(rows[1]["final_score"], 1)
     assert rows[0]["all_preferences_pct"] == pytest.approx(800 / 9)
     # The Dashboard ranks the same rows by weather alone: Seville first.
-    assert weather_ranks(rows) == {SEVILLE: 1, SEGOVIA: 2}
+    assert destination_ranks(rows) == {SEGOVIA: 1, SEVILLE: 2}
 
 
 # --- 4/5. genuine saved forecasts, replayed read-only
@@ -332,11 +333,11 @@ def _tally(group, days, low, high, rain, wind):
         return {"reason": "missing_metrics"}
     values = [tuple(float(c) for c in row) for row in cells]
     checks = [(low <= t <= high, p <= rain, w <= wind) for t, p, w in values]
-    passed = sum(sum(c) for c in checks)
     return {
         "reason": None,
         "slots": len(slots),
-        "match": 100 * passed / (3 * len(slots)),
+        "match": reference_score([(*v, float(by_time[t]["cloud_pct"]))
+                                  for v, t in zip(values, slots)]),
         "all": 100 * sum(all(c) for c in checks) / len(slots),
         "mean_t": sum(v[0] for v in values) / len(values),
         "max_p": max(v[1] for v in values),
@@ -383,7 +384,7 @@ def test_genuine_catalog_replay_matches_an_independent_tally(genuine, days):
         assert got["max_precipitation_probability_pct"] == pytest.approx(
             want["max_p"])
         assert got["max_wind_kmh"] == pytest.approx(want["max_w"])
-        penalty = min(CATALOG[city].car_duration_min / 60, 5)
+        penalty = min(CATALOG[city].car_duration_min / 30, 15)
         assert got["final_score"] == pytest.approx(
             max(want["match"] - penalty, 0))
 
@@ -391,24 +392,22 @@ def test_genuine_catalog_replay_matches_an_independent_tally(genuine, days):
     ok = [c for c, w in expected.items() if w["reason"] is None]
     trip = sorted(ok, key=lambda c: (
         -max(expected[c]["match"]
-             - min(CATALOG[c].car_duration_min / 60, 5), 0),
+             - min(CATALOG[c].car_duration_min / 30, 15), 0),
         -expected[c]["match"], CATALOG[c].car_duration_min, c))
     assert [r["city_id"] for r in rows[:len(ok)]] == trip
     assert all(r["status"] == "unavailable" for r in rows[len(ok):])
 
-    # Dashboard: weather-only competition ranks, city_id within ties, and
-    # display filters never change a rank.
-    want_ranks = _competition_ranks({c: expected[c]["match"] for c in ok})
-    assert weather_ranks(rows) == want_ranks
+    # Dashboard: driving-adjusted competition ranks, city_id within ties.
+    # Every catalogued destination remains in this view.
+    want_ranks = _competition_ranks({
+        c: max(expected[c]["match"]
+               - min(CATALOG[c].car_duration_min / 30, 15), 0) for c in ok})
+    assert destination_ranks(rows) == want_ranks
     frame = prepare_frame(rows, CATALOG_ROWS)
     ranked = frame[frame["rank"].notna()]
     assert ranked["city_id"].tolist() == sorted(
         ok, key=lambda c: (want_ranks[c], c))
-    coast = filter_frame(frame, activities=["Coast"])
-    assert 0 < len(coast) < len(frame)
-    assert coast["rank"].fillna(0).tolist() == [
-        want_ranks.get(c, 0) for c in coast["city_id"]
-    ]
+    assert len(frame) == len(CATALOG)
 
 
 def test_genuine_fifth_day_needs_a_newer_forecast(genuine):

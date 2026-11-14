@@ -1,5 +1,7 @@
 # Team roles
 
+> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+
 One owner builds each complete component, including its tests, documentation and fixes. Another member reviews it. Roles do not imply work or reviews have already happened. Phase 1 was completed by Asier and is not reassigned.
 
 | Owner | Whole deliverables | Main files | Reviewer |
@@ -23,3 +25,12 @@ Asier owns shared preferences/search state and application wiring. Selin's Dashb
 Use the task prompt in the active phase with the actual requester, task ID and existing inputs. Keep the project car-only and follow [Phase 2](PHASE2_SCOPE.md) plus the [API contract](WEATHER_API_CONTRACT.md). Update affected steps when interfaces change, record real results/reviews and follow [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
 
 Use actual Git identities and actual AI attribution. Every member must make meaningful contributions and understand the application. A task assignment or generated prompt is not evidence of a contribution. Keep personal credentials local. No commit, push, review request or merge is implied by this role document.
+
+## Current P4.5 extension
+
+AsierMarmol implemented the experimental redesign with OpenAI Codex, including
+cross-component scoring, provider mapping and integration changes. Original
+component ownership remains; it does not reattribute these changes. Proposed
+reviews: Christian for analytics/data, Selin for Dashboard/presentation, Gabriel
+for integration. After adoption, Selin owns P6.2 (Christian reviews); Asier owns
+P6.3 (Gabriel reviews). Current evidence/status is in [PROJECT_PHASES.md](PROJECT_PHASES.md).

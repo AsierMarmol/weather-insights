@@ -144,14 +144,14 @@ def test_matching_name_does_not_hide_wrong_forecast_coordinates():
 
 
 def test_explicit_provider_alias_and_city_id_override():
-    city = {"latitude": "40", "longitude": "-4"}
-    assert verification.request_parameters(city, {}) == {"lat": 40, "lon": -4}
+    with pytest.raises(ValueError, match="No verified"):
+        verification.request_parameters({})
     assert verification.request_parameters(
-        city, {"request_parameters": {"id": 12345}}
+        {"request_parameters": {"id": 12345}}
     ) == {"id": 12345}
     with pytest.raises(ValueError):
         verification.request_parameters(
-            city, {"request_parameters": {"q": "Example"}}
+            {"request_parameters": {"q": "Example"}}
         )
     payload = {
         "name": "Vitoria-Gasteiz",
@@ -279,3 +279,68 @@ def test_non_object_json_does_not_create_weather_record(tmp_path, monkeypatch):
     )
     assert summary["result"] == "invalid_data" and payload is None
     assert not list(tmp_path.iterdir())
+
+
+@pytest.mark.parametrize("all_cities", [False, True])
+@pytest.mark.parametrize("fault", [
+    None, "name", "id", "country", "coordinates", "missing_check",
+])
+def test_diagnostic_exit_requires_location_validation(
+    tmp_path, monkeypatch, capsys, all_cities, fault,
+):
+    from weather_fakes import Clock, FakeResponse, FakeSession, catalog_handler
+
+    now = datetime(2026, 11, 14, 6, tzinfo=timezone.utc)
+
+    class FixedDatetime(datetime):
+        @classmethod
+        def now(cls, tz=None):
+            return now if tz else now.replace(tzinfo=None)
+
+    base_handler = catalog_handler(Clock(now))
+
+    def handler(url, params):
+        if params["appid"] == "p23-deliberately-invalid-key":
+            return FakeResponse(401)
+        if "q" in params:
+            return FakeResponse(404)
+        payload = base_handler(url, params).json()
+        place = payload["city"] if url.endswith("/forecast") else payload
+        if fault == "name":
+            place["name"] = "Wrong nearby district"
+        elif fault == "id":
+            place["id"] += 10_000_000
+        elif fault == "country":
+            (place if url.endswith("/forecast") else place["sys"])[
+                "country"] = "US"
+        elif fault == "coordinates":
+            place["coord"] = {"lat": 0, "lon": 0}
+        return FakeResponse(200, payload)
+
+    class Session(FakeSession):
+        def __enter__(self):
+            return self
+
+        def __exit__(self, *args):
+            self.close()
+
+    session = Session(handler=handler)
+    monkeypatch.setattr(verification.requests, "Session", lambda: session)
+    monkeypatch.setattr(verification, "get_api_key", lambda: "synthetic-key")
+    monkeypatch.setattr(verification, "datetime", FixedDatetime)
+    monkeypatch.setattr(verification, "sleep", lambda _: None)
+    monkeypatch.setattr(verification, "DATA", tmp_path)
+    if fault == "missing_check":
+        monkeypatch.setattr(verification, "location_check", lambda *a: {})
+    exit_code = verification.main(["--all-cities"] if all_cities else [])
+    assert exit_code == (0 if fault is None else 1)
+    summary = json.loads(capsys.readouterr().out.splitlines()[-1])
+    assert summary["access_and_required_fields_pass"]
+    assert summary["expected_error_statuses_pass"]
+    assert summary["location_checks_pass"] is (fault is None)
+    assert summary["overall_pass"] is (fault is None)
+    # Keep fetched evidence even when identity needs review; no real files.
+    saved = (tmp_path / "api_verification_fetches.jsonl").read_text(
+        encoding="utf-8").splitlines()
+    assert len(saved) == summary["successful_fetches_this_run"]
+    assert len(session.calls) == len(saved) + (0 if all_cities else 2)

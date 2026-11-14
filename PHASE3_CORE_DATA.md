@@ -1,5 +1,7 @@
 # Phase 3 - Core Application and Automatic Data Saving
 
+> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+
 Updated: 12 November 2026. **Core accepted for Phase 4:** P3.1, P3.2 and P3.3 reviewed and merged into dev (PR #4, PR #6, PR #5); P3.3 integration reviewed and merged in PR #7; P3.1 validation follow-up reviewed and merged in PR #8; P2.5 was approved by Gabriel and Christian and merged in PR #9. Final integrated acceptance remains Phase 5.
 
 ## Purpose and dependencies
@@ -54,4 +56,38 @@ request review, merge or submit without the relevant authorization.
 
 PR #7 and PR #8 are approved and merged. P2.5 passed on Toledo, Segovia and Seville; see [the evidence](PHASE2_SCOPE.md#p25-verification---12-november-2026). Gabriel and Christian approved P2.5 in merged PR #9, satisfying the Phase 4 dependency gate. P4 wiring uses `forecasts_from_service()` with one shared service. Christian's foundation approval is recorded in PR #3; historical pending entries above retain their original context.
 
-Current checkpoint: P2.5 was approved by Gabriel and Christian in PR #9; its original three-city verification had 164 records. The dataset subsequently grew to 3,324 records across 82 destinations. P5.5 now validates the integrated application and improves repeated storage reads; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Optional historical JSONL import remains deferred; the original evidence is retained.
+Current checkpoint: P2.5 and the original P5.5 integration review are complete. The P4.5 redesign is integrated into local asier/feature and remains uncommitted; its current validation and remaining review gates are in [Phase 5](PHASE5_QUALITY_REVIEW.md#cleanup-and-reproducibility-review--14-november-2026). The earlier 164-record and 3,324-record counts are historical snapshots, not current coverage. Optional historical JSONL import remains deferred; the original evidence is retained.
+
+
+## P4.5 integration boundary — 13 November 2026
+
+The redesign retains the reviewed OOP/client/service/store foundation. The
+shared analytics engine supplies daily_weather and full-window results;
+executive.py aggregates existing validated results without Streamlit, HTTP or
+storage dependencies. config.py owns the shared seasonal reference lookup.
+Presentation helpers format durations and safe HTML; they do not change source
+units or calculate alternative weather scores. These additions are tested with
+independent expected answers and UI integration checks in Phase 5. No Phase 3
+ownership or historical completion evidence is reassigned by this update.
+
+
+### P4.5 complete city-ID mapping — 13 November 2026
+
+All 83 destinations now use unique verified provider IDs, with no coordinate
+fallback for missing mappings. Live verification: 166/166 current/forecast
+responses passed; 3,403 genuine records saved through the existing paced
+service/store. Catalog/scoring/schema are unchanged. Duplicate/conflicting IDs
+are rejected; regression checks enforce full coverage and response identity.
+494 passed, 2 POSIX-only skips on Windows; Flake8 passed. See
+[reference evidence](data/reference/README.md#complete-provider-city-id-mapping--13-november-2026).
+Restart Streamlit before resuming searches. Testing only; no commit or push.
+
+## Current integration validation
+
+P4.5 also uses `scoring.py` as the single slot/aggregation formula source and
+`analytics.py` for validated whole-window/daily results. New mean rain/wind
+fields support executive averages without changing the raw CSV schema.
+Reload-safe service replacement preserves pending saves before replacing old
+Python instances. Checkpoint 6 adds temporary-data concurrency/history/cache
+simulations; see [Phase 5](PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).
+The process-local lock does not support multiple server processes writing one CSV.

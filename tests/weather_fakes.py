@@ -12,10 +12,13 @@ import requests
 
 from weather_app.client import OpenWeatherClient, RateLimiter
 from weather_app.storage import load_destinations
+from weather_app.config import load_location_overrides
 
 UTC = timezone.utc
 DUMMY_KEY = "dummy-test-key-0123456789"
 CATALOG = {d.city_id: d for d in load_destinations()}
+PROVIDER_IDS = {k: v["expected_provider_id"]
+                for k, v in load_location_overrides().items()}
 TOLEDO = CATALOG["ES-45168"]
 SEGOVIA = CATALOG["ES-40194"]
 LUGO = CATALOG["ES-27028"]
@@ -99,13 +102,14 @@ def location(
     destination,
     *,
     name=None,
-    provider_id=2510409,
+    provider_id=None,
     country="ES",
     lat=None,
     lon=None,
 ) -> dict:
     return {
-        "id": provider_id,
+        "id": (PROVIDER_IDS[destination.city_id]
+               if provider_id is None else provider_id),
         "name": destination.city if name is None else name,
         "coord": {
             "lat": destination.latitude if lat is None else lat,
@@ -169,11 +173,14 @@ def catalog_handler(clock: Clock, *, failures: dict | None = None):
 
     def handle(url, params):
         if "id" in params:
-            destination, provider_id = LUGO, params["id"]
+            by_id = {value: CATALOG[key]
+                     for key, value in PROVIDER_IDS.items()}
+            destination, provider_id = by_id[params["id"]], params["id"]
         else:
             destination, provider_id = (
                 by_coordinates[(params["lat"], params["lon"])],
-                1000,
+                PROVIDER_IDS[by_coordinates[
+                    (params["lat"], params["lon"])].city_id],
             )
         if destination.city_id in failures:
             return FakeResponse(

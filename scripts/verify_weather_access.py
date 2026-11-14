@@ -133,8 +133,8 @@ def location_check(
     }
 
 
-def request_parameters(city, override):
-    """Use a documented city-specific ID only when coordinates misidentify it.
+def request_parameters(override):
+    """Use the verified provider city ID; never silently use coordinates.
     """
     if "request_parameters" in override:
         params = override["request_parameters"]
@@ -146,7 +146,7 @@ def request_parameters(city, override):
         ):
             raise ValueError("Invalid provider city-ID override")
         return params.copy()
-    return {"lat": float(city["latitude"]), "lon": float(city["longitude"])}
+    raise ValueError("No verified provider city ID configured")
 
 
 def valid_reading(item, forecast=False):
@@ -338,7 +338,7 @@ def main(argv=None):
                 summary, payload = probe(
                     session,
                     endpoint,
-                    request_parameters(city, override),
+                    request_parameters(override),
                     key,
                     f"{name}:{endpoint}",
                     run_id,
@@ -386,7 +386,7 @@ def main(argv=None):
                 )
             if stopped:
                 break
-        # Safe diagnostics only; catalog requests use coordinates, not this
+        # Safe diagnostics only; catalog requests use verified IDs, not this
         # legacy city lookup.
         diagnostics = (
             ()
@@ -448,10 +448,17 @@ def main(argv=None):
     review_count = sum(
         c.get("location_check", {}).get("review_required", False) for c in live
     )
+    locations_pass = len(live) == 2 * len(selected) and all(
+        c.get("location_check", {}).get("review_required") is False
+        for c in live
+    )
+    overall_pass = bool(passed and errors_pass and locations_pass)
     print(
         json.dumps(
             {
                 "access_and_required_fields_pass": bool(passed),
+                "location_checks_pass": locations_pass,
+                "overall_pass": overall_pass,
                 "expected_error_statuses_pass": errors_pass,
                 "location_checks_requiring_review": review_count,
                 "successful_fetches_this_run": sum(
@@ -461,7 +468,7 @@ def main(argv=None):
             }
         )
     )
-    return 0 if passed and errors_pass else 1
+    return 0 if overall_pass else 1
 
 
 if __name__ == "__main__":

@@ -8,6 +8,7 @@ instead of silently changing product defaults or provider requests.
 import json
 import math
 import os
+from zoneinfo import ZoneInfo
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -156,6 +157,7 @@ def load_location_overrides(
         raise ValueError(
             "Location overrides must contain a 'locations' object"
         )
+    requested_ids = set()
     for city_id, entry in locations.items():
         if not isinstance(entry, dict):
             raise ValueError(f"Override for {city_id} must be an object")
@@ -173,6 +175,14 @@ def load_location_overrides(
             raise ValueError(
                 f"Override for {city_id} has an invalid expected_provider_id"
             )
+        if params is not None:
+            if expected != params["id"]:
+                raise ValueError(
+                    f"Override for {city_id}: requested and expected IDs "
+                    "must match")
+            if params["id"] in requested_ids:
+                raise ValueError("Location mapping has duplicate provider IDs")
+            requested_ids.add(params["id"])
         names = entry.get("accepted_names", [])
         if not isinstance(names, list) or not all(
             isinstance(n, str) and n.strip() for n in names
@@ -185,3 +195,19 @@ def load_location_overrides(
 
 def _positive_int(value: object) -> bool:
     return isinstance(value, int) and not isinstance(value, bool) and value > 0
+
+
+def seasonal_defaults(now, defaults):
+    """Return the configured season and comfort range at Madrid local time.
+
+    Month-based project conventions, not measured climate or equinox dates.
+    This never changes user preferences or reads the clock implicitly.
+    """
+    if now.tzinfo is None or now.utcoffset() is None:
+        raise ValueError("Season selection needs an aware datetime.")
+    month = now.astimezone(ZoneInfo(defaults["timezone"])).month
+    return next(
+        (name, values)
+        for name, values in defaults["seasonal_temperature_c"].items()
+        if month in values["months"]
+    )

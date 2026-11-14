@@ -8,6 +8,8 @@ reach storage or analytics. Missing weather readings stay ``None``, never zero.
 
 from __future__ import annotations
 
+from weather_app.scoring import RAIN_BANDS, WIND_BANDS, SEASONAL_BANDS
+
 import math
 import re
 import uuid
@@ -213,8 +215,27 @@ class SearchPreferences:
     max_wind_kmh: float
     activities: tuple[str, ...] = ()
     destination_sizes: tuple[str, ...] = ()
+    scoring_mode: str = "searcher"
+    rain_preference: str | None = None
+    wind_preference: str | None = None
+    seasonal_bands: tuple = SEASONAL_BANDS
 
     def __post_init__(self) -> None:
+        if self.scoring_mode not in {"searcher", "dashboard"}:
+            raise ValueError("Unknown scoring mode")
+        if (self.rain_preference is not None
+                and self.rain_preference not in RAIN_BANDS):
+            raise ValueError("Unknown rain preference")
+        if (self.wind_preference is not None
+                and self.wind_preference not in WIND_BANDS):
+            raise ValueError("Unknown wind preference")
+        if len(self.seasonal_bands) != 12:
+            raise ValueError("Seasonal bands must cover all 12 months")
+        bands = tuple(tuple(_number("seasonal temperature", v) for v in band)
+                      for band in self.seasonal_bands)
+        if any(len(b) != 2 or b[0] > b[1] for b in bands):
+            raise ValueError("Invalid seasonal temperature band")
+        _set(self, "seasonal_bands", bands)
         if (
             isinstance(self.days, bool)
             or self.days not in SUPPORTED_FORECAST_DAYS

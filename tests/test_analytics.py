@@ -123,22 +123,22 @@ def test_worked_example_ranking_and_values(three):
         toledo["wind_passes"],
     ) == (3, 3, 3)
     assert toledo["weather_match_pct"] == 100
-    assert toledo["travel_penalty"] == pytest.approx(61 / 60)
-    assert toledo["final_score"] == pytest.approx(5939 / 60)
+    assert toledo["travel_penalty"] == pytest.approx(61 / 30)
+    assert toledo["final_score"] == pytest.approx(100 - 61 / 30)
     assert (
         toledo["suitable_period_count"] == 3
         and toledo["all_preferences_pct"] == 100
     )
 
-    assert segovia["weather_match_pct"] == pytest.approx(200 / 3)
-    assert segovia["final_score"] == pytest.approx(785 / 12)
+    assert segovia["weather_match_pct"] == pytest.approx(97.97166666666667)
+    assert segovia["final_score"] == pytest.approx(95.47166666666667)
     assert (
         segovia["suitable_period_count"] == 0
         and segovia["all_preferences_pct"] == 0
     )
 
-    assert seville["travel_penalty"] == 5  # 351 minutes capped at five
-    assert seville["final_score"] == pytest.approx(185 / 3)
+    assert seville["travel_penalty"] == 11.7  # two points per hour
+    assert seville["final_score"] == pytest.approx(85.93166666666667)
     assert seville["all_preferences_pct"] == pytest.approx(200 / 3)
 
     for row in rows:
@@ -160,13 +160,13 @@ def test_weather_comparison_statistics(three):
     assert rows[SEGOVIA]["max_wind_kmh"] == 26
 
 
-def test_same_weather_match_different_simultaneous_suitability(three):
+def test_gradual_scores_keep_simultaneous_suitability_separate(three):
     rows = by_city(
         analyse_destinations(three, worked_forecasts(), prefs(), RUN_AT)
     )
     assert (
         rows[SEGOVIA]["weather_match_pct"]
-        == rows[SEVILLE]["weather_match_pct"]
+        > rows[SEVILLE]["weather_match_pct"]
     )
     assert rows[SEGOVIA]["all_preferences_pct"] == 0
     assert rows[SEVILLE]["all_preferences_pct"] == pytest.approx(200 / 3)
@@ -186,7 +186,8 @@ def test_bounds_are_inclusive_and_just_outside_fails(catalog):
     row = analyse_destinations([toledo], outside, prefs(), RUN_AT)[0]
     assert row["status"] == "available"  # imperfect weather stays eligible
     # floored, not negative
-    assert row["weather_match_pct"] == 0 and row["final_score"] == 0
+    assert row["weather_match_pct"] == pytest.approx(99.605)
+    assert row["final_score"] == pytest.approx(99.605 - 61 / 30)
     assert row["suitable_period_count"] == 0
 
 
@@ -527,10 +528,10 @@ def test_tie_breaking_order():
 
 
 def test_engine_breaks_equal_scores_by_drive_then_city_id(catalog):
-    # Seville (351 min) and Barcelona-like long drives are both capped at 5,
+    # Seville (351 min) and Barcelona-like long drives are both capped at 15,
     # so identical weather gives identical scores; then minutes, then city_id.
     long_drives = sorted(
-        (d for d in catalog.values() if d.car_duration_min >= 300),
+        (d for d in catalog.values() if d.car_duration_min >= 450),
         key=lambda d: d.city_id,
     )[:2]
     toledo = catalog[TOLEDO]
@@ -546,7 +547,7 @@ def test_engine_breaks_equal_scores_by_drive_then_city_id(catalog):
     assert [r["city_id"] for r in rows] == [TOLEDO] + [
         d.city_id for d in long_sorted
     ]
-    assert rows[1]["final_score"] == rows[2]["final_score"] == 95
+    assert rows[1]["final_score"] == rows[2]["final_score"] == 85
 
 
 @pytest.mark.parametrize(

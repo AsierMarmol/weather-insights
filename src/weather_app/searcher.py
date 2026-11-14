@@ -1,5 +1,6 @@
 """P4.1 trip search over the shared weather service and analytical engine."""
 
+from dataclasses import asdict
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 
@@ -12,7 +13,10 @@ from weather_app.analytics import (
     is_eligible,
 )
 from weather_app.client import APIError
-from weather_app.config import load_product_defaults
+from weather_app.config import load_product_defaults, seasonal_defaults
+from weather_app.presentation import (
+    eyebrow, recommendation_cards, duration_text, duration_column,
+)
 from weather_app.models import SearchPreferences
 from weather_app.service import WeatherService
 from weather_app.storage import CatalogError, load_destinations
@@ -49,6 +53,34 @@ WIDGETS = {
 }
 
 
+# Numeric widget codes for preferred bands, not maximum tolerances.
+RAIN_CHOICES = {
+    30.0: "Low (0–30%)",
+    60.0: "Medium (>30–60%)",
+    100.0: "High (>60–100%)",
+}
+WIND_CHOICES = {
+    19.0: "Gentle (<20 km/h)",
+    28.0: "Moderate (20–<29 km/h)",
+    38.0: "Fresh (29–<39 km/h)",
+    49.0: "Strong (39–<50 km/h)",
+}
+CATEGORY_WIDGETS = {"_trip_rain": RAIN_CHOICES, "_trip_wind": WIND_CHOICES}
+
+
+def preferred_label(category, choices, maximum, unit):
+    """Use saved category labels; support legacy numeric callers explicitly."""
+    if category:
+        return next(label for label in choices.values()
+                    if label.startswith(category + " ("))
+    return f"0–{maximum:g}{unit}"
+
+
+def category_limit(value, choices):
+    """Map a prior numeric preference to the nearest accepting preset."""
+    return next((limit for limit in choices if value <= limit), max(choices))
+
+
 def utc_now():
     """One aware time source, replaceable in offline interface tests."""
     return datetime.now(timezone.utc)
@@ -58,28 +90,47 @@ def initial_preferences(now_utc, defaults):
     """Use the Madrid season only on first use or explicit reset."""
     if now_utc.tzinfo is None or now_utc.utcoffset() is None:
         raise ValueError("Initial preferences need an aware datetime.")
-    month = now_utc.astimezone(MADRID).month
-    season = next(
-        s
-        for s in defaults["seasonal_temperature_c"].values()
-        if month in s["months"]
+    _, season = seasonal_defaults(now_utc, defaults)
+    rain = category_limit(
+        defaults["max_precipitation_probability_percent"], RAIN_CHOICES
     )
+    wind = category_limit(defaults["max_wind_kmh"], WIND_CHOICES)
     return SearchPreferences(
+        rain_preference=RAIN_CHOICES[rain].split()[0],
+        wind_preference=WIND_CHOICES[wind].split()[0],
         days=defaults["default_forecast_days"],
         temperature_min_c=season["min"],
         temperature_max_c=season["max"],
-        max_precipitation_probability_pct=(
-            defaults["max_precipitation_probability_percent"]
-        ),
-        max_wind_kmh=defaults["max_wind_kmh"],
+        max_precipitation_probability_pct=rain,
+        max_wind_kmh=wind,
     )
 
 
+class PendingServiceReloadError(APIError):
+    """Keep an obsolete service alive until its fetched records are saved."""
+
+    code = "storage"
+
+
 def get_service():
-    """Create one service per app session, lazily after a search request."""
-    if "weather_service" not in st.session_state:
-        st.session_state.weather_service = WeatherService.from_environment()
-    return st.session_state.weather_service
+    """Reuse the session service unless a code reload replaced its class."""
+    service = st.session_state.get("weather_service")
+    if service is not None and not isinstance(service, WeatherService):
+        # Streamlit keeps session objects when it reloads Python modules.
+        # Old class identities reject newly loaded Destination objects.
+        if service.unsaved_record_count:
+            service.retry_unsaved()
+            if service.unsaved_record_count:
+                raise PendingServiceReloadError(
+                    "The app was updated, but fetched weather is still "
+                    "waiting to be saved. Keep this tab open, fix the local "
+                    "data-file issue, then retry. No records were discarded."
+                )
+        service = None
+    if service is None:
+        service = WeatherService.from_environment()
+        st.session_state.weather_service = service
+    return service
 
 
 def search_destinations(catalog, preferences, service, run_at, progress=None):
@@ -88,9 +139,8 @@ def search_destinations(catalog, preferences, service, run_at, progress=None):
     if not eligible:
         return {"rows": [], "errors": {}, "cached": 0, "eligible": 0}
     results = service.forecast_many(eligible, on_progress=progress)
-    rows = analyse_destinations(
-        eligible, forecasts_from_service(results), preferences, run_at
-    )
+    forecasts = forecasts_from_service(results)
+    rows = analyse_destinations(eligible, forecasts, preferences, run_at)
     # A cached forecast may have lost its fifth-day coverage as time moved on.
     # Refresh only those cached groups once, using the same service/save path.
     refresh_ids = {
@@ -99,16 +149,32 @@ def search_destinations(catalog, preferences, service, run_at, progress=None):
         if r["reason"] in {"missing_periods", "stale_forecast"}
         and results[r["city_id"]]["from_cache"]
     }
-    if refresh_ids:
+    batch_stopped = any(
+        r["error"] and r["error"]["code"] in WeatherService.BATCH_STOP_CODES
+        for r in results.values()
+    )
+    # A coverage retry must obey the same global stop as the first pass.
+    if refresh_ids and not batch_stopped:
         refreshed = service.forecast_many(
             [d for d in eligible if d.city_id in refresh_ids],
             force_refresh=True,
             on_progress=progress,
         )
         results.update(refreshed)
-        rows = analyse_destinations(
-            eligible, forecasts_from_service(results), preferences, run_at
-        )
+        forecasts = forecasts_from_service(results)
+        rows = analyse_destinations(eligible, forecasts, preferences, run_at)
+    storage_error = next((r["error"] for r in results.values()
+                          if r["error"] and r["error"]["code"] == "storage"
+                          and not r["error"].get("skipped")), None)
+    storage_failure = None
+    if storage_error:
+        storage_failure = {
+            "guidance": storage_error.get("storage_guidance", ""),
+            "skipped": sum(
+                bool(r["error"] and r["error"].get("skipped"))
+                for r in results.values()
+            ),
+        }
     return {
         "rows": rows,
         "errors": {
@@ -116,22 +182,10 @@ def search_destinations(catalog, preferences, service, run_at, progress=None):
             for city, result in results.items()
             if result["error"]
         },
-        "storage_failure": next(
-            (
-                {
-                    "guidance": r["error"].get("storage_guidance", ""),
-                    "skipped": sum(
-                        bool(v["error"] and v["error"].get("skipped"))
-                        for v in results.values()
-                    ),
-                }
-                for r in results.values()
-                if r["error"] and r["error"]["code"] == "storage"
-                and not r["error"].get("skipped")
-            ), None,
-        ),
+        "storage_failure": storage_failure,
         "cached": sum(r["from_cache"] for r in results.values()),
         "eligible": len(eligible),
+        "forecasts": forecasts,
     }
 
 
@@ -186,6 +240,11 @@ def _seed_widgets(preferences, overwrite=False):
             if field in {"activities", "destination_sizes"}:
                 value = list(value) or ["All"]
             st.session_state[key] = value
+        if key in CATEGORY_WIDGETS:
+            # Migrate old numeric controls safely before creating widgets.
+            st.session_state[key] = category_limit(
+                st.session_state[key], CATEGORY_WIDGETS[key]
+            )
 
 
 def _reset(defaults):
@@ -211,68 +270,58 @@ def _selection(values):
 
 
 def _controls(catalog, defaults):
-    st.button(
-        "Reset to seasonal defaults",
-        key="reset_preferences",
-        on_click=_reset,
-        args=(defaults,),
-    )
     _seed_widgets(st.session_state.search_preferences)
-    with st.container(border=True):
-        st.subheader("Plan your trip")
-        st.select_slider(
-            "Forecast window (days from now)",
-            options=[1, 2, 3, 4, 5],
-            key="_trip_days",
-        )
-        left, right = st.columns(2)
-        with left:
-            st.number_input(
-                "Minimum comfortable temperature (°C)",
-                step=1.0,
-                key="_trip_min",
+    with st.container(border=True, key="trip_form"):
+        days, low, high = st.columns(3)
+        with days:
+            st.selectbox(
+                "Forecast window (days from now)", [1, 2, 3, 4, 5],
+                key="_trip_days", format_func=lambda n: f"Next {n} days",
             )
-            st.number_input(
-                "Maximum precipitation probability (%)",
-                min_value=0.0,
-                max_value=100.0,
-                step=5.0,
-                key="_trip_rain",
+        with low:
+            st.number_input("Minimum comfortable temperature (°C)",
+                            step=1.0, key="_trip_min")
+        with high:
+            st.number_input("Maximum comfortable temperature (°C)",
+                            step=1.0, key="_trip_max")
+        rain, wind = st.columns(2)
+        with rain:
+            st.selectbox(
+                "Preferred rain likelihood", list(RAIN_CHOICES),
+                format_func=RAIN_CHOICES.get, key="_trip_rain",
+                help="Rewards this probability range, not rainfall intensity.",
             )
-        with right:
-            st.number_input(
-                "Maximum comfortable temperature (°C)",
-                step=1.0,
-                key="_trip_max",
+        with wind:
+            st.selectbox(
+                "Preferred wind level", list(WIND_CHOICES),
+                format_func=WIND_CHOICES.get, key="_trip_wind",
+                help="Rewards the selected range, including its lower bound.",
             )
-            st.number_input(
-                "Maximum wind (km/h)",
-                min_value=0.0,
-                step=5.0,
-                key="_trip_wind",
+        activities, sizes = st.columns(2)
+        with activities:
+            st.multiselect(
+                "Activities",
+                ["All"] + sorted({t for d in catalog for t in d.activities}),
+                key="_trip_activities", on_change=_keep_all_exclusive,
+                args=("_trip_activities",),
+                help="Choose activities or All. Clearing means All.",
             )
-        st.multiselect(
-            "Activities",
-            ["All"] + sorted({tag for d in catalog for tag in d.activities}),
-            key="_trip_activities",
-            on_change=_keep_all_exclusive,
-            args=("_trip_activities",),
-            help="Choose activities or All. Clearing the selection means All.",
-        )
-        st.multiselect(
-            "Destination size",
-            ["All"] + sorted({d.destination_size for d in catalog}),
-            key="_trip_sizes",
-            on_change=_keep_all_exclusive,
-            args=("_trip_sizes",),
-            help="Choose sizes or All. Clearing the selection means All.",
-        )
-        if not st.session_state._trip_activities:
-            st.caption("Activities: All")
-        if not st.session_state._trip_sizes:
-            st.caption("Destination size: All")
+        with sizes:
+            st.multiselect(
+                "Destination size",
+                ["All"] + sorted({d.destination_size for d in catalog}),
+                key="_trip_sizes", on_change=_keep_all_exclusive,
+                args=("_trip_sizes",),
+                help="Choose sizes or All. Clearing means All.",
+            )
+        st.button("Reset to seasonal defaults", key="reset_preferences",
+                  on_click=_reset, args=(defaults,))
     try:
         preferences = SearchPreferences(
+            rain_preference=(
+                RAIN_CHOICES[st.session_state._trip_rain].split()[0]),
+            wind_preference=(
+                WIND_CHOICES[st.session_state._trip_wind].split()[0]),
             **{
                 field: (
                     _selection(st.session_state[key])
@@ -283,41 +332,40 @@ def _controls(catalog, defaults):
             }
         )
     except ValueError:
-        st.error(
-            "Check your settings: minimum temperature cannot exceed "
-            "maximum, and probability/wind limits must be valid."
-        )
+        if st.session_state._trip_min > st.session_state._trip_max:
+            st.error(
+                "Minimum temperature cannot be higher than maximum "
+                "temperature. Adjust your temperature range."
+            )
+        else:
+            st.error(
+                "These preferences could not be validated. Check your "
+                "temperature values or reset to seasonal defaults."
+            )
         return None
     st.session_state.search_preferences = preferences
     return preferences
 
 
-def ranking_table(rows, catalog, errors):
+def ranking_table(rows, catalog):
     """Presentation only: preserve engine order and label units/reasons."""
     places = {d.city_id: d for d in catalog}
     table = []
     for row in rows:
         d = places[row["city_id"]]
-        reason = errors.get(d.city_id, row["reason"])
         table.append(
             {
                 "City": d.city,
                 "Region": d.region,
-                "Status": (
-                    "Available"
-                    if row["status"] == "available"
-                    else MESSAGES.get(reason, "Forecast unavailable.")
-                ),
-                "Score / 100": row["final_score"],
-                "Weather match (%)": row["weather_match_pct"],
-                "All preferences (%)": row["all_preferences_pct"],
-                "Drive (min)": d.car_duration_min,
+                "Trip score / 100": row["final_score"],
+                "Drive (h:mm)": d.car_duration_min,
                 "Distance (km)": d.car_distance_km,
-                "Daytime slots with data": row["evaluated_periods"],
-                "Daytime slots required": row["expected_periods"],
                 "Forecast retrieved (UTC)": row["forecast_retrieved_at_utc"],
             }
         )
+    durations = duration_column(row["Drive (h:mm)"] for row in table)
+    for row, duration in zip(table, durations):
+        row["Drive (h:mm)"] = duration
     return table
 
 
@@ -329,7 +377,8 @@ def _render_results(catalog, current_preferences, defaults):
     render_storage_failure(state.get("search_storage_failure"))
     rows = state.search_analysis_rows
     searched = state.search_result_preferences
-    if current_preferences != searched:
+    if (current_preferences is None
+            or asdict(current_preferences) != asdict(searched)):
         st.info(
             "Settings changed. Results below use your last search. "
             "Click Search destinations to update them."
@@ -343,11 +392,15 @@ def _render_results(catalog, current_preferences, defaults):
         f"{start_label} → {end_label}. Madrid daytime: 09:00–18:00 "
         "(18:00 excluded), checked in three-hour daytime forecast slots."
     )
+    rain_label = preferred_label(
+        searched.rain_preference, RAIN_CHOICES,
+        searched.max_precipitation_probability_pct, "%")
+    wind_label = preferred_label(
+        searched.wind_preference, WIND_CHOICES, searched.max_wind_kmh, " km/h")
     st.caption(
         f"Preferences: {searched.temperature_min_c:g}–"
-        f"{searched.temperature_max_c:g} °C · rain probability ≤"
-        f"{searched.max_precipitation_probability_pct:g}% · wind ≤"
-        f"{searched.max_wind_kmh:g} km/h. Activities: "
+        f"{searched.temperature_max_c:g} °C · preferred rain probability: "
+        f"{rain_label} · preferred wind: {wind_label}. Activities: "
         f"{', '.join(searched.activities) or 'All'}. Size: "
         f"{', '.join(searched.destination_sizes) or 'All'}."
     )
@@ -372,7 +425,9 @@ def _render_results(catalog, current_preferences, defaults):
         oldest_age = max(
             0, (utc_now() - min(receipt_times)).total_seconds() / 60
         )
-        st.caption(f"Oldest forecast was retrieved {oldest_age:.0f} min ago.")
+        st.caption(
+            f"Oldest forecast was retrieved {duration_text(oldest_age)} h ago."
+        )
         if oldest_age > 180:
             st.warning(
                 "These saved results are now over three hours old. "
@@ -384,80 +439,66 @@ def _render_results(catalog, current_preferences, defaults):
             "forecasts cannot cover the original window. Search again "
             "to start a new window; suitable saved data will be reused."
         )
-    table = ranking_table(rows, catalog, state.search_errors)
+    table = ranking_table(rows, catalog)
     places = {d.city_id: d for d in catalog}
+    recommendations = available[:defaults["recommendation_count"]]
+    high_wind = sum(r['max_wind_kmh'] >= 39 for r in recommendations)
+    if high_wind:
+        st.warning(f"{high_wind} of your top recommendations include "
+                   "high forecast wind "
+                   "(39+ km/h), even if it matches your preference.")
     if available:
-        st.subheader("Top recommendations")
-        for rank, row in enumerate(
-            available[: defaults["recommendation_count"]], start=1
-        ):
-            d = places[row["city_id"]]
-            with st.container(border=True):
-                st.markdown(f"**{rank}. {d.city} · {d.region}**")
-                st.caption(
-                    f"{d.car_distance_km:g} km · "
-                    f"{d.car_duration_min:g} min one-way drive"
-                )
-                score, match, suitable = st.columns(3)
-                score.metric("Trip score / 100", f"{row['final_score']:.1f}")
-                match.metric(
-                    "Weather match", f"{row['weather_match_pct']:.1f}%"
-                )
-                suitable.metric(
-                    "All preferences met", f"{row['all_preferences_pct']:.1f}%"
-                )
-                st.caption(
-                    f"{row['evaluated_periods']}/{row['expected_periods']} "
-                    "three-hour daytime forecast slots with data · "
-                    f"{row['travel_penalty']:.2f} driving penalty points"
-                )
+        st.html(
+            '<div class="wi-recommendation-heading"><div>'
+            '<p class="wi-eyebrow">Personalized selection</p>'
+            '<h2>Your recommendation</h2></div>'
+            '<span class="wi-forecast-badge">OpenWeather forecast · '
+            f'next {searched.days} day(s)</span></div>'
+        )
+        recommendation_cards(recommendations, places)
     else:
         st.warning(
             "No complete usable forecasts for this search. "
             "See each destination's reason below."
         )
-    st.subheader("Full ranking")
-    st.dataframe(
-        table,
-        hide_index=True,
-        width="stretch",
-        alt="All eligible destinations ranked by weather and driving time",
-        column_config={
-            label: st.column_config.NumberColumn(label, format="%.1f")
-            for label in [
-                "Score / 100",
-                "Weather match (%)",
-                "All preferences (%)",
-            ]
-        },
-    )
+    with st.expander("Full ranking and forecast details"):
+        st.caption(
+            "Trip score /100 measures weather against your chosen "
+            "preferences, minus the driving-time penalty. "
+            "The cards and table show the same score."
+        )
+        st.dataframe(
+            table,
+            hide_index=True,
+            width="stretch",
+            alt="All eligible destinations ranked by weather and driving time",
+            column_config={
+                label: st.column_config.NumberColumn(label, format="%.1f")
+                for label in [
+                    "Trip score / 100",
+                ]
+            },
+        )
+        for row in rows:
+            if row["status"] != "available":
+                reason = state.search_errors.get(row["city_id"], row["reason"])
+                message = MESSAGES.get(reason, "Forecast unavailable.")
+                st.caption(f"{places[row['city_id']].city}: {message}")
     with st.expander("How the ranking works"):
         st.write(
-            "Each three-hour daytime forecast slot earns one point for "
-            "temperature in your "
-            "range, one for precipitation probability below your limit, and "
-            "one for wind below your limit (boundaries included). Weather "
-            "match is the percentage of checks passed. The trip score "
-            "subtracts one point per driving hour, capped at five, with a "
-            "minimum score of zero. All preferences met is the percentage "
-            "of slots passing all three checks together; it adds no "
-            "extra points. Activities and size only filter destinations."
-        )
-        st.caption(
-            "A coverage of 9/9 means all nine required three-hour daytime "
-            "forecast slots (09:00-18:00 Madrid time) have data. It is not "
-            "nine days or nine hours of good weather."
-        )
-        st.caption(
-            "Driving times are reference estimates from Madrid Km0, not "
-            "live traffic. Forecasts are predictions, not guaranteed "
-            "good-weather hours. Source: OpenWeather."
+            "Trip score uses temperature (45%), preferred rain range "
+            "(35%) and preferred wind range (20%). Full points inside each "
+            "target; gradual penalties outside. The window combines 80% "
+            "average and 20% worst-quarter scores. Trip score subtracts "
+            "2 points per one-way driving hour, capped at 15. "
+            "Scores are preferences, not probabilities or safety advice."
         )
 
 
 def render_searcher():
     """Render controls first; network work happens only on explicit search."""
-    st.header("Searcher")
+    eyebrow("Find your next escape")
+    st.header("Trip Searcher")
     st.write(
         "Find a mainland-Spain car trip from Madrid that fits your weather."
     )
@@ -505,7 +546,7 @@ def render_searcher():
             )
         except APIError as error:
             st.error(MESSAGES.get(error.code, "Weather is unavailable."))
-            if error.code == "authentication":
+            if error.code in {"authentication", "storage"}:
                 # Fixed local setup guidance from config; never the key.
                 st.caption(error.message)
             st.info("Previous results, if shown, have not been refreshed.")
@@ -523,7 +564,11 @@ def render_searcher():
             state.search_storage_failure = result.get("storage_failure")
             state.search_cached_count = result["cached"]
             for code in sorted(set(result["errors"].values())):
-                st.warning(MESSAGES.get(code, "Weather is unavailable."))
+                names = ", ".join(
+                    d.city for d in catalog
+                    if result["errors"].get(d.city_id) == code)
+                message = MESSAGES.get(code, "Weather is unavailable.")
+                st.warning(f"{names}: {message}")
         finally:
             progress.empty()
     _render_results(catalog, preferences, defaults)

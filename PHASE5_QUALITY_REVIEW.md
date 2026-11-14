@@ -1,12 +1,22 @@
 # Phase 5 - Quality Review
 
-Updated: 13 November 2026. **In progress:** P5.1 model/storage acceptance approved by Christian and merged in [PR #13](https://github.com/AsierMarmol/weather-insights/pull/13); P5.2 API/security/save acceptance merged in PR #14 with Selin's approval (Alejandra was the planned reviewer); P5.3 analytical acceptance approved by Selin and merged in [PR #17](https://github.com/AsierMarmol/weather-insights/pull/17) (dev `bfd9fd7`); P5.4 Dashboard/chart acceptance approved by Asier and merged in PR #18 (dev `1784b8c`); P5.5 approved by Gabriel and merged in [PR #19](https://github.com/AsierMarmol/weather-insights/pull/19) (dev `2999dae`); Mac test results and desktop/mobile visual confirmation remain unconfirmed. Phase 5 verification is not yet fully closed. A user-reported storage failure is under follow-up review; see the 13 November entry below.
+> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+
+Updated: 14 November 2026. **Current automated audit: 523 passed,
+two POSIX-only skips; lint clean.** The earlier checkpoint-6 Windows/VS Code
+preview evidence remains dated 13 November. The [provider-identity follow-up](#provider-identity-and-diagnostic-follow-up--14-november-2026)
+records the latest run; earlier semantic/cleanup entries retain their dated results. Phone and Mac checks are excluded from this
+audit at the user's request, not claimed as passed and not blockers here.
+Peer review, authorized adoption and final delivery remain separate.
+The original P5.1–P5.5 table and dated records below are historical baseline
+evidence. The current redesign evidence is in
+[checkpoint 6](#checkpoint-6-validation--13-november-2026).
 
 ## Purpose and dependencies
 
 Verify the integrated app against the teacher rubric. Component tests already belong to implementation; rerun affected checks and fix actual gaps rather than repeating development as new tasks.
 
-## Deliverables
+## Historical baseline deliverables
 
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -51,7 +61,10 @@ Dated entries describe their original submission state. The deliverable table an
 
 ## Next action
 
-P5.1-P5.5 are merged. Gabriel approved P5.5 in PR #19, but Mac test results and desktop/mobile visual checks are not yet confirmed. Gabriel should update his own feature branch from dev and record the tested commit, commands/results and browser/viewport checks. Asier can prepare P6.1 documentation while this evidence remains open; Selin performs P6.2 with Christian reviewing; Asier completes P6.3 with Gabriel reviewing. Phase 5 acceptance and Phase 6 delivery are not claimed complete.
+Review the locally validated P4.5 changes and proposed publication scope.
+Do not commit or push during testing. After explicit authorization and peer
+review, adopt the redesign through dev, then perform P6.2 from the reviewed
+commit and P6.3 delivery. Older review records do not approve this redesign.
 
 ### P5.1 model/storage acceptance - 12 November 2026
 
@@ -245,31 +258,20 @@ The source counts and route/activity limitations remain explicit. Keep accumulat
 
 ### Remaining cross-platform and visual checks
 
-**Two skipped tests (Selin on macOS, or a Linux checkout):**
+This audit is scoped to Windows and the VS Code embedded browser. The user
+explicitly excluded phone and Mac checks on 13 November; they are not local
+completion gates. No phone, Mac or Linux acceptance is claimed.
 
-- `test_saving_keeps_the_files_permissions`: saving preserves an existing Unix mode of `0640`.
-- `test_first_saved_file_follows_the_umask`: a first save under umask `0022` creates mode `0644`.
+Two tests are intentionally skipped on Windows because they require Unix
+permissions: `test_saving_keeps_the_files_permissions` and
+`test_first_saved_file_follows_the_umask`. Windows storage failures, atomic
+replacement and recovery are tested separately. Earlier Mac results concern
+older versions and are not relabelled as current results.
 
-Windows does not implement these Unix permission semantics. Its real read/write failure paths are covered separately with simulated errors. WSL is not installed on this PC; no OS installation is needed for the project. Selin's prior macOS P5.4 suite passed these checks, but the revised P5.5 version still needs a targeted cross-platform run. After the reviewed changes are available locally, from the repository on macOS/Linux:
-
-```sh
-uv sync --locked
-uv run --locked python -m pytest -q tests/test_model_storage_acceptance.py::test_saving_keeps_the_files_permissions tests/test_model_storage_acceptance.py::test_first_saved_file_follows_the_umask
-```
-
-Expected: **2 passed**, not skipped. Record the tested commit and OS. On WSL, use a checkout in the Linux home filesystem so the test measures Linux permissions.
-
-**Browser appearance (Asier or Gabriel):** browser automation was retried and the browser access host remains unavailable. Automated UI behavior is covered; rendered layout still needs human confirmation. Start one app using `uv run --locked streamlit run app.py`, then:
-
-1. Open Dashboard before a Searcher run. Confirm all 83 markers, a readable heading and separate map toolbar, with no exception.
-2. Inspect both a normal desktop window and a narrow phone-sized viewport (about 390 pixels). Confirm the heading wraps above the map without covering the toolbar; charts, legends, filters and controls remain usable.
-3. Load the overview for 3 days. Hover an available marker: city, activities, average daytime temperature with units, weather rank and score must be readable. Wheel-scrolling the page should not change the map zoom.
-4. Apply Coast and a size filter. All markers remain; nonmatching ones dim and global ranks stay unchanged. Inspect ranking, comparison and all-three-criteria tabs and their tables.
-5. Switch to Searcher, adjust preferences, search and return. Searcher choices and Dashboard's independent window/results must persist. Check 1-day and 5-day choices, explicit loading, and incomplete coverage messages if returned; do not invent a result to force a pass.
-6. Record browser, viewport sizes, tested commit, pass/fail and any screenshots without credentials. Normal live loads append genuine data; visual checks should not run concurrently with data-integrity tests in the same clone.
-
-**Acceptance remains pending** until Gabriel reviews P5.5 and the visual result is recorded. Phase 6 still owns the named clean-clone verification, final source/license check, reviewed main publication, instructor access and submission receipt. No commit, push, review request or merge was performed in this follow-up.
-
+The current Windows desktop evidence is recorded below. Native phone touch,
+other operating systems and blocked external map tiles remain untested here.
+If cross-platform delivery is later requested, record its exact tested version
+and results separately; do not infer them from this audit.
 
 ### P5.5 review and merge update - 12 November 2026
 
@@ -297,3 +299,342 @@ Asier supplied a desktop Searcher screenshot and a four-page browser print of Da
 
 
 **Publication validation:** Final pre-publication rerun on 13 November 2026: 438 passed, 2 POSIX-only tests skipped in 88.18 seconds; Flake8 clean; isolated locked install, dependency check and source/wheel builds passed. All 75 local Markdown links resolve. The frozen data contains 8,004 records across all 83 destinations; all 6,644 rows in the previous commit remain intact, with 1,360 additional genuine forecast records. No live API requests were made.
+
+## Checkpoint 6 validation — 13 November 2026
+
+**Scope/result:** local P4.5 technical validation and documentation completed
+on Windows in `weather-insights-dashboard-test`, branch
+`asier/dashboard-experiment`, baseline HEAD
+`923de369a581869f2e183b0ba6c6471325816185`, plus the current uncommitted changes.
+Actual work: AsierMarmol / OpenAI Codex. No staging, commit, push, PR or merge.
+This is a candidate-worktree check, not acceptance of a newly published commit.
+
+### Fixes and documentation
+
+- Removed the Dashboard caption's obsolete hard rain/wind threshold wording.
+- Labelled catalogue rain/wind as maximum slot values, distinct from mean KPIs.
+- Made KPI cards adapt to the embedded preview width, preventing broken numbers.
+- Fixed false changed-settings notices after a Python class reload by comparing
+  preference values. Invalid Searcher input still retains its validation path.
+  Added a regression covering equivalent reloaded preferences and real changes.
+- Consolidated the Phase 4 extension and current specification, linked exact
+  scoring rules instead of repeating iterative alternatives, and updated
+  affected README, phase, API, role, provenance and AI records. Phase 1 history,
+  `.gitignore`, reference inputs and genuine observations were preserved.
+
+### Reproducible checks
+
+Tests ran in a frozen, credential-free copy with a new environment so the
+running app could not change the test fixture. The same source changes were
+applied to the testing worktree. Package installation uses the repository's
+locked editable setup; a wheel alone does not include app.py/data/assets.
+
+| Check | Observed result |
+| --- | --- |
+| `uv sync --locked --offline` | Fresh isolated environment installed successfully |
+| `uv lock --check --offline`; `uv pip check` | Lock consistent; installed dependencies compatible |
+| `uv run --locked --offline flake8 src tests scripts app.py` | No findings |
+| `uv run --locked --offline python -m pytest -q --tb=short` | **508 passed, 2 skipped in 71.68 seconds** |
+| `uv build --offline` with an external output directory | Source distribution and wheel built successfully |
+| Data/key/document checks | Genuine rows validated and preserved; configured key absent from publication candidates; local links checked |
+
+The two skips are the Unix-mode tests named above. No failing test is being
+hidden by these skips. Test durations are observations on this machine, not
+performance guarantees. Repeat code checks if code changes after this audit.
+
+### Bounded offline stress simulations
+
+`tests/test_stress.py` contains three passing tests, included in the full run.
+Run them alone with `uv run --locked python -m pytest -q -s tests/test_stress.py`.
+They block live HTTP and use synthetic weather and temporary files only.
+
+| Simulation | Result from the dedicated run |
+| --- | --- |
+| 50 all-83 Dashboard/Searcher window changes, restart and cache expiry | 0.296 seconds for repeat changes; 83 initial fake fetches, zero repeat fetches/saves, 83 new fetches after expiry; scoring/band consistency checked |
+| Eight threads, 48 save attempts containing 24 duplicated batches | 1.657 seconds; exactly 960 new unique records plus 40 initial records; no duplicate or lost rows |
+| 33,200-row history and latest-group lookup for 83 cities | Cold load 0.925 seconds; warm lookups 0.522 seconds; correct newest groups and unchanged input file |
+
+Thread safety is tested within one process. Multiple independent writing
+processes sharing one CSV/key remain unsupported; use one running server per
+clone. No database, extra cache layer or new dependency was needed.
+
+### Failure simulations and handling
+
+Existing API/security, service, storage-recovery and acceptance tests were
+rerun; their deliberate failures are expected test inputs, not open app defects.
+
+| Raised condition | Verified handling / practical action |
+| --- | --- |
+| Missing/rejected key (401) or quota (429) | Safe message and stop batch; correct local credentials or wait for quota before retrying |
+| Unknown city, wrong provider identity, malformed response | Explicit unavailable result; other valid destinations continue; no fabricated score or wrong-city save |
+| Timeout, connection or transient server failure | Bounded retry, then safe error; avoid repeated manual full-catalog loads |
+| Brief Windows replacement lock | Bounded replacement retry; existing file remains intact |
+| Disk full, permission failure or persistent lock | Preserve previous CSV and retain pending batches in the current service; repair storage and retry before closing the process |
+| Corrupt/unreadable saved CSV | Do not overwrite it; preserve a copy and recover from a verified genuine backup after inspection |
+| Missing metric/forecast slot or stale coverage | Unavailable, never zero-filled; refresh through the normal paced service when coverage is insufficient |
+| Invalid temperature range | Search disabled with clear validation; Reset restores valid defaults |
+
+Pending batches are memory-resident: a process crash before successful saving
+can lose them. A stopped local app does not collect weather. These are explicit
+limits, not grounds to invent records or promise uninterrupted provider access.
+
+### VS Code live preview
+
+Verified the already-running app through VS Code Simple Browser at localhost:
+Landing, Dashboard before Searcher, transitions 3→1→2→5→4→3, navigation and
+independent state. Every tested Dashboard load showed 83/83 and reused 83 saved
+forecasts. Searcher returned 83 available, none unavailable, and reused all 83.
+An inverted temperature range disabled Search; Reset restored valid defaults.
+The class-reload correction removed a false settings-changed notice.
+
+OSM tiles/attribution, contrasting score dots/legend, responsive KPI cards,
+top-five results, scatter, h:mm driving bands, descending daily-average heatmap
+and the complete catalogue rendered in the embedded preview. Catalogue scores
+matched the displayed ranking (for example Valencia 88.0 and Cartagena 87.6
+in the tested three-day snapshot). Daily averages were labelled separately.
+This is a rendered Windows check, not a claim that every possible hover,
+viewport, touch gesture or blocked-tile scenario was exercised.
+
+### Genuine-data and teacher alignment
+
+Frozen data: **15,607 records**, 87 current and 15,520 forecast, 83 cities,
+475 coherent fetch groups; latest retrieval `2026-11-13T15:31:08.745753+00:00`.
+SHA256 `d567fc974f589e1ec0f42096371b2f8e6e4416988f7767cae9d88c4569b83f82`.
+Model/schema, unique keys, catalogue membership and group identities passed;
+all previously committed rows remain a prefix. The active file matched the
+frozen bytes after the preview checks. No synthetic stress rows entered it.
+All 83 mappings remain unique and unchanged; live mapping evidence is retained
+in the reference notes, not rerun by the offline stress tests.
+
+| Teacher criterion | Current evidence |
+| --- | --- |
+| OOP (2) | Reusable JSON client inheritance, deliberate encapsulation, validated models, meaningful special methods and properties; model/client/storage tests |
+| API (2) | dotenv, input/identity validation, safe distinct errors, bounded retries and save-before-ranking service behavior |
+| Data/analytics (2) | Genuine timestamped records; destination ranking, score-versus-driving comparison/bands and destination-by-day heatmap across comparison and derived metrics |
+| Streamlit (2) | Separate interactive Searcher and Dashboard plus Landing; all-83 map and scatter with real logged data, heatmap, labels and missing-data behavior |
+| Repository/AI (1) | Installable src package, locked setup, current documentation and truthful requester/tool log; final reviewed clean-clone test still belongs to P6.2 |
+| Team (1) | Preserve historical real contributions/reviews; each member must understand the app. Role assignments and test counts do not establish authorship or instructor acceptance |
+
+The authoritative assignment README and reference summary remain unchanged.
+Forecast valid dates are predictions, not future observed history. Retained
+retrieval times demonstrate genuine collection during development. Source
+terms, final access/submission and review are delivery matters in Phase 6.
+
+### Exit and next dependency
+
+The local Windows checkpoint is complete. Phone/Mac checks are outside scope
+by explicit user instruction. Review this candidate, then authorize any
+publication separately. Proposed reviewers remain Christian for scoring/data,
+Selin for presentation and Gabriel for integration; no approval is implied.
+P6.2 tests the adopted reviewed commit from a fresh clone; P6.3 handles reviewed
+main publication and submission. Do not treat this uncommitted preview as dev.
+
+
+### Request-cap follow-up — 14 November 2026
+
+The approved local cap is now 55 calls per rolling minute. Targeted offline
+client/service/stress verification: **64 passed in 9.63 seconds**, changed-file
+Flake8 clean. The shared default and boundary behavior (the 56th immediate
+request waits) are covered; failed attempts/retries still consume allowance.
+The 508-test full run above predates this cap-only change; it was not relabelled
+as a new full-suite run. No live API calls or weather data edits were made.
+The observed slow search completed, but its precise delay was not diagnosed;
+clearer waiting/retry feedback remains an open usability improvement.
+
+## Semantic and test-quality audit — 14 November 2026
+
+Scope: the local `asier/dashboard-experiment` candidate; active source, alerts,
+tests, package setup and repository documentation compared with the external
+authoritative assignment README and reference summary. Historical progress
+records remain historical; they do not override SCORING.md or current contracts.
+
+### Findings and corrections
+
+- Reproduced unwanted second requests after authentication/quota stops when an
+  earlier cached destination had incomplete coverage. New tests failed before
+  the fix, then passed. Coverage refresh now respects all batch-stop codes;
+  a storage-failure case also verifies no second fetch and unchanged saved bytes.
+- Reproduced mismatched category labels/codes after valid reference changes.
+  Initial/reset category labels now derive from the same preset as the widgets.
+- Corrected obsolete filter/maximum-limit wording, catalogue scope and fixed
+  accessible counts. Removed unused Dashboard filters/map dimming and seven
+  obsolete parameterized filter cases; retained Searcher's actual filters.
+- Strengthened genuine cross-view consistency checks: they require scored
+  results and full catalogue coverage, preventing an all-unavailable vacuous pass.
+- The first full run exposed a stale `<=40` cap assertion. Updated it to the
+  approved 55, retaining shared-queue and 56th-call-waits boundary checks.
+
+### Verification
+
+Final complete suite: **506 passed, 2 skipped in 71.24 seconds**. Skips are
+POSIX permission tests on Windows; Windows file-sharing/recovery tests ran.
+Flake8 passed. Fresh `uv sync --locked --offline`, dependency compatibility,
+source/wheel builds and installed-wheel imports/scoring outside the repository
+passed. The wheel smoke environment used the locked runtime; unrestricted
+offline pip resolution lacked cached index distributions and was not counted
+as a successful install. No dependency versions were changed.
+
+The suite includes genuine frozen forecast replay with independently calculated
+expectations, AppTest journeys and all 1–5-day windows, error/partial-result
+handling, credential redaction, atomic persistence/recovery and cache expiry.
+The bounded stress tests exercised 50 full-catalogue window/mode changes,
+8 concurrent writers with 48 save attempts, and a 33,200-row synthetic history.
+Synthetic records and deliberate faults stayed in temporary stores.
+
+Test sensitivity experiments used disposable package copies and unchanged tests:
+dropping worst-quarter aggregation caused 1 failure; rewarding Dashboard rain
+caused 3 failures; dropping driving penalty caused 2 failures. These were real
+numerical assertion failures, not import errors. All three variants were rejected;
+none entered the candidate. This supports test usefulness, not exhaustive proof.
+
+### Limits and next action
+
+No fresh live OpenWeather call or new rendered-browser inspection was made in
+this audit; the earlier dated live/Windows preview evidence is kept separately.
+Phone/Mac checks remain outside this audit by request. Clearer rate-limit/retry
+progress remains an open usability improvement; the exact previously observed
+delay was not reproduced or diagnosed. The 55 cap is not a loading-time promise.
+
+The rubric mapping above still applies. Tests cannot establish student
+understanding, authorship, reviewer approval or the instructor's final grade.
+Review this uncommitted candidate, then authorize publication separately;
+P6.2 remains the fresh-clone check of the exact reviewed commit. No commit,
+push, PR, merge or production-data rewrite was performed.
+
+### Final integrity check
+
+The tested source files exactly match the active testing worktree. All
+103 local Markdown file/anchor references resolved; required
+project directories contain candidate files. The configured key was absent
+from candidate files and `variables.env` remains ignored. Phase 1, `.gitignore`,
+catalogue, defaults and provider mappings were unchanged by this audit.
+
+The frozen genuine dataset contains 19,167 records across
+83 cities and 564 coherent fetch groups,
+with unique record keys and original committed rows preserved. It remained
+byte-identical in the active worktree throughout this audit.
+SHA256: `b46cc611172b25b8037dee900cb9d7357d780408557829179bdc86d886c293d1`.
+No files were staged; HEAD remained `923de369a581869f2e183b0ba6c6471325816185`.
+
+## Cleanup and reproducibility review — 14 November 2026
+
+Scope: the same uncommitted testing worktree, reviewed against the instructor's
+README and reference summary. Preserve functionality and reproduction helpers;
+remove only demonstrated unused/duplicate code. No Git publication authorized.
+
+### Changes and retained requirements
+
+- Removed unused `_age`, `WeatherService.clear_cache` and `APIError.as_dict`.
+  Active refresh, expiry and unsaved-record recovery remain. Error redaction
+  tests still exercise displayed strings, representations and safe codes.
+- Removed unused preference arguments from summaries/KPIs and the unused city
+  argument from the optional diagnostic's parameter builder. All callers updated.
+  The diagnostic itself remains. Progress callback arguments remain because
+  they are part of the service callback contract.
+- Replaced the old `weather_ranks` alias with canonical `destination_ranks`.
+  Kept real API inheritance, public/protected/private intent, computed properties,
+  model special methods, current/forecast support and durable logging.
+- Retained `__init__.py` as the regular-package marker, with a short explanatory
+  docstring and no import side effects. It was the only zero-byte candidate file;
+  there were no empty implementation stubs. Generated metadata/caches are ignored,
+  not source files to fill with placeholder code or copy to another computer.
+- Removed one duplicate shared-limiter test. The acceptance test still verifies
+  both clients share the 55-call queue; boundary and retry accounting tests remain.
+  No failure-path, independent numerical, genuine replay or stress coverage was
+  removed. Renamed an old weather-only test to describe Destination score.
+- Genuine cross-view tests now parse the saved CSV once per module, group in
+  linear time, and share immutable records across all five window cases.
+  Every numerical, rank, coverage and cross-view assertion remains.
+- CSS is read explicitly as UTF-8, avoiding system-default encoding differences.
+  No stylesheet or layout change was made.
+
+### Verification and portability
+
+Before cleanup: **506 passed, 2 skipped in 88.59s**. After cleanup:
+**505 passed, 2 skipped in 70.96s**, plus the renamed test rerun. The same
+POSIX permission checks skip on Windows. Timing is an observation from these
+runs, not a guaranteed performance improvement on other computers.
+Flake8, fresh locked installation, dependency compatibility and source/wheel
+builds passed. A credential-free clean candidate copy started Streamlit with
+HTTP 200 at its root and health endpoint; the temporary server was stopped.
+AppTest covers the actual application journeys; HTTP startup alone does not
+prove rendered browser interaction or a fresh provider response.
+
+The copy contains only candidate repository files, no personal key, copied
+virtual environment or generated metadata. Runtime source has no developer-home
+paths. README now distinguishes source, required reproduction files and generated
+artifacts. The same instructions apply to the instructor and teammates. External
+Git/uv installation, internet and a personal active API key are still prerequisites.
+Phone/Mac tests were not requested here; P6.2 remains the independent clean-clone
+test on the final reviewed commit. Do not claim a full other-OS pass from Windows.
+
+### Git/GitHub review
+
+Local secret/env/build/cache/egg-info exclusions are in place; `.gitignore` was
+not changed. No files were staged. On 14 November, GitHub reported both main and
+dev protected, with no required status checks. Detailed approval/bypass settings
+returned 403 for the integration, so those were not independently reconfirmed.
+The remote dev commit was `59a1fbb588526684edd4a4332d17ac0ed1715682`;
+main still held the starter commit. No pull, merge or setting update was made.
+
+Keep feature → dev review and final reviewed dev → main delivery. For stronger
+enforcement, add a working offline test/lint CI job and then require its named
+check before merging; this is an optional follow-up, not a teacher-mandated
+dependency or a claim that CI currently runs. Preserve actual authorship and AI
+trailers. Never upload credentials, copied environments or generated metadata.
+
+Integrity after applying cleanup: all 106 local Markdown references resolve; the active source matches the tested copy. All 19,167 genuine records remain byte-identical. The credential file remains ignored and its key is absent from candidate files. Required project directories are populated; no files are staged and HEAD is unchanged.
+
+
+## Provider identity and diagnostic follow-up — 14 November 2026
+
+Two audit gaps were reproduced and corrected in the delivery candidate:
+
+- Current/forecast reuse checks every saved record against the currently
+  requested provider city ID, as well as freshness. A mapping change triggers
+  a fresh validated fetch. Existing history is preserved; failure does not
+  silently fall back to the old identity. Matching batches remain reusable.
+- The optional API diagnostic now exits unsuccessfully for failed or missing
+  location checks. Its summary includes `location_checks_pass` and
+  `overall_pass`. HTTP evidence is retained separately from identity acceptance.
+
+Regression checks cover mapping changes in an existing service and after a
+restart, preservation of earlier records, reuse of the newly saved identity,
+and replacement-fetch failure. Diagnostic command tests cover valid results,
+wrong names/IDs/countries/coordinates and missing checks in both command modes.
+The new cases were run before the fixes and exposed the gaps; positive cases
+also verify the added summary fields. After correction, all 56 affected tests
+passed. The historical 82-destination replay now checks current mapping IDs: obsolete identities trigger requests, simulated failures remain unavailable, and unchanged matching records retain the independent score comparison. No synthetic weather is ranked in that replay. Full frozen-copy suite: **523 passed, 2 skipped in 80.71s**;
+Flake8 passed. The skips are the existing POSIX permission checks on Windows.
+No scoring, UI, raw-data schema, request limit or cache-age rule changed.
+
+Checks used a fresh locked offline environment and temporary synthetic data.
+No live API calls were made and no credentials were copied. The 22,487-row
+genuine snapshot remains unchanged. No PROMPTS.md entry was added during
+that review, as requested. The later authorized documentation update records
+the technical changes in the [development log](PROMPTS.md#phase-5-provider-identity-reuse-and-diagnostic-acceptance-2026-11-14);
+the private course-material discussion remains excluded.
+No staging, commit, push, review request or merge was performed. Gabriel's
+P6.1 review and the reviewed-commit P6.2 clean-clone check remain pending.
+
+
+## Feature integration validation — 14 November 2026
+
+The P4.5 delivery candidate is now in the main weather-insights folder on
+asier/feature, uncommitted. Its own locked environment imports the local package.
+Full offline suite: **523 passed, 2 POSIX-only Windows skips in 82.90 seconds**;
+Flake8 and dependency compatibility passed. This is the latest execution;
+earlier frozen-copy runs retain their original timings and datasets.
+
+Combined genuine data: **22,767 records**, 87 current and 22,680 forecast,
+83 destinations and 654 fetch groups. Preserved all 22,487 candidate records
+and all 8,284 pre-integration main-folder records, with 280 main-folder-only
+records added once and no conflicting identities. Model/schema, key uniqueness,
+catalogue membership and full-suite replay passed. No live API calls were made;
+no browser, phone or Mac pass is inferred from this automated integration.
+
+Source/tests/assets match the validated implementation. Only branch-status
+documentation, the integration record and the preserved data union differ.
+Credentials and the existing environment configuration are unchanged; neither
+environment nor Git metadata was copied. Publication and peer review remain
+pending. See [integration record](PROMPTS.md#phase-6-p61-integrate-the-validated-application-into-asierfeature-2026-11-14).

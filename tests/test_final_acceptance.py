@@ -120,7 +120,7 @@ def test_slot_boundary_keeps_strict_window_and_explains_retry(
     clock = Clock(run_at)
 
     def handle(url, params):
-        place = TOLEDO if params["lat"] == TOLEDO.latitude else SEGOVIA
+        place = TOLEDO if params["id"] == 2510409 else SEGOVIA
         if place is SEGOVIA:
             clock.now = run_at.replace(hour=9, minute=0, second=1)
         hour = 9 if clock.now.hour == 8 else 12
@@ -149,6 +149,7 @@ def test_slot_boundary_keeps_strict_window_and_explains_retry(
         default_timeout=15,
     )
     state = app.session_state
+    state.view = "Searcher"
     state["search_preferences"] = prefs
     state["search_result_preferences"] = prefs
     state["search_run_at_utc"] = run_at
@@ -158,6 +159,8 @@ def test_slot_boundary_keeps_strict_window_and_explains_retry(
     app.run()
     assert not app.exception
     assert any("slot boundary" in x.value for x in app.warning)
+    # Display the injected one-day snapshot without changing its window.
+    state["dashboard_days"] = prefs.days
     state["dashboard_overview"] = {
         "rows": result["rows"], "errors": {}, "cached": 0,
         "run_at": run_at, "preferences": prefs,
@@ -165,7 +168,7 @@ def test_slot_boundary_keeps_strict_window_and_explains_retry(
     app.sidebar.radio[0].set_value("Dashboard").run()
     assert not app.exception
     assert any("slot boundary" in x.value for x in app.warning)
-    assert any("Mainland Spain" in x.value for x in app.subheader)
+    assert any("Destination map" in e.proto.body for e in app.get("html"))
 
     again = searcher.search_destinations(
         [TOLEDO, SEGOVIA], prefs, service, clock.now

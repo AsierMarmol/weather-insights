@@ -334,3 +334,74 @@ def test_results_and_repr_never_contain_the_key(tmp_path):
     )
     result = service.forecast(TOLEDO)
     assert DUMMY_KEY not in repr(result) and DUMMY_KEY not in repr(service)
+
+
+def test_missing_mapping_returns_safe_failure_without_request(tmp_path):
+    session = FakeSession()
+    service = WeatherService(make_client(session, overrides={}),
+                             WeatherStore(tmp_path / "weather.csv"))
+    result = service.forecast(TOLEDO)
+    assert result["error"]["code"] == "invalid_input"
+    assert not session.calls
+    assert not service.store.path.exists()
+
+
+@pytest.mark.parametrize("kind", ["current", "forecast"])
+@pytest.mark.parametrize("restart", [False, True])
+def test_mapping_change_fetches_new_identity_and_preserves_history(
+    setup, kind, restart,
+):
+    from weather_fakes import forecast_payload
+
+    service, _, store, clock = setup
+    original = getattr(service, kind)(TOLEDO)["records"]
+    before = store.path.read_bytes()
+    clock.advance(seconds=1)
+    new_id = original[0].provider_city_id + 10_000_000
+    payload = (current_payload(TOLEDO, clock(), provider_id=new_id)
+               if kind == "current" else forecast_payload(
+                   TOLEDO, clock() + timedelta(hours=3), provider_id=new_id))
+    session = FakeSession(FakeResponse(200, payload))
+    client = make_client(session, clock, overrides={TOLEDO.city_id: {
+        "request_parameters": {"id": new_id},
+        "expected_provider_id": new_id,
+    }})
+    if restart:
+        service = WeatherService(client, WeatherStore(store.path), clock=clock)
+    else:
+        service.client = client
+    result = getattr(service, kind)(TOLEDO)
+    assert result["error"] is None and not result["from_cache"]
+    assert len(session.calls) == 1
+    assert session.calls[0]["params"]["id"] == new_id
+    assert all(r.provider_city_id == new_id for r in result["records"])
+    assert store.path.read_bytes().startswith(before)
+    assert store.load() == original + result["records"]
+    after = store.path.read_bytes()
+    # A second restart must now reuse the matching persisted batch.
+    restarted = WeatherService(client, WeatherStore(store.path), clock=clock)
+    reused = getattr(restarted, kind)(TOLEDO)
+    assert reused["from_cache"] and reused["records"] == result["records"]
+    assert len(session.calls) == 1
+    assert store.path.read_bytes() == after
+
+
+@pytest.mark.parametrize("kind", ["current", "forecast"])
+def test_mapping_change_never_falls_back_to_old_identity_on_failure(
+    setup, kind,
+):
+    service, _, store, clock = setup
+    old = getattr(service, kind)(TOLEDO)["records"]
+    before = store.path.read_bytes()
+    new_id = old[0].provider_city_id + 10_000_000
+    session = FakeSession(FakeResponse(404))
+    client = make_client(session, clock, overrides={TOLEDO.city_id: {
+        "request_parameters": {"id": new_id},
+        "expected_provider_id": new_id,
+    }})
+    restarted = WeatherService(client, WeatherStore(store.path), clock=clock)
+    result = getattr(restarted, kind)(TOLEDO)
+    assert result["error"]["code"] == "location_not_found"
+    assert result["records"] == [] and not result["from_cache"]
+    assert len(session.calls) == 1
+    assert store.path.read_bytes() == before

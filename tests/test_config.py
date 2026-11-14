@@ -173,3 +173,17 @@ def test_key_file_read_failure_is_safe(tmp_path, monkeypatch, in_environment):
     else:
         with pytest.raises(ValueError, match="Cannot read variables.env"):
             config.get_api_key()
+
+
+@pytest.mark.parametrize("duplicate", [False, True])
+def test_city_mapping_rejects_conflicting_ids(tmp_path, duplicate):
+    entries = {"first": {"request_parameters": {"id": 1},
+                         "expected_provider_id": 1}}
+    if duplicate:
+        entries["second"] = dict(entries["first"])
+    else:
+        entries["first"]["expected_provider_id"] = 2
+    path = tmp_path / "mapping.json"
+    path.write_text(json.dumps({"locations": entries}))
+    with pytest.raises(ValueError, match="duplicate|must match"):
+        config.load_location_overrides(path)

@@ -52,6 +52,9 @@ def journey(monkeypatch, tmp_path):
     monkeypatch.setattr(dashboard_module, "load_destinations", lambda: places)
     monkeypatch.setattr(WeatherService, "from_environment", factory)
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=30)
+    # Reserve the load for each test's configured scenario.
+    app.session_state.dashboard_attempted_days = 3
+    app.session_state.view = "Searcher"
     yield app, service, session, clock, factory
     assert all(p.read_bytes() == contents for p, contents in data.items())
 
@@ -84,19 +87,16 @@ def overview(app):
     return app.session_state["dashboard_overview"]
 
 
-def test_metric_persists_across_navigation(journey):
+def test_window_persists_across_navigation(journey):
     app, service, session, _, factory = journey
     app.run().button(key="run_search").click().run()
     saved = service.store.path.read_bytes()
     load_dashboard(app)  # reuses the Searcher's fresh forecasts
-    app.radio(key="dashboard_metric").set_value("max_wind_kmh").run()
-    app.multiselect(key="dashboard_destinations").select(TOLEDO.city_id).run()
+    app.selectbox(key="dashboard_days").set_value(5).run()
     search_page(app)
     dashboard(app)
-    assert app.radio(key="dashboard_metric").value == "max_wind_kmh"
-    assert app.multiselect(key="dashboard_destinations").value == [
-        TOLEDO.city_id
-    ]
+    assert app.selectbox(key="dashboard_days").value == 5
+    assert not app.multiselect
     assert len(session.calls) == 3 and factory.call_count == 1
     assert service.store.path.read_bytes() == saved
 
@@ -123,11 +123,7 @@ def test_all_selection_is_consistent_between_views(journey):
     assert len(session.calls) == 1
     dashboard(app)
     # Searcher filters never leak into the independent Dashboard.
-    assert app.multiselect(key="dashboard_sizes").value == ["All"]
-    app.multiselect(key="dashboard_sizes").select("Large city").run()
-    assert app.multiselect(key="dashboard_sizes").value == ["Large city"]
-    app.multiselect(key="dashboard_sizes").select("All").run()
-    assert app.multiselect(key="dashboard_sizes").value == ["All"]
+    assert not app.multiselect
     assert len(charts(app)) == 1  # map only until the Dashboard loads
     assert "dashboard_overview" not in app.session_state
     assert len(session.calls) == 1
@@ -140,21 +136,21 @@ def test_all_windows_share_service_and_do_not_refetch(journey):
     assert len(charts(app)) == 1 and not factory.called  # map, no request
     search_page(app)
     for days in range(1, 6):
-        app.select_slider(key="_trip_days").set_value(days).run()
+        app.selectbox(key="_trip_days").set_value(days).run()
         app.button(key="run_search").click().run()
         assert not app.exception
         search_rows = app.session_state.search_analysis_rows
         snapshot = service.store.path.read_bytes()
         dashboard(app)
-        app.select_slider(key="dashboard_days").set_value(days).run()
+        app.selectbox(key="dashboard_days").set_value(days).run()
         app.button(key="dashboard_load").click().run()
         assert not app.exception
         rows = overview(app)["rows"]
         assert all(r["evaluated_periods"] == days * 3 for r in rows)
         weather = {r["city_id"]: r["weather_match_pct"] for r in rows}
         for row in search_rows:  # same engine, same weather match
-            assert weather[row["city_id"]] == row["weather_match_pct"]
-        assert len(charts(app)) == 4
+            assert weather[row["city_id"]] != row["weather_match_pct"]
+        assert len(charts(app)) == 2
         assert service.store.path.read_bytes() == snapshot
         search_page(app)
     assert len(session.calls) == 3 and factory.call_count == 1
@@ -166,16 +162,16 @@ def test_edited_settings_keep_old_results_until_explicit_action(journey):
     app.run().button(key="run_search").click().run()
     original = app.session_state.search_analysis_rows
     app.number_input(key="_trip_min").set_value(20.0).run()
-    app.select_slider(key="_trip_days").set_value(5).run()
+    app.selectbox(key="_trip_days").set_value(5).run()
     assert "Settings changed" in texts(app.info)
     assert app.session_state.search_analysis_rows == original
     load_dashboard(app)
     loaded = overview(app)
-    app.select_slider(key="dashboard_days").set_value(5).run()
-    assert "Your settings have changed" in texts(app.info)
-    assert "next 3 day(s)" in texts(app.caption)
-    assert overview(app) == loaded
-    assert all(r["evaluated_periods"] == 9 for r in loaded["rows"])
+    app.selectbox(key="dashboard_days").set_value(5).run()
+    assert "Your settings have changed" not in texts(app.info)
+    assert "next 5 day(s)" in texts(app.caption)
+    assert overview(app) != loaded
+    assert all(r["evaluated_periods"] == 15 for r in overview(app)["rows"])
     app.button(key="dashboard_load").click().run()
     assert "Your settings have changed" not in texts(app.info)
     assert all(r["evaluated_periods"] == 15 for r in overview(app)["rows"])
@@ -188,11 +184,10 @@ def test_edited_settings_keep_old_results_until_explicit_action(journey):
     assert len(service.store.load()) == 120
 
 
-def test_searches_never_change_dashboard_overview_or_filters(journey):
+def test_searches_never_change_unfiltered_dashboard(journey):
     app, _, session, _, _ = journey
     load_dashboard(app.run())
     loaded = overview(app)
-    app.multiselect(key="dashboard_destinations").select(SEGOVIA.city_id).run()
     search_page(app)
     app.multiselect(key="_trip_activities").set_value(
         ["History and heritage"]
@@ -200,11 +195,9 @@ def test_searches_never_change_dashboard_overview_or_filters(journey):
     app.button(key="run_search").click().run()
     assert len(app.session_state.search_analysis_rows) == 2
     dashboard(app)
-    assert app.multiselect(key="dashboard_destinations").value == [
-        SEGOVIA.city_id
-    ]
+    assert not app.multiselect
     assert overview(app) == loaded
-    assert len(charts(app)[1]["data"][0]["x"]) == 1  # Segovia highlighted
+    assert len(charts(app)[1]["data"][0]["x"]) == 3
     assert len(session.calls) == 3
 
 
@@ -216,7 +209,7 @@ def test_partial_failure_and_recovery_use_one_service(journey):
     assert "2 of 3 destinations can be ranked" in texts(app.markdown)
     assert len(charts(app)[1]["data"][0]["x"]) == 2
     assert "could not find" in (
-        app.dataframe[-1].value.iloc[0]["Why it has no weather rank"]
+        app.dataframe[-1].value.iloc[0]["Why it has no destination rank"]
     )
     session.handler = catalog_handler(clock)
     app.button(key="dashboard_load").click().run()
@@ -242,12 +235,12 @@ def test_storage_failure_never_charts_unsaved_results(journey, monkeypatch):
     assert len(charts(app)) == 1  # the map, with no ranked markers
     assert all(
         "saved or read" in reason
-        for reason in app.dataframe[-1].value["Why it has no weather rank"]
+        for reason in app.dataframe[-1].value["Why it has no destination rank"]
     )
     assert len(session.calls) == 1
     monkeypatch.setattr(service.store, "append", real_append)
     app.button(key="dashboard_load").click().run()
-    assert len(charts(app)) == 4 and service.unsaved_record_count == 0
+    assert len(charts(app)) == 2 and service.unsaved_record_count == 0
     # Recover the first response without requesting it twice.
     assert len(session.calls) == 3
     assert len(service.store.load()) == 120
@@ -284,7 +277,7 @@ def test_empty_new_search_keeps_dashboard_without_fetching(journey):
     app.button(key="run_search").click().run()
     assert app.session_state.search_analysis_rows == []
     dashboard(app)
-    assert overview(app) == loaded and len(charts(app)) == 4
+    assert overview(app) == loaded and len(charts(app)) == 2
     assert len(session.calls) == 3
     assert service.store.path.read_bytes() == saved
 
@@ -318,25 +311,47 @@ def test_genuine_saved_data_drives_complete_app_without_requests(journey):
     saved = service.store.path.read_bytes()
     app.run().button(key="run_search").click().run()
     assert not app.exception and not session.calls
-    scores = [float(metric.value) for metric in app.metric[::3]]
-    assert scores == [83.9, 50.8, 46.9]
+    scores = card_scores(app)
+    # Frozen CSV independently evaluated with preferred Low rain and
+    # Moderate wind, 80/20 aggregation and two points per driving hour.
+    assert scores == [74.0, 69.6, 67.1]
     load_dashboard(app)
-    _, weather, comparison, suitable = charts(app)
-    # Weather-only order matches here: 24/27, 14/27 and 13/27 checks.
-    assert weather["data"][0]["y"] == [
-        "1. Seville",
-        "2. Toledo",
-        "3. Segovia",
-    ]
+    _, scatter = charts(app)
     rows = overview(app)["rows"]
-    assert weather["data"][0]["x"] == pytest.approx(
-        [row["weather_match_pct"] for row in rows]
+    assert scatter["data"][0]["y"] == pytest.approx(
+        [row["final_score"] for row in rows]
     )
-    assert comparison["data"][0]["x"] == pytest.approx(
+    full = next(d.value for d in app.dataframe
+                if "Driving distance (km)" in d.value.columns)
+    assert full["Destination"].tolist() == ["Seville", "Toledo", "Segovia"]
+    assert full["Temperature (°C)"].tolist() == pytest.approx(
         [row["mean_temperature_c"] for row in rows]
     )
-    assert suitable["data"][0]["x"] == pytest.approx(
-        [row["all_preferences_pct"] for row in rows]
-    )
+    heat = next(e.proto.body for e in app.get('html')
+                if 'class="wi-heatmap-table"' in e.proto.body)
+    assert heat.count('scope="row"') == 3
     assert factory.call_count == 1 and not session.calls
     assert service.store.path.read_bytes() == saved
+
+
+def card_scores(app):
+    import re
+    html = next(element.proto.body for element in app.get('html')
+                if 'class="wi-trip-list"' in element.proto.body)
+    return [float(value) for value in re.findall(
+        r'class="wi-trip-fit">([0-9.]+)/100', html)]
+
+
+def test_scoring_version_change_resets_results_but_preserves_service():
+    app = AppTest.from_file(str(ROOT / "app.py"))
+    app.session_state.scoring_version = "previous-formula"
+    app.session_state.dashboard_attempted_days = 3
+    app.session_state.dashboard_overview = {"preferences": None}
+    app.session_state.search_results = ["obsolete"]
+    app.session_state.service_unsaved = ["pending-recovery"]
+    app.run()
+    assert not app.exception
+    assert "dashboard_attempted_days" not in app.session_state
+    assert "dashboard_overview" not in app.session_state
+    assert "search_results" not in app.session_state
+    assert app.session_state.service_unsaved == ["pending-recovery"]

@@ -1,28 +1,19 @@
-"""P4.4 Dashboard: an independent weather overview of mainland Spain.
+"""Independent Spain overview using seasonal comfort minus driving cost.
 
-The Dashboard works without a Searcher run. It always shows all catalog
-destinations on a map and, after an explicit Load/refresh, ranks them by
-weather alone for its own next 1-5 days using the seasonal default
-criteria (product_defaults.json). It reuses the shared request/save path
-(``searcher.search_destinations`` -> ``WeatherService`` -> analytics), so
-suitable saved forecasts are reused, missing or stale ones are fetched with
-the established pacing and every fresh response is saved automatically.
-
-Weather score = the engine's ``weather_match_pct`` (no driving penalty).
-Weather rank: highest unrounded score first; equal scores share a rank
-(competition ranking: 1, 1, 3) and ``city_id`` orders destinations within a
-tie. This is deliberately different from the Searcher's trip ranking.
-
-Dashboard controls, results and errors use ``dashboard_*`` session keys and
-never read or change the Searcher's ``search_*`` state. Hovering, filtering
-and navigation never make requests; only the Load/refresh button does.
+All destinations remain visible. Ranking uses final_score, with shared ranks
+for exact ties. Every visual uses final_score, including driving; daily
+heatmap cells apply the same engine to each individual day.
+First entry, changed windows and manual refresh use the shared
+saved-weather service. Ordinary reruns and return navigation reuse
+the loaded overview; chart interactions do not fetch weather.
 """
 
 from __future__ import annotations
 
 import math
+from html import escape
 from collections.abc import Iterable, Mapping, Sequence
-from dataclasses import replace
+from dataclasses import asdict, replace
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
 
@@ -31,67 +22,45 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from weather_app import searcher
+from weather_app.executive import executive_summary
+from weather_app.executive_view import render_kpis, render_details
+from weather_app.presentation import eyebrow, duration_text, duration_column
+from weather_app.scoring import wind_label
 from weather_app.analytics import (
     AVAILABLE,
+    destination_ranks,
+    daily_weather,
     FORECAST_MAX_AGE,
     RESULT_FIELDS,
     UNAVAILABLE,
 )
 from weather_app.client import APIError
 from weather_app.config import load_product_defaults
-from weather_app.models import ACTIVITIES, DESTINATION_SIZES
 from weather_app.storage import CatalogError, load_destinations
 
 MADRID = ZoneInfo("Europe/Madrid")
-ALL = "All"
 DAY_OPTIONS = (1, 2, 3, 4, 5)
 NO_DATA_COLOUR = "#9e9e9e"
-# Mercator zoom that keeps every mainland catalog destination in view with
-# a small margin (checked visually at desktop and phone widths).
-MAP_SCALE = 22
-MAP_CONFIG = {"scrollZoom": False}
+# Presentation configuration; coordinates match the documented route origin.
+MADRID_ORIGIN = {"lat": 40.4168, "lon": -3.7038}
+MAP_ZOOM = 4.5
+OSM_TILE_URL = "https://tile.openstreetmap.org/{z}/{x}/{y}.png"
+OSM_ATTRIBUTION = (
+    '© <a href="https://www.openstreetmap.org/copyright">'
+    'OpenStreetMap contributors</a>'
+)
+MAP_CONFIG = {
+    "scrollZoom": False, "displaylogo": False, "displayModeBar": True,
+    "modeBarButtonsToAdd": ["zoomInMap", "zoomOutMap", "resetViewMap"],
+}
 
 DAYS_KEY = "dashboard_days"
 LOAD_KEY = "dashboard_load"
 OVERVIEW_KEY = "dashboard_overview"
 ERROR_KEY = "dashboard_error"
-METRIC_KEY = "dashboard_metric"
-FILTER_KEYS = {
-    "destinations": "dashboard_destinations",
-    "activities": "dashboard_activities",
-    "sizes": "dashboard_sizes",
-}
 
 # Scores and statistics an available row must carry as finite numbers.
 _AVAILABLE_NUMBERS = RESULT_FIELDS[6:]
-
-SLOT_NOTE = (
-    "Slots are three-hour daytime forecast slots (09:00-18:00 Madrid "
-    "time). Coverage 9/9 means all nine required slots have data; it is "
-    "not nine days or nine hours of good weather."
-)
-
-# Weather comparison metrics: (chart title, axis label, aggregation note).
-COMPARISON_METRICS = {
-    "mean_temperature_c": (
-        "Average daytime temperature",
-        "Average daytime temperature (°C)",
-        "Average temperature over every three-hour daytime forecast slot "
-        "in the window.",
-    ),
-    "max_precipitation_probability_pct": (
-        "Highest precipitation probability",
-        "Highest slot precipitation probability (%)",
-        "Highest probability in any single three-hour daytime slot. "
-        "It is not the probability of rain over the whole window.",
-    ),
-    "max_wind_kmh": (
-        "Strongest daytime wind",
-        "Highest slot wind speed (km/h)",
-        "Highest sustained wind speed (not gusts) in any single three-hour "
-        "daytime slot.",
-    ),
-}
 
 
 class DashboardDataError(ValueError):
@@ -106,28 +75,24 @@ class DashboardDataError(ValueError):
 def overview_preferences(now_utc: datetime, defaults: Mapping, days: int):
     """Seasonal default criteria for a Dashboard window of ``days`` days.
 
-    Temperature comes from the Europe/Madrid season of ``now_utc``;
-    precipitation and wind limits and All filters come from the defaults.
+    Each forecast date uses its Madrid seasonal band from the reference.
+    Numeric rain/wind limits remain internal diagnostic thresholds; the
+    Dashboard score uses continuous comfort curves and has no city filters.
     """
     if days not in DAY_OPTIONS:
         raise ValueError("The Dashboard window must be 1-5 days.")
-    return replace(searcher.initial_preferences(now_utc, defaults), days=days)
-
-
-def weather_ranks(analysis_rows: Iterable[Mapping]) -> dict[str, int]:
-    """Weather-only competition ranks for available rows, by city_id.
-
-    The highest unrounded ``weather_match_pct`` ranks first; equal scores
-    share a rank and the next distinct score skips the tied places.
-    Driving time is never used.
-    """
-    scores = {
-        row["city_id"]: row["weather_match_pct"]
-        for row in analysis_rows
-        if row["status"] == AVAILABLE
-    }
-    ordered = sorted(scores.values(), reverse=True)
-    return {city: ordered.index(score) + 1 for city, score in scores.items()}
+    bands = [None] * 12
+    for season in defaults["seasonal_temperature_c"].values():
+        for month in season["months"]:
+            bands[month - 1] = (season["min"], season["max"])
+    return replace(
+        searcher.initial_preferences(now_utc, defaults), days=days,
+        scoring_mode="dashboard", rain_preference=None, wind_preference=None,
+        seasonal_bands=tuple(bands),
+        max_precipitation_probability_pct=defaults[
+            "max_precipitation_probability_percent"],
+        max_wind_kmh=defaults["max_wind_kmh"],
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -192,9 +157,10 @@ def _check_row(position: int, row: Mapping) -> None:
 def prepare_frame(
     analysis_rows: Sequence[Mapping], catalog_rows: Sequence[Mapping]
 ) -> pd.DataFrame:
-    """Join engine rows to the catalog and order them by weather rank.
+    """Join engine rows to the catalog and order them by Destination rank.
 
-    ``rank`` is the weather-only rank (see ``weather_ranks``). Ranked rows
+    ``rank`` includes the driving penalty (see ``destination_ranks``).
+    Ranked rows
     come first (rank, then city_id); unavailable rows follow by city_id
     with no rank. Raises ``DashboardDataError`` for rows outside the
     shared result contract.
@@ -237,7 +203,7 @@ def prepare_frame(
     if len(searches) > 1:
         raise DashboardDataError("results come from more than one search")
 
-    ranks = weather_ranks(analysis_rows)
+    ranks = destination_ranks(analysis_rows)
     for record in records:
         record["rank"] = ranks.get(record["city_id"])
     records.sort(
@@ -250,48 +216,6 @@ def prepare_frame(
     frame = pd.DataFrame.from_records(records, columns=columns)
     frame["rank"] = frame["rank"].astype("Int64")  # <NA> when unavailable
     return frame
-
-
-def _clean(selection: Iterable[str] | None) -> tuple[str, ...]:
-    return tuple(item for item in (selection or ()) if item != ALL)
-
-
-def matches(
-    city_id: str,
-    activities: Iterable[str],
-    size: str,
-    chosen_ids: Iterable[str] | None = None,
-    chosen_activities: Iterable[str] | None = None,
-    chosen_sizes: Iterable[str] | None = None,
-) -> bool:
-    """ANY chosen value within a group; AND between groups; All = no limit."""
-    ids, tags, kinds = (
-        _clean(chosen_ids),
-        _clean(chosen_activities),
-        _clean(chosen_sizes),
-    )
-    return (
-        (not ids or city_id in ids)
-        and (not tags or bool(set(tags).intersection(activities)))
-        and (not kinds or size in kinds)
-    )
-
-
-def filter_frame(
-    frame: pd.DataFrame,
-    destinations: Iterable[str] | None = None,
-    activities: Iterable[str] | None = None,
-    sizes: Iterable[str] | None = None,
-) -> pd.DataFrame:
-    """Rows matching the optional filters; order and ranks are unchanged."""
-    if frame.empty:
-        return frame
-    mask = [
-        matches(row.city_id, row.activities, row.destination_size,
-                destinations, activities, sizes)
-        for row in frame.itertuples()
-    ]
-    return frame[mask]
 
 
 def search_context(frame: pd.DataFrame) -> dict | None:
@@ -362,261 +286,126 @@ def map_points(
             "mean_temperature_c": None,
         }
         heading = (
-            f"<b>{point['city']}</b><br>Activities: {', '.join(tags)}"
+            f"<b>{escape(point['city'])}</b><br>Activities: "
+            f"{escape(', '.join(tags))}"
         )
         row = results.get(place["city_id"])
         if row is None:
             point["hover"] = (
                 f"{heading}<br>Weather not loaded. Choose the days and "
-                "click Load weather overview."
+                "click Refresh weather overview."
             )
         elif row["status"] == AVAILABLE:
             point.update(
                 status="ranked",
                 rank=int(row["rank"]),
-                weather_score=row["weather_match_pct"],
+                weather_score=row["final_score"],
                 mean_temperature_c=row["mean_temperature_c"],
             )
             point["hover"] = (
                 f"{heading}<br>Average daytime temperature: "
                 f"{row['mean_temperature_c']:.1f} °C"
-                f"<br>Weather rank: {point['rank']} of {ranked_total}"
-                f"<br>Weather score: {row['weather_match_pct']:.1f}%"
+                f"<br>Destination rank: {point['rank']} of {ranked_total}"
+                f"<br>Destination score: {row['final_score']:.1f}/100"
             )
         else:
             point["status"] = "unavailable"
             point["hover"] = (
-                f"{heading}<br>No weather rank: "
+                f"{heading}<br>No destination rank: "
                 f"{_reason(place['city_id'], row['reason'], errors)}"
             )
+        point["hover"] += (
+            f"<br>Drive from Madrid: "
+            f"{duration_text(place.get('car_duration_min'))} h one way"
+        )
         points.append(point)
     return points
 
 
-def map_figure(
-    points: Sequence[Mapping], highlighted: Iterable[str] | None = None
-) -> go.Figure:
-    """Mainland-Spain map with every destination as a marker.
+def map_figure(points: Sequence[Mapping]) -> go.Figure:
+    """OSM tile map with all destinations plus a separate Madrid origin.
 
-    Ranked destinations are coloured by weather score; destinations
-    without a result are neutral grey. ``highlighted`` city_ids stay
-    opaque and the rest are dimmed, never removed.
+    Browser requests fetch only visible map tiles using normal caching.
+    Weather remains from the validated service; OSM supplies the basemap only.
     """
-    keep = None if highlighted is None else set(highlighted)
-
-    def opacity(group):
-        return [
-            0.95 if keep is None or p["city_id"] in keep else 0.2
-            for p in group
-        ]
-
-    ranked = sorted(
-        (p for p in points if p["status"] == "ranked"),
-        key=lambda p: (p["rank"], p["city_id"]),
-    )
-    others = sorted(
-        (p for p in points if p["status"] != "ranked"),
-        key=lambda p: p["city_id"],
-    )
+    ranked = sorted((p for p in points if p["status"] == "ranked"),
+                    key=lambda p: (p["rank"], p["city_id"]))
+    others = sorted((p for p in points if p["status"] != "ranked"),
+                    key=lambda p: p["city_id"])
     loaded = any(p["status"] != "not_loaded" for p in points)
     figure = go.Figure()
-    figure.add_trace(
-        go.Scattergeo(
-            name="Weather score",
-            lat=[p["latitude"] for p in ranked],
-            lon=[p["longitude"] for p in ranked],
-            customdata=[p["city_id"] for p in ranked],
-            hovertext=[p["hover"] for p in ranked],
-            hovertemplate="%{hovertext}<extra></extra>",
-            mode="markers",
-            marker={
-                "size": 12,
-                "color": [p["weather_score"] for p in ranked],
-                "cmin": 0,
-                "cmax": 100,
-                "colorscale": "RdYlGn",
-                "colorbar": {"title": {"text": "Weather score (%)"}},
-                "opacity": opacity(ranked),
-                "line": {"width": 0.6, "color": "#333333"},
+    for group, name, marker in [
+        (ranked, "Destination score", {
+            "size": 16, "color": [p["weather_score"] for p in ranked],
+            "cmin": 0, "cmax": 100,
+            "colorscale": [
+                [0, "#c8463a"], [.2, "#c8463a"],
+                [.2, "#ed9145"], [.4, "#ed9145"],
+                [.4, "#e7c65b"], [.6, "#e7c65b"],
+                [.6, "#8bb66a"], [.8, "#8bb66a"],
+                [.8, "#247548"], [1, "#247548"],
+            ],
+            "showscale": bool(ranked),
+            "colorbar": {
+                "title": {"text": "Destination score /100"},
+                "orientation": "h", "x": .5, "xanchor": "center",
+                "y": -.06, "yanchor": "top", "len": .85,
+                "thickness": 14, "outlinewidth": 0,
+                "tickvals": [0, 20, 40, 60, 80, 100],
+                "tickfont": {"size": 11},
             },
-        )
-    )
-    figure.add_trace(
-        go.Scattergeo(
-            name="No weather rank" if loaded else "Weather not loaded",
-            lat=[p["latitude"] for p in others],
-            lon=[p["longitude"] for p in others],
-            customdata=[p["city_id"] for p in others],
-            hovertext=[p["hover"] for p in others],
-            hovertemplate="%{hovertext}<extra></extra>",
-            mode="markers",
-            marker={
-                "size": 10,
-                "color": NO_DATA_COLOUR,
-                "opacity": opacity(others),
-                "line": {"width": 0.6, "color": "#333333"},
-            },
-        )
-    )
-    # Centre on the middle of the catalog coordinates and zoom to mainland
-    # Spain. (Plotly's fitbounds="locations" centred this map about 3° too
-    # far north and left the markers in a small part of the frame.)
-    lats = [p["latitude"] for p in points] or [40.0]
-    lons = [p["longitude"] for p in points] or [-3.7]
-    figure.update_geos(
-        center={
-            "lat": (min(lats) + max(lats)) / 2,
-            "lon": (min(lons) + max(lons)) / 2,
+        }),
+        (others, "No destination rank" if loaded else "Weather not loaded",
+         {"size": 16, "color": NO_DATA_COLOUR}),
+    ]:
+        figure.add_trace(go.Scattermap(
+            name=name, lat=[p["latitude"] for p in group],
+            lon=[p["longitude"] for p in group],
+            customdata=[p["city_id"] for p in group],
+            hovertext=[p["hover"] for p in group],
+            hovertemplate="%{hovertext}<extra></extra>", mode="markers",
+            marker={**marker, "opacity": 0.95},
+            showlegend=False,
+        ))
+    figure.add_trace(go.Scattermap(
+        name="Madrid origin", lat=[MADRID_ORIGIN["lat"]],
+        lon=[MADRID_ORIGIN["lon"]], customdata=["madrid-origin"],
+        hovertext=["<b>Madrid · approximate Km0</b><br>"
+                   "Fixed departure point for driving estimates.<br>"
+                   "Origin marker only; not a ranked destination."],
+        hovertemplate="%{hovertext}<extra></extra>", mode="markers",
+        marker={"size": 23, "color": "#2489c5"}, showlegend=False,
+    ))
+    # Border layer underneath the circles keeps close destinations legible.
+    outlines = {"type": "FeatureCollection", "features": [
+        {"type": "Feature", "geometry": {"type": "Point", "coordinates":
+         [p["longitude"], p["latitude"]]}, "properties": {}}
+        for p in points
+    ]}
+    style = {
+        "version": 8,
+        "sources": {"osm": {
+            "type": "raster", "tiles": [OSM_TILE_URL], "tileSize": 256,
+            "maxzoom": 19, "attribution": OSM_ATTRIBUTION,
+        }},
+        "layers": [{"id": "osm-basemap", "type": "raster",
+                    "source": "osm"}],
+    }
+    lats = [p["latitude"] for p in points] or [MADRID_ORIGIN["lat"]]
+    lons = [p["longitude"] for p in points] or [MADRID_ORIGIN["lon"]]
+    figure.update_layout(
+        map={
+            "style": style, "zoom": MAP_ZOOM,
+            "center": {"lat": (min(lats) + max(lats)) / 2,
+                       "lon": (min(lons) + max(lons)) / 2},
+            "layers": [{"sourcetype": "geojson", "source": outlines,
+                        "type": "circle", "color": "#34432c",
+                        "circle": {"radius": 9}, "below": "traces"}],
         },
-        projection_scale=MAP_SCALE,
-        projection_type="mercator",
-        resolution=50,
-        showcountries=True,
-        countrycolor="#8c8c8c",
-        showland=True,
-        landcolor="#f2efe9",
-        showocean=True,
-        oceancolor="#dceaf5",
-        showlakes=False,
+        height=520, margin={"l": 0, "r": 0, "t": 0, "b": 75},
+        paper_bgcolor="#ffffff", font={"color": "#183535"},
+        uirevision="destination-map-osm-v1",
     )
-    figure.update_layout(
-        height=560,
-        margin={"l": 0, "r": 0, "t": 35, "b": 0},
-        legend={"orientation": "h", "y": -0.02},
-    )
-    return figure
-
-
-# ---------------------------------------------------------------------------
-# Companion charts (pure)
-# ---------------------------------------------------------------------------
-
-
-def _available(frame: pd.DataFrame) -> pd.DataFrame:
-    return frame[frame["status"] == AVAILABLE]
-
-
-def _labels(rows: pd.DataFrame) -> list[str]:
-    return [f"{r}. {n}" for r, n in zip(rows["rank"], rows["destination"])]
-
-
-def _bar_layout(figure: go.Figure, title: str, axis: str, rows: int) -> None:
-    figure.update_layout(
-        title=title,
-        xaxis_title=axis,
-        yaxis_title="Destination (weather rank)",
-        yaxis_autorange="reversed",
-        height=max(260, 90 + 20 * rows),
-        margin={"l": 10, "r": 10, "t": 50, "b": 10},
-    )
-
-
-def weather_score_chart(frame: pd.DataFrame) -> go.Figure:
-    """Weather score per destination in weather-rank order (best on top)."""
-    rows = _available(frame)
-    figure = go.Figure(
-        go.Bar(
-            x=rows["weather_match_pct"].tolist(),
-            y=_labels(rows),
-            orientation="h",
-            customdata=rows["mean_temperature_c"].tolist(),
-            hovertemplate=(
-                "%{y}<br>Weather score: %{x:.1f}%"
-                "<br>Average daytime temperature: %{customdata:.1f} °C"
-                "<extra></extra>"
-            ),
-        )
-    )
-    _bar_layout(
-        figure,
-        "Weather ranking: weather score by destination",
-        "Weather score (% of temperature, rain and wind checks met; "
-        "no driving penalty)",
-        len(rows),
-    )
-    figure.update_xaxes(range=[0, 100])
-    return figure
-
-
-def _limits(preferences: object, metric: str) -> tuple:
-    if preferences is None:
-        return None, None
-    if metric == "mean_temperature_c":
-        return (
-            getattr(preferences, "temperature_min_c", None),
-            getattr(preferences, "temperature_max_c", None),
-        )
-    name = (
-        "max_precipitation_probability_pct"
-        if metric == "max_precipitation_probability_pct"
-        else "max_wind_kmh"
-    )
-    return None, getattr(preferences, name, None)
-
-
-def comparison_chart(
-    frame: pd.DataFrame, metric: str, preferences: object = None
-) -> go.Figure:
-    """Compare one weather metric across destinations, marking limits."""
-    if metric not in COMPARISON_METRICS:
-        raise ValueError(f"unknown comparison metric {metric!r}")
-    title, axis, _ = COMPARISON_METRICS[metric]
-    rows = _available(frame)
-    figure = go.Figure(
-        go.Bar(
-            x=rows[metric].tolist(),
-            y=_labels(rows),
-            orientation="h",
-            hovertemplate=f"%{{y}}<br>{axis}: %{{x:.1f}}<extra></extra>",
-        )
-    )
-    low, high = _limits(preferences, metric)
-    # The limit is named in the title: an annotation inside the plot was
-    # hidden behind the first bar.
-    heading = f"{title} across destinations"
-    if low is not None and high is not None:
-        figure.add_vrect(
-            x0=low, x1=high, fillcolor="green", opacity=0.12, line_width=0,
-        )
-        heading += f" (seasonal range {low:g}-{high:g} °C shaded)"
-    elif high is not None:
-        figure.add_vline(x=high, line_dash="dash")
-        unit = "%" if metric == "max_precipitation_probability_pct" else (
-            " km/h"
-        )
-        heading += f" (limit {high:g}{unit} dashed)"
-    _bar_layout(figure, heading, axis, len(rows))
-    return figure
-
-
-def all_preferences_chart(frame: pd.DataFrame) -> go.Figure:
-    """Share of daytime slots meeting all three criteria at once."""
-    rows = _available(frame)
-    counts = [
-        f"{int(ok)}/{int(total)} slots"
-        for ok, total in zip(
-            rows["suitable_period_count"], rows["evaluated_periods"]
-        )
-    ]
-    figure = go.Figure(
-        go.Bar(
-            x=rows["all_preferences_pct"].tolist(),
-            y=_labels(rows),
-            orientation="h",
-            text=counts,
-            textposition="auto",
-            hovertemplate=(
-                "%{y}<br>%{x:.1f}% of slots (%{text})<extra></extra>"
-            ),
-        )
-    )
-    _bar_layout(
-        figure,
-        "Three-hour daytime slots meeting all three criteria",
-        "Slots meeting temperature, rain and wind criteria together (%)",
-        len(rows),
-    )
-    figure.update_xaxes(range=[0, 100])
     return figure
 
 
@@ -629,19 +418,14 @@ def _madrid(value: datetime) -> str:
     return value.astimezone(MADRID).strftime("%a %d %b %Y, %H:%M %Z")
 
 
-def _age(delta: timedelta) -> str:
-    minutes = int(delta.total_seconds() // 60)
-    if minutes < 60:
-        return f"{minutes} min"
-    return f"{minutes // 60} h {minutes % 60:02d} min"
-
-
-def _criteria(preferences) -> str:
+def _criteria(preferences):
+    """Explain the active scoring mode, not obsolete pass/fail limits."""
     return (
-        f"{preferences.temperature_min_c:g}-"
-        f"{preferences.temperature_max_c:g} °C · precipitation probability "
-        f"≤ {preferences.max_precipitation_probability_pct:g}% · wind ≤ "
-        f"{preferences.max_wind_kmh:g} km/h"
+        f"Seasonal temperature band at load: "
+        f"{preferences.temperature_min_c:g}–"
+        f"{preferences.temperature_max_c:g} °C; each forecast date uses "
+        "its season. Gradual rain, wind and cloud components; "
+        "2 points per driving hour, capped at 15"
     )
 
 
@@ -650,37 +434,12 @@ def _remember(key: str) -> None:
     st.session_state[f"_saved_{key}"] = st.session_state[key]
 
 
-def _keep_all_exclusive(key: str) -> None:
-    st.session_state[key] = searcher.normalize_all_selection(
-        st.session_state.get(key, [])
-    )
-    _remember(key)
-
-
 def _seed(key: str, valid, default) -> None:
     """Restore a widget value from its saved copy before drawing it."""
     if key in st.session_state and valid(st.session_state[key]):
         return
     saved = st.session_state.get(f"_saved_{key}")
     st.session_state[key] = saved if valid(saved) else default
-
-
-def _multiselect(label, key, options, help_text, format_func=str):
-    _seed(
-        key,
-        lambda v: bool(v) and all(item in options for item in v),
-        [ALL],
-    )
-    return st.multiselect(
-        label, options, key=key, format_func=format_func,
-        on_change=_keep_all_exclusive, args=(key,), help=help_text,
-    )
-
-
-def _ordered(values: Iterable[str], canonical: Sequence[str]) -> list[str]:
-    present = set(values)
-    extra = sorted(present - set(canonical))
-    return [v for v in canonical if v in present] + extra
 
 
 def _load(catalog, defaults, days: int) -> None:
@@ -706,7 +465,8 @@ def _load(catalog, defaults, days: int) -> None:
             "code": error.code,
             # Fixed setup guidance from config; never the key itself.
             "guidance": (
-                error.message if error.code == "authentication" else None
+                error.message
+                if error.code in {"authentication", "storage"} else None
             ),
         }
     except ValueError:
@@ -714,6 +474,9 @@ def _load(catalog, defaults, days: int) -> None:
     else:
         state[OVERVIEW_KEY] = {
             "rows": result["rows"],
+            "daily": daily_weather(
+                catalog, result.get("forecasts", {}), preferences, run_at
+            ),
             "errors": result["errors"],
             "cached": result["cached"],
             "storage_failure": result.get("storage_failure"),
@@ -728,7 +491,7 @@ def _load(catalog, defaults, days: int) -> None:
 def _render_controls(defaults) -> int:
     default_days = defaults.get("default_forecast_days", 3)
     _seed(DAYS_KEY, lambda v: v in DAY_OPTIONS, default_days)
-    days = st.select_slider(
+    days = st.selectbox(
         "Forecast window (next days)", options=list(DAY_OPTIONS),
         key=DAYS_KEY, on_change=_remember, args=(DAYS_KEY,),
         help="Rolling window starting when you load the overview.",
@@ -738,7 +501,7 @@ def _render_controls(defaults) -> int:
 
 def _render_status(overview, frame, next_preferences, total) -> None:
     used = overview["preferences"]
-    if used != next_preferences:
+    if asdict(used) != asdict(next_preferences):
         st.info(
             f"The overview below is for the next {used.days} day(s) as "
             f"loaded on {_madrid(overview['run_at'])}. Your settings have "
@@ -778,75 +541,46 @@ def _render_status(overview, frame, next_preferences, total) -> None:
             )
 
 
-def _filters(catalog_rows) -> tuple:
-    names = {row["city_id"]: row["city"] for row in catalog_rows}
-    tags = _ordered(
-        (t for row in catalog_rows for t in _activities(row["activities"])),
-        ACTIVITIES,
-    )
-    kinds = _ordered(
-        (row["destination_size"] for row in catalog_rows), DESTINATION_SIZES
-    )
-    first, second, third = st.columns(3)
-    with first:
-        chosen_ids = _multiselect(
-            "Highlight destinations", FILTER_KEYS["destinations"],
-            [ALL, *sorted(names, key=names.get)],
-            "Highlights markers and narrows the charts; ranks stay global.",
-            format_func=lambda v: v if v == ALL else names[v],
-        )
-    with second:
-        chosen_tags = _multiselect(
-            "Activities", FILTER_KEYS["activities"], [ALL, *tags],
-            "Destinations offering ANY selected activity.",
-        )
-    with third:
-        chosen_kinds = _multiselect(
-            "Destination size", FILTER_KEYS["sizes"], [ALL, *kinds],
-            "Destinations of ANY selected size.",
-        )
-    return chosen_ids, chosen_tags, chosen_kinds
-
-
-def _ranking_table(rows: pd.DataFrame) -> pd.DataFrame:
+def _catalogue_table(rows, catalog, errors, now):
+    """Catalog facts and loaded forecast details in one sortable table."""
+    places = {d.city_id: d for d in catalog}
+    retrieved = pd.to_datetime(rows['forecast_retrieved_at_utc'], utc=True)
+    age = (now - retrieved).dt.total_seconds().div(60).clip(lower=0)
+    starts = pd.to_datetime(rows['run_at_utc'], utc=True)
+    ends = starts + pd.to_timedelta(rows['days'], unit='D')
     return pd.DataFrame({
-        "Weather rank": rows["rank"].astype(int),
-        "Destination": rows["destination"],
-        "Region": rows["region"],
-        "Activities": rows["activities"].map(", ".join),
-        "Weather score (%)": rows["weather_match_pct"],
-        "Average daytime temperature (°C)": rows["mean_temperature_c"],
-        "Slots with data": [
-            f"{int(e)}/{int(x)}"
-            for e, x in zip(
-                rows["evaluated_periods"], rows["expected_periods"]
-            )
-        ],
-    })
-
-
-def _comparison_table(rows: pd.DataFrame) -> pd.DataFrame:
-    return pd.DataFrame({
-        "Weather rank": rows["rank"].astype(int),
-        "Destination": rows["destination"],
-        "Average daytime temperature (°C)": rows["mean_temperature_c"],
-        "Highest slot precipitation probability (%)": rows[
-            "max_precipitation_probability_pct"
-        ],
-        "Highest slot wind speed (km/h)": rows["max_wind_kmh"],
-    })
-
-
-def _all_conditions_table(rows: pd.DataFrame) -> pd.DataFrame:
-    return pd.DataFrame({
-        "Weather rank": rows["rank"].astype(int),
-        "Destination": rows["destination"],
-        "Slots meeting all three": rows["suitable_period_count"].astype(int),
-        "Slots with data": rows["evaluated_periods"].astype(int),
-        "Share of slots (%)": rows["all_preferences_pct"],
-        "Temperature checks met": rows["temperature_passes"].astype(int),
-        "Rain checks met": rows["precipitation_passes"].astype(int),
-        "Wind checks met": rows["wind_passes"].astype(int),
+        'Destination': rows['destination'],
+        'Destination score / 100': rows['final_score'],
+        'Driving penalty': rows['travel_penalty'],
+        'Forecast': rows['days'].map(lambda days: f'Next {days} day(s)'),
+        'Temperature (°C)': rows['mean_temperature_c'],
+        'Maximum rain probability (%)': (
+            rows['max_precipitation_probability_pct']),
+        'Maximum wind (km/h)': rows['max_wind_kmh'],
+        'Wind level': rows['max_wind_kmh'].map(
+            lambda v: wind_label(v) if pd.notna(v) else 'Unavailable'),
+        'Activities': rows['activities'].map(' · '.join),
+        'Driving distance (km)': [places[c].car_distance_km
+                                  for c in rows['city_id']],
+        'Driving time (h:mm)': duration_column(
+            places[c].car_duration_min for c in rows['city_id']),
+        'Window starts (Madrid)': starts.dt.tz_convert(MADRID),
+        'Window ends (Madrid)': ends.dt.tz_convert(MADRID),
+        'Retrieved (Madrid)': retrieved.dt.tz_convert(MADRID),
+        'Age (h:mm)': duration_column(age),
+        'Freshness': ['Unavailable' if pd.isna(a) else
+                      'Over 3 hours old' if a > 180 else 'Within 3 hours'
+                      for a in age],
+        'Destination rank': rows['rank'].astype('Int64'),
+        'Region': rows['region'],
+        'Size': rows['destination_size'],
+        'Slots with data': [f'{int(e)}/{int(x)}' for e, x in zip(
+            rows['evaluated_periods'], rows['expected_periods'])],
+        'Status': rows['status'],
+        'Unavailable reason': [
+            _reason(city, reason, errors) if status == UNAVAILABLE else ''
+            for city, reason, status in zip(
+                rows['city_id'], rows['reason'], rows['status'])],
     })
 
 
@@ -854,7 +588,7 @@ def _unavailable_table(rows: pd.DataFrame, errors: Mapping) -> pd.DataFrame:
     return pd.DataFrame({
         "Destination": rows["destination"],
         "Region": rows["region"],
-        "Why it has no weather rank": [
+        "Why it has no destination rank": [
             _reason(city, code, errors)
             for city, code in zip(rows["city_id"], rows["reason"])
         ],
@@ -868,64 +602,15 @@ def _number_columns(labels: Iterable[str], fmt: str = "%.1f") -> dict:
     }
 
 
-def _render_tabs(available: pd.DataFrame, preferences) -> None:
-    ranking_tab, comparison_tab, all_tab = st.tabs(
-        ["Weather ranking", "Weather comparison", "All three criteria"]
-    )
-    with ranking_tab:
-        st.plotly_chart(weather_score_chart(available))
-        st.dataframe(
-            _ranking_table(available), hide_index=True,
-            column_config=_number_columns(
-                ["Weather score (%)", "Average daytime temperature (°C)"]
-            ),
-        )
-        st.caption(
-            "Weather score is the percentage of temperature, rain and wind "
-            "checks met across the window, with no driving penalty. Equal "
-            "scores share a rank. The Searcher ranks trips differently "
-            f"because it subtracts a driving penalty. {SLOT_NOTE}"
-        )
-    with comparison_tab:
-        _seed(
-            METRIC_KEY,
-            lambda v: v in COMPARISON_METRICS,
-            next(iter(COMPARISON_METRICS)),
-        )
-        metric = st.radio(
-            "Weather measure", list(COMPARISON_METRICS), key=METRIC_KEY,
-            horizontal=True, format_func=lambda m: COMPARISON_METRICS[m][0],
-            on_change=_remember, args=(METRIC_KEY,),
-        )
-        st.plotly_chart(comparison_chart(available, metric, preferences))
-        st.caption(COMPARISON_METRICS[metric][2])
-        st.dataframe(
-            _comparison_table(available), hide_index=True,
-            column_config=_number_columns([
-                "Average daytime temperature (°C)",
-                "Highest slot precipitation probability (%)",
-                "Highest slot wind speed (km/h)",
-            ]),
-        )
-    with all_tab:
-        st.plotly_chart(all_preferences_chart(available))
-        st.caption(
-            "A slot counts only when temperature, precipitation probability "
-            "and wind all meet the criteria at once. Slots are forecasts, "
-            "not guaranteed good-weather hours."
-        )
-        st.dataframe(
-            _all_conditions_table(available), hide_index=True,
-            column_config=_number_columns(["Share of slots (%)"]),
-        )
-
-
 def render_dashboard_page() -> None:
     """Independent Dashboard: map of every destination plus weather views."""
+    eyebrow("Destination overview")
     st.header("Dashboard")
     st.write(
-        "Weather across all mainland-Spain destinations for the next few "
-        "days, ranked by weather alone. Use the Searcher for a personal "
+        "Weather across our catalogued mainland-Spain destinations for the "
+        "next few "
+        "days, ranked by standard seasonal criteria and driving time. "
+        "Use the Searcher for a personal "
         "trip recommendation that also weighs driving time."
     )
     try:
@@ -943,19 +628,27 @@ def render_dashboard_page() -> None:
     days = _render_controls(defaults)
     next_preferences = overview_preferences(searcher.utc_now(), defaults, days)
     st.caption(
-        f"Seasonal criteria for the next load: {_criteria(next_preferences)}."
-        " Saved forecasts under three hours old are reused; others are "
-        "fetched and saved automatically. A first full load can take a few "
-        "minutes."
+        f"Current seasonal temperature band: "
+        f"{next_preferences.temperature_min_c:g}–"
+        f"{next_preferences.temperature_max_c:g} °C; follows each forecast "
+        "date's season."
+        " Saved forecasts up to three hours old are reused; others are "
+        "fetched and saved automatically. The overview loads on first "
+        "opening and when you change the forecast window. A first full "
+        "load can take a few minutes."
     )
     overview = state.get(OVERVIEW_KEY)
-    if st.button(
-        "Refresh weather overview" if overview else "Load weather overview",
-        key=LOAD_KEY, type="primary",
-    ):
+    # Keep an existing snapshot on hot reload. Mark attempts before loading
+    # so a failed request cannot repeat on every ordinary Streamlit rerun.
+    if "dashboard_attempted_days" not in state and overview:
+        state.dashboard_attempted_days = overview["preferences"].days
+    refresh = st.button(
+        "Refresh weather overview", key=LOAD_KEY, type="primary",
+    )
+    if refresh or state.get("dashboard_attempted_days") != days:
+        state.dashboard_attempted_days = days
         _load(catalog, defaults, days)
-        # Redraw once so the button, status and map reflect the new load.
-        st.rerun()
+        overview = state.get(OVERVIEW_KEY)
 
     failure = state.get(ERROR_KEY)
     if failure:
@@ -982,49 +675,101 @@ def render_dashboard_page() -> None:
     else:
         st.info(
             f"All {len(catalog)} destinations are shown without weather. "
-            "Choose the days and click Load weather overview."
+            "Click Refresh weather overview to retry."
         )
 
-    chosen = _filters(catalog_rows)
-    highlighted = [
-        row["city_id"]
-        for row in catalog_rows
-        if matches(row["city_id"], _activities(row["activities"]),
-                   row["destination_size"], *chosen)
-    ]
-    st.subheader("Mainland Spain destinations by weather score")
-    st.plotly_chart(
-        map_figure(map_points(catalog_rows, frame, errors), highlighted),
-        # Scrolling the page over the map must not zoom it out of Spain;
-        # the map's +/- buttons still zoom.
-        config=MAP_CONFIG,
-        alt="All 83 mainland-Spain destinations by weather-only rank",
+    summary = executive_summary(
+        overview["rows"] if frame is not None else [], catalog
     )
-    st.caption(
-        f"All {len(catalog)} destinations stay on the map. Grey markers "
-        "have no weather rank yet; filters dim other markers but never "
-        "change ranks. Coordinates come from the destination catalog."
-    )
+    render_kpis(summary)
+    with st.container(border=True, key="map_panel"):
+        st.html(
+            '<div class="wi-map-heading"><h3>Destination map</h3>'
+            '<span>Madrid, Spain · fixed origin for all routes</span></div>'
+        )
+        st.plotly_chart(
+            map_figure(map_points(catalog_rows, frame, errors)),
+            config=MAP_CONFIG,
+            alt=f"All {len(catalog)} catalogued destinations by rank "
+                "on OpenStreetMap, with Madrid as the blue origin marker",
+        )
+        st.caption(
+            f"All {len(catalog)} destinations remain visible. "
+            "Colours use fixed Destination score bands: red 0–<20, "
+            "orange 20–<40, yellow 40–<60, light green 60–<80, "
+            "dark green 80–100 (highly recommended). Grey means "
+            "unavailable weather. Blue marks Madrid, not a ranked result. "
+            "© [OpenStreetMap contributors]"
+            "(https://www.openstreetmap.org/copyright)."
+        )
+    with st.expander("How Dashboard scores work"):
+        st.write(
+            "Destination score weights seasonal temperature 45%, rain 35%, "
+            "wind 15% and cloud 5%. Temperature follows each forecast date's "
+            "season with gradual penalties outside its ideal band. The "
+            "window uses 80% average plus 20% worst-quarter weather matching. "
+            "Destination score subtracts 2 points per one-way driving hour, "
+            "capped at 15. All views include driving. Daily heatmap cells "
+            "use each day's weather, so can differ from the window score. "
+            "Scores are not probabilities or safety ratings."
+        )
     if frame is None:
         return
 
-    shown = filter_frame(frame, *chosen)
+    shown = frame
     available = shown[shown["status"] == AVAILABLE]
     unavailable = shown[shown["status"] == UNAVAILABLE]
     if shown.empty:
         st.warning(
-            "No destinations match these filters. Choose All or add "
-            "more options."
+            "No destination results were loaded. Refresh the overview "
+            "to try again."
         )
     elif available.empty:
         st.info(
-            "None of the selected destinations has a complete forecast "
+            "None of the catalogued destinations has a complete forecast "
             "for this window. See the reasons below."
         )
     else:
-        _render_tabs(available, overview["preferences"])
+        render_details(summary, overview.get("daily", []), catalog)
+    with st.expander(f"All {len(catalog)} destinations"):
+        full = _catalogue_table(
+            frame, catalog, errors, searcher.utc_now()
+        )
+        st.caption(
+            "Sortable catalogue · click a column header to sort. "
+            "Temperature is the daytime mean; rain and wind are the "
+            "highest daytime-slot values across the selected window. "
+            "Scroll right for driving details, dates and freshness. "
+            "Missing weather stays blank, never zero."
+        )
+        columns = _number_columns([
+            "Temperature (°C)", "Maximum rain probability (%)",
+            "Maximum wind (km/h)",
+            "Driving distance (km)",
+        ])
+        columns["Destination score / 100"] = st.column_config.NumberColumn(
+            "Destination score", format="%.1f/100"
+        )
+        columns["Destination"] = st.column_config.TextColumn(
+            "Destination", pinned=True, width="medium"
+        )
+        columns["Activities"] = st.column_config.TextColumn(
+            "Activities", width="large"
+        )
+        for label in ["Window starts (Madrid)", "Window ends (Madrid)",
+                      "Retrieved (Madrid)"]:
+            columns[label] = st.column_config.DatetimeColumn(
+                label, format="DD MMM YYYY HH:mm"
+            )
+        st.dataframe(
+            full, hide_index=True, width="stretch", height=560,
+            row_height=34, column_config=columns,
+            alt=f"All {len(catalog)} destinations with weather, "
+                "activities, "
+                "driving estimates, forecast dates and freshness",
+        )
     if not unavailable.empty:
-        st.markdown("**Destinations without a weather rank**")
+        st.markdown("**Destinations without a destination rank**")
         st.caption(
             "Shown in grey on the map. They have no invented temperature, "
             "score or rank."

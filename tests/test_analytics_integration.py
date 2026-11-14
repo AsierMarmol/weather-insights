@@ -11,6 +11,7 @@ from __future__ import annotations
 from datetime import datetime, timedelta, timezone
 
 import pytest
+from scoring_reference import reference_score
 from weather_fakes import (
     CATALOG,
     SEGOVIA,
@@ -80,8 +81,8 @@ def test_service_results_feed_the_engine(service):
         toledo["weather_match_pct"] == 100
         and toledo["all_preferences_pct"] == 100
     )
-    assert toledo["final_score"] == pytest.approx(100 - 61 / 60)
-    assert segovia["final_score"] == pytest.approx(100 - 75 / 60)
+    assert toledo["final_score"] == pytest.approx(100 - 61 / 30)
+    assert segovia["final_score"] == pytest.approx(100 - 75 / 30)
     assert toledo["mean_temperature_c"] == pytest.approx(19)
     assert toledo["max_precipitation_probability_pct"] == 30
     assert toledo["max_wind_kmh"] == pytest.approx(10.8)
@@ -101,7 +102,8 @@ def test_service_results_feed_the_engine(service):
     )
     assert again == rows
     assert (len(session.calls), len(store.load())) == (4, 80)
-    assert session.calls[-1]["params"]["lat"] == SEVILLE.latitude
+    assert session.calls[-1]["params"]["id"] == (
+        weather.client.request_parameters(SEVILLE)["id"])
 
 
 def test_saved_records_reload_into_the_same_analysis(service):
@@ -169,8 +171,8 @@ def test_genuine_toledo_forecast_one_day(genuine_toledo):
         row["precipitation_passes"],
         row["wind_passes"],
     ) == (2, 0, 1)
-    assert row["weather_match_pct"] == pytest.approx(100 / 3)
-    assert row["final_score"] == pytest.approx(100 / 3 - 61 / 60)
+    assert row["weather_match_pct"] == pytest.approx(70.31666666666667)
+    assert row["final_score"] == pytest.approx(70.31666666666667 - 61 / 30)
     assert row["suitable_period_count"] == 0
     assert row["mean_temperature_c"] == pytest.approx(
         (16.54 + 17.19 + 15.47) / 3
@@ -232,11 +234,15 @@ def test_p25_genuine_multi_city_replay(days):
             "ES-45168",
             "ES-40194",
         ]
-        assert [r["final_score"] for r in rows] == pytest.approx(
-            [
-                100 * 24 / 27 - 5,
-                100 * 14 / 27 - 61 / 60,
-                100 * 13 / 27 - 75 / 60,
-            ]
-        )
+        for row in rows:
+            group = [r for r in forecasts[row['city_id']]
+                     if run_at < r.valid_at_utc <= run_at + timedelta(days=3)
+                     and r.valid_at_utc.hour in (9, 12, 15)]
+            want = reference_score([
+                (r.temperature_c, r.precipitation_probability_pct,
+                 r.wind_kmh, r.cloud_pct) for r in group], mode="searcher")
+            place = next(d for d in [TOLEDO, SEGOVIA, SEVILLE]
+                         if d.city_id == row['city_id'])
+            assert row['final_score'] == pytest.approx(
+                max(0, want - min(place.car_duration_min / 30, 15)))
     assert WEATHER_RECORDS_PATH.read_bytes() == before

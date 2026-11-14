@@ -1,13 +1,556 @@
 {
   "canonical_name_source": "OpenWeather forecast city.name (lang=en)",
   "locations": {
+    "ES-08019": {
+      "canonical_name": "Barcelona",
+      "request_parameters": {
+        "id": 3128760
+      },
+      "expected_provider_id": 3128760,
+      "accepted_names": [
+        "Barcelona"
+      ],
+      "reason": "Verified 13 November 2026: the coordinate query returned Eixample. Explicit city ID 3128760 returns Barcelona, ES, at 41.3888, 2.159, matching earlier verified records."
+    },
+    "ES-03031": {
+      "canonical_name": "Benidorm",
+      "request_parameters": {
+        "id": 2521088
+      },
+      "expected_provider_id": 2521088,
+      "accepted_names": [
+        "Benidorm"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-41091": {
+      "canonical_name": "Seville",
+      "request_parameters": {
+        "id": 2510911
+      },
+      "expected_provider_id": 2510911,
+      "accepted_names": [
+        "Seville"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29901": {
+      "canonical_name": "Torremolinos",
+      "request_parameters": {
+        "id": 2510281
+      },
+      "expected_provider_id": 2510281,
+      "accepted_names": [
+        "Torremolinos"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-46250": {
+      "canonical_name": "Valencia",
+      "request_parameters": {
+        "id": 2509954
+      },
+      "expected_provider_id": 2509954,
+      "accepted_names": [
+        "Valencia"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29025": {
+      "canonical_name": "Benalmádena",
+      "request_parameters": {
+        "id": 2521139
+      },
+      "expected_provider_id": 2521139,
+      "accepted_names": [
+        "Benalmádena"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29067": {
+      "canonical_name": "Málaga",
+      "request_parameters": {
+        "id": 2514256
+      },
+      "expected_provider_id": 2514256,
+      "accepted_names": [
+        "Málaga"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-18087": {
+      "canonical_name": "Granada",
+      "request_parameters": {
+        "id": 2517117
+      },
+      "expected_provider_id": 2517117,
+      "accepted_names": [
+        "Granada"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29054": {
+      "canonical_name": "Fuengirola",
+      "request_parameters": {
+        "id": 2517595
+      },
+      "expected_provider_id": 2517595,
+      "accepted_names": [
+        "Fuengirola"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29069": {
+      "canonical_name": "Marbella",
+      "request_parameters": {
+        "id": 2514169
+      },
+      "expected_provider_id": 2514169,
+      "accepted_names": [
+        "Marbella"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-48020": {
+      "canonical_name": "Bilbao",
+      "request_parameters": {
+        "id": 6362368
+      },
+      "expected_provider_id": 6362368,
+      "accepted_names": [
+        "Bilbao"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-03014": {
+      "canonical_name": "Alicante",
+      "request_parameters": {
+        "id": 2521978
+      },
+      "expected_provider_id": 2521978,
+      "accepted_names": [
+        "Alicante"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-20069": {
+      "canonical_name": "San Sebastian",
+      "request_parameters": {
+        "id": 3110044
+      },
+      "expected_provider_id": 3110044,
+      "accepted_names": [
+        "San Sebastian"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-50297": {
+      "canonical_name": "Zaragoza",
+      "request_parameters": {
+        "id": 3104324
+      },
+      "expected_provider_id": 3104324,
+      "accepted_names": [
+        "Zaragoza"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-14021": {
+      "canonical_name": "Cordova",
+      "request_parameters": {
+        "id": 2519240
+      },
+      "expected_provider_id": 2519240,
+      "accepted_names": [
+        "Cordova"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-15078": {
+      "canonical_name": "Santiago de Compostela",
+      "request_parameters": {
+        "id": 3109642
+      },
+      "expected_provider_id": 3109642,
+      "accepted_names": [
+        "Santiago de Compostela"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29051": {
+      "canonical_name": "Estepona",
+      "request_parameters": {
+        "id": 2517816
+      },
+      "expected_provider_id": 2517816,
+      "accepted_names": [
+        "Estepona"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-37274": {
+      "canonical_name": "Salamanca",
+      "request_parameters": {
+        "id": 3111108
+      },
+      "expected_provider_id": 3111108,
+      "accepted_names": [
+        "Salamanca"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-15030": {
+      "canonical_name": "A Coruña",
+      "request_parameters": {
+        "id": 3119841
+      },
+      "expected_provider_id": 3119841,
+      "accepted_names": [
+        "A Coruña"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-39075": {
+      "canonical_name": "Santander",
+      "request_parameters": {
+        "id": 3109718
+      },
+      "expected_provider_id": 3109718,
+      "accepted_names": [
+        "Santander"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-30016": {
+      "canonical_name": "Cartagena",
+      "request_parameters": {
+        "id": 2520058
+      },
+      "expected_provider_id": 2520058,
+      "accepted_names": [
+        "Cartagena"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-45168": {
+      "canonical_name": "Toledo",
+      "request_parameters": {
+        "id": 2510409
+      },
+      "expected_provider_id": 2510409,
+      "accepted_names": [
+        "Toledo"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-30030": {
+      "canonical_name": "Murcia",
+      "request_parameters": {
+        "id": 2513416
+      },
+      "expected_provider_id": 2513416,
+      "accepted_names": [
+        "Murcia"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-33044": {
+      "canonical_name": "Oviedo",
+      "request_parameters": {
+        "id": 3114711
+      },
+      "expected_provider_id": 3114711,
+      "accepted_names": [
+        "Oviedo"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-36057": {
+      "canonical_name": "Vigo",
+      "request_parameters": {
+        "id": 3105976
+      },
+      "expected_provider_id": 3105976,
+      "accepted_names": [
+        "Vigo"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
     "ES-01059": {
       "canonical_name": "Gasteiz / Vitoria",
       "accepted_names": [
         "Gasteiz / Vitoria",
         "Vitoria-Gasteiz"
       ],
-      "reason": "Forecast and current products use different bilingual labels"
+      "reason": "Forecast and current products use different bilingual labels",
+      "request_parameters": {
+        "id": 3104499
+      },
+      "expected_provider_id": 3104499
+    },
+    "ES-29075": {
+      "canonical_name": "Nerja",
+      "request_parameters": {
+        "id": 2513240
+      },
+      "expected_provider_id": 2513240,
+      "accepted_names": [
+        "Nerja"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-04013": {
+      "canonical_name": "Almería",
+      "request_parameters": {
+        "id": 2521886
+      },
+      "expected_provider_id": 2521886,
+      "accepted_names": [
+        "Almería"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-33024": {
+      "canonical_name": "Gijón",
+      "request_parameters": {
+        "id": 3121424
+      },
+      "expected_provider_id": 3121424,
+      "accepted_names": [
+        "Gijón"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-09059": {
+      "canonical_name": "Burgos",
+      "request_parameters": {
+        "id": 3127460
+      },
+      "expected_provider_id": 3127460,
+      "accepted_names": [
+        "Burgos"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-11012": {
+      "canonical_name": "Cadiz",
+      "request_parameters": {
+        "id": 2520600
+      },
+      "expected_provider_id": 2520600,
+      "accepted_names": [
+        "Cadiz"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-08270": {
+      "canonical_name": "Sitges",
+      "request_parameters": {
+        "id": 6356289
+      },
+      "expected_provider_id": 6356289,
+      "accepted_names": [
+        "Sitges"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-47186": {
+      "canonical_name": "Valladolid",
+      "request_parameters": {
+        "id": 3106672
+      },
+      "expected_provider_id": 3106672,
+      "accepted_names": [
+        "Valladolid"
+      ],
+      "reason": "Verified 13 November 2026: coordinate request returned Delicias (6691623). City ID 3106672 returns Valladolid, ES, at 41.6552, -4.7237, matching the catalog and prior genuine records."
+    },
+    "ES-11020": {
+      "canonical_name": "Jerez de la Frontera",
+      "request_parameters": {
+        "id": 2516326
+      },
+      "expected_provider_id": 2516326,
+      "accepted_names": [
+        "Jerez de la Frontera"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-31201": {
+      "canonical_name": "Pamplona",
+      "request_parameters": {
+        "id": 3114472
+      },
+      "expected_provider_id": 3114472,
+      "accepted_names": [
+        "Pamplona"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-24089": {
+      "canonical_name": "León",
+      "request_parameters": {
+        "id": 3118532
+      },
+      "expected_provider_id": 3118532,
+      "accepted_names": [
+        "León"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-26089": {
+      "canonical_name": "Logroño",
+      "request_parameters": {
+        "id": 3118150
+      },
+      "expected_provider_id": 3118150,
+      "accepted_names": [
+        "Logroño"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-40194": {
+      "canonical_name": "Segovia",
+      "request_parameters": {
+        "id": 3109256
+      },
+      "expected_provider_id": 3109256,
+      "accepted_names": [
+        "Segovia"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-08056": {
+      "canonical_name": "Castelldefels",
+      "request_parameters": {
+        "id": 3125897
+      },
+      "expected_provider_id": 3125897,
+      "accepted_names": [
+        "Castelldefels"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-11027": {
+      "canonical_name": "El Puerto de Santa María",
+      "request_parameters": {
+        "id": 2518207
+      },
+      "expected_provider_id": 2518207,
+      "accepted_names": [
+        "El Puerto de Santa María"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-17079": {
+      "canonical_name": "Girona",
+      "request_parameters": {
+        "id": 3121456
+      },
+      "expected_provider_id": 3121456,
+      "accepted_names": [
+        "Girona"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-12040": {
+      "canonical_name": "Castellón de la Plana/Castelló de la Plana",
+      "request_parameters": {
+        "id": 6356995
+      },
+      "expected_provider_id": 6356995,
+      "accepted_names": [
+        "Castellón de la Plana/Castelló de la Plana"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-28005": {
+      "canonical_name": "Alcalá de Henares",
+      "request_parameters": {
+        "id": 3130616
+      },
+      "expected_provider_id": 3130616,
+      "accepted_names": [
+        "Alcalá de Henares"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-43148": {
+      "canonical_name": "Tarragona",
+      "request_parameters": {
+        "id": 3108288
+      },
+      "expected_provider_id": 3108288,
+      "accepted_names": [
+        "Tarragona"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-05019": {
+      "canonical_name": "Ávila",
+      "request_parameters": {
+        "id": 3129136
+      },
+      "expected_provider_id": 3129136,
+      "accepted_names": [
+        "Ávila"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-10037": {
+      "canonical_name": "Cáceres",
+      "request_parameters": {
+        "id": 2520611
+      },
+      "expected_provider_id": 2520611,
+      "accepted_names": [
+        "Cáceres"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-06083": {
+      "canonical_name": "Mérida",
+      "request_parameters": {
+        "id": 2513917
+      },
+      "expected_provider_id": 2513917,
+      "accepted_names": [
+        "Mérida"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-03065": {
+      "canonical_name": "Elche",
+      "request_parameters": {
+        "id": 2518559
+      },
+      "expected_provider_id": 2518559,
+      "accepted_names": [
+        "Elche"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-11004": {
+      "canonical_name": "Algeciras",
+      "request_parameters": {
+        "id": 2522013
+      },
+      "expected_provider_id": 2522013,
+      "accepted_names": [
+        "Algeciras"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29084": {
+      "canonical_name": "Ronda",
+      "request_parameters": {
+        "id": 2511730
+      },
+      "expected_provider_id": 2511730,
+      "accepted_names": [
+        "Ronda"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
     },
     "ES-25120": {
       "canonical_name": "Lérida",
@@ -15,7 +558,22 @@
         "Lérida",
         "Lleida"
       ],
-      "reason": "Forecast uses Lérida; current uses Lleida"
+      "reason": "Forecast uses Lérida; current uses Lleida",
+      "request_parameters": {
+        "id": 3118514
+      },
+      "expected_provider_id": 3118514
+    },
+    "ES-06015": {
+      "canonical_name": "Badajoz",
+      "request_parameters": {
+        "id": 6355880
+      },
+      "expected_provider_id": 6355880,
+      "accepted_names": [
+        "Badajoz"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
     },
     "ES-27028": {
       "canonical_name": "Lugo",
@@ -27,6 +585,346 @@
         "Lugo"
       ],
       "reason": "Use verified city ID 3117814; coordinate requests do not identify the intended city reliably."
+    },
+    "ES-02003": {
+      "canonical_name": "Albacete",
+      "request_parameters": {
+        "id": 2522258
+      },
+      "expected_provider_id": 2522258,
+      "accepted_names": [
+        "Albacete"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-03018": {
+      "canonical_name": "Altea",
+      "request_parameters": {
+        "id": 2521804
+      },
+      "expected_provider_id": 2521804,
+      "accepted_names": [
+        "Altea"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-16078": {
+      "canonical_name": "Cuenca",
+      "request_parameters": {
+        "id": 3124132
+      },
+      "expected_provider_id": 3124132,
+      "accepted_names": [
+        "Cuenca"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-44216": {
+      "canonical_name": "Teruel",
+      "request_parameters": {
+        "id": 3108126
+      },
+      "expected_provider_id": 3108126,
+      "accepted_names": [
+        "Teruel"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-13034": {
+      "canonical_name": "Ciudad Real",
+      "request_parameters": {
+        "id": 2519402
+      },
+      "expected_provider_id": 2519402,
+      "accepted_names": [
+        "Ciudad Real"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-42173": {
+      "canonical_name": "Soria",
+      "request_parameters": {
+        "id": 3108681
+      },
+      "expected_provider_id": 3108681,
+      "accepted_names": [
+        "Soria"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-32054": {
+      "canonical_name": "Ourense",
+      "request_parameters": {
+        "id": 3114965
+      },
+      "expected_provider_id": 3114965,
+      "accepted_names": [
+        "Ourense"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-19130": {
+      "canonical_name": "Guadalajara",
+      "request_parameters": {
+        "id": 3121070
+      },
+      "expected_provider_id": 3121070,
+      "accepted_names": [
+        "Guadalajara"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-36038": {
+      "canonical_name": "Pontevedra",
+      "request_parameters": {
+        "id": 3113209
+      },
+      "expected_provider_id": 3113209,
+      "accepted_names": [
+        "Pontevedra"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-29015": {
+      "canonical_name": "Antequera",
+      "request_parameters": {
+        "id": 2521710
+      },
+      "expected_provider_id": 2521710,
+      "accepted_names": [
+        "Antequera"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-34120": {
+      "canonical_name": "Palencia",
+      "request_parameters": {
+        "id": 3114531
+      },
+      "expected_provider_id": 3114531,
+      "accepted_names": [
+        "Palencia"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-24115": {
+      "canonical_name": "Ponferrada",
+      "request_parameters": {
+        "id": 3113236
+      },
+      "expected_provider_id": 3113236,
+      "accepted_names": [
+        "Ponferrada"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-49275": {
+      "canonical_name": "Zamora",
+      "request_parameters": {
+        "id": 3104342
+      },
+      "expected_provider_id": 3104342,
+      "accepted_names": [
+        "Zamora"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-10148": {
+      "canonical_name": "Plasencia",
+      "request_parameters": {
+        "id": 3113331
+      },
+      "expected_provider_id": 3113331,
+      "accepted_names": [
+        "Plasencia"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-23092": {
+      "canonical_name": "Úbeda",
+      "request_parameters": {
+        "id": 2510116
+      },
+      "expected_provider_id": 2510116,
+      "accepted_names": [
+        "Úbeda"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-03063": {
+      "canonical_name": "Denia",
+      "request_parameters": {
+        "id": 2518878
+      },
+      "expected_provider_id": 2518878,
+      "accepted_names": [
+        "Denia"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-03133": {
+      "canonical_name": "Torrevieja",
+      "request_parameters": {
+        "id": 2510253
+      },
+      "expected_provider_id": 2510253,
+      "accepted_names": [
+        "Torrevieja"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-04066": {
+      "canonical_name": "Níjar",
+      "request_parameters": {
+        "id": 2513222
+      },
+      "expected_provider_id": 2513222,
+      "accepted_names": [
+        "Níjar"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-04079": {
+      "canonical_name": "Roquetas de Mar",
+      "request_parameters": {
+        "id": 2511716
+      },
+      "expected_provider_id": 2511716,
+      "accepted_names": [
+        "Roquetas de Mar"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-11006": {
+      "canonical_name": "Arcos de la Frontera",
+      "request_parameters": {
+        "id": 2521665
+      },
+      "expected_provider_id": 2521665,
+      "accepted_names": [
+        "Arcos de la Frontera"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-11014": {
+      "canonical_name": "Conil de la Frontera",
+      "request_parameters": {
+        "id": 2519289
+      },
+      "expected_provider_id": 2519289,
+      "accepted_names": [
+        "Conil de la Frontera"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-11015": {
+      "canonical_name": "Chiclana de la Frontera",
+      "request_parameters": {
+        "id": 2519513
+      },
+      "expected_provider_id": 2519513,
+      "accepted_names": [
+        "Chiclana de la Frontera"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-17095": {
+      "canonical_name": "Lloret de Mar",
+      "request_parameters": {
+        "id": 3118212
+      },
+      "expected_provider_id": 3118212,
+      "accepted_names": [
+        "Lloret de Mar"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-18017": {
+      "canonical_name": "Almuñécar",
+      "request_parameters": {
+        "id": 2521847
+      },
+      "expected_provider_id": 2521847,
+      "accepted_names": [
+        "Almuñécar"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-21041": {
+      "canonical_name": "Huelva",
+      "request_parameters": {
+        "id": 2516548
+      },
+      "expected_provider_id": 2516548,
+      "accepted_names": [
+        "Huelva"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-22125": {
+      "canonical_name": "Huesca",
+      "request_parameters": {
+        "id": 3120514
+      },
+      "expected_provider_id": 3120514,
+      "accepted_names": [
+        "Huesca"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-23050": {
+      "canonical_name": "Jaén",
+      "request_parameters": {
+        "id": 2516395
+      },
+      "expected_provider_id": 2516395,
+      "accepted_names": [
+        "Jaén"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-43038": {
+      "canonical_name": "Cambrils",
+      "request_parameters": {
+        "id": 3126888
+      },
+      "expected_provider_id": 3126888,
+      "accepted_names": [
+        "Cambrils"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-43905": {
+      "canonical_name": "Salou",
+      "request_parameters": {
+        "id": 3110986
+      },
+      "expected_provider_id": 3110986,
+      "accepted_names": [
+        "Salou"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
+    },
+    "ES-46131": {
+      "canonical_name": "Gandia",
+      "request_parameters": {
+        "id": 2517367
+      },
+      "expected_provider_id": 2517367,
+      "accepted_names": [
+        "Gandia"
+      ],
+      "reason": "Provider city ID from genuine saved weather; verified by explicit ID request."
     }
+  },
+  "verification": {
+    "date": "2026-11-13",
+    "destinations": 83,
+    "products": [
+      "current",
+      "forecast"
+    ],
+    "successful_responses": 166,
+    "evidence": "Explicit-ID responses validated and saved in data/weather/weather_records.csv; names, country ES and proximity checked."
   }
 }
