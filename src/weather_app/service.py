@@ -188,11 +188,6 @@ class WeatherService:
                 pass
             return self.unsaved_record_count
 
-    def clear_cache(self) -> None:
-        """Forget in-memory results (stored records are untouched)."""
-        with self.__lock:
-            self.__cache.clear()
-
     # -- internals
 
     def _request(
@@ -208,7 +203,10 @@ class WeatherService:
                 "invalid_input", "force_refresh must be True or False."
             )
         place = destination.city
-        params = self.client.request_parameters(destination)
+        try:
+            params = self.client.request_parameters(destination)
+        except APIError as error:
+            return _failure(error.code, error.message)
         key = (kind, destination.city_id, tuple(sorted(params.items())))
 
         # Recover fetched data before any cache lookup or new HTTP request.
@@ -227,7 +225,7 @@ class WeatherService:
 
         if not force_refresh:
             try:
-                reused = self._reusable(kind, key, destination)
+                reused = self._reusable(kind, key, destination, params["id"])
             except StorageError as error:
                 return _storage_failure(
                     error, f"{place}: saved weather could not be read. {error}"
@@ -262,7 +260,7 @@ class WeatherService:
         return _result(records, from_cache=False)
 
     def _reusable(
-        self, kind: str, key: tuple, destination: Destination
+        self, kind: str, key: tuple, destination: Destination, provider_id: int
     ) -> list[WeatherRecord]:
         """Fresh records from memory, else the newest fresh group already in
         the store.
@@ -270,13 +268,13 @@ class WeatherService:
         now = self._clock()
         with self.__lock:
             cached = self.__cache.get(key)
-        if cached and self._is_fresh(kind, cached, now):
+        if cached and self._is_reusable(kind, cached, now, provider_id):
             return cached
         if kind == "forecast":
             stored = self.store.latest_forecast(destination.city_id)
         else:
             stored = self._latest_current(destination.city_id)
-        if stored and self._is_fresh(kind, stored, now):
+        if stored and self._is_reusable(kind, stored, now, provider_id):
             with self.__lock:
                 self.__cache[key] = stored
             return stored
@@ -288,9 +286,12 @@ class WeatherService:
             return []
         return [max(records, key=lambda record: record.retrieved_at_utc)]
 
-    def _is_fresh(
-        self, kind: str, records: Sequence[WeatherRecord], now: datetime
+    def _is_reusable(
+        self, kind: str, records: Sequence[WeatherRecord], now: datetime,
+        provider_id: int,
     ) -> bool:
+        if any(record.provider_city_id != provider_id for record in records):
+            return False
         retrieved_at = records[0].retrieved_at_utc
         age = max(timedelta(0), now - retrieved_at)
         if kind == "forecast":

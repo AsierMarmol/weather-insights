@@ -41,9 +41,6 @@ class APIError(Exception):
         super().__init__(message)
         self.message = message
 
-    def as_dict(self) -> dict[str, str]:
-        return {"code": self.code, "message": self.message}
-
 
 class InvalidInputError(APIError, ValueError):
     """The request was rejected before (or by) the provider as invalid input.
@@ -108,7 +105,7 @@ class RateLimiter:
 
     def __init__(
         self,
-        max_calls: int = 40,
+        max_calls: int = 55,
         period_s: float = 60.0,
         *,
         clock: Callable[[], float] = time.monotonic,
@@ -152,8 +149,8 @@ class RateLimiter:
             self._calls.popleft()
 
 
-# One queue for the whole process (WEATHER_API_CONTRACT.md: 40 calls/minute).
-OPENWEATHER_RATE_LIMITER = RateLimiter(max_calls=40, period_s=60.0)
+# One queue for the whole process (WEATHER_API_CONTRACT.md: 55 calls/minute).
+OPENWEATHER_RATE_LIMITER = RateLimiter(max_calls=55, period_s=60.0)
 
 
 # --- generic JSON API base
@@ -477,19 +474,19 @@ class OpenWeatherClient(JSONAPIClient):
         """The exact provider parameters (without the key) used for a
         destination.
 
-        Catalog coordinates are used unless a documented override requests a
-        verified provider city ID (Lugo). The service also uses these
-        parameters as part of its cache key.
+        Every project catalog destination has a verified provider city ID
+        in the shared mapping. Missing mappings fail before any request,
+        without falling back to ambiguous coordinates. The service uses
+        these parameters as part of its cache key.
         """
         self._require_destination(destination)
         override = self._overrides.get(destination.city_id, {})
         if "request_parameters" in override:
             params: dict[str, object] = dict(override["request_parameters"])
         else:
-            params = {
-                "lat": destination.latitude,
-                "lon": destination.longitude,
-            }
+            raise InvalidInputError(
+                "No verified provider city ID is configured for "
+                f"{destination.city}.")
         params["units"] = self.UNITS
         params["lang"] = self.LANGUAGE
         return params

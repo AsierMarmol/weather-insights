@@ -883,3 +883,1124 @@ Updated PHASE5, PHASE4, PROJECT_PHASES and README.
 
 
 **Pre-publication verification:** Final pre-publication rerun on 13 November 2026: 438 passed, 2 POSIX-only tests skipped in 88.18 seconds; Flake8 clean; isolated locked install, dependency check and source/wheel builds passed. All 75 local Markdown links resolve. The frozen data contains 8,004 records across all 83 destinations; all 6,644 rows in the previous commit remain intact, with 1,360 additional genuine forecast records. No live API requests were made.
+
+---
+
+## Phase 4 extension and delivery development record
+
+The following entries continue Weather Insights from the reviewed application
+with the Canva-inspired interface, revised analytics and delivery preparation.
+They are professional summaries of the actual requests and follow-up decisions,
+not verbatim prompts. The published history above is unchanged.
+
+### Reading order
+
+| Step | Development work and rationale | Detailed record |
+| --- | --- | --- |
+| 1 | Integrate the Canva HTML/visual reference with real project data; establish the baseline and six implementation checkpoints | [Canva integration](#phase-4-p45-canva-integration-and-executive-redesign-2026-11-13) |
+| 2 | Build shared styling, Landing/navigation and compact Searcher cards; keep a shortlist and complete ranking | [Visual foundation](#phase-4-p45-canva-integration-and-executive-redesign-2026-11-13), [recommendations](#phase-4-p45-compact-canva-style-recommendations-2026-11-13) |
+| 3 | Build the executive Dashboard, automatic loading, daily table, all-destination catalogue and consistent travel units | [Automatic overview](#phase-4-p45-automatic-dashboard-overview-2026-11-13), [heatmap](#phase-4-p45-table-style-daily-weather-heatmap-2026-11-13), [catalogue](#phase-4-p45-complete-destination-catalogue-2026-11-13) |
+| 4 | Improve map presentation, attribution, daily ordering and concise tooltips; remove duplicate analytical panels | [Map](#phase-4-p45-openstreetmap-dashboard-map-2026-11-13), [tooltips](#phase-4-p45-concise-visualization-tooltips-2026-11-13) |
+| 5 | Replace binary thresholds with gradual seasonal/personal scoring, preferred-condition categories and driving penalties | [Scoring decisions](#phase-4-p45-seasonal-and-preferred-condition-scoring-2026-11-13) |
+| 6 | Resolve provider district mismatches and verify the identity of every destination | [Response diagnosis](#phase-4-p45-partial-weather-response-validation-failure-2026-11-13), [83 mappings](#phase-4-p45-complete-verified-provider-mapping-2026-11-13) |
+| 7 | Agree one score per view; align cards, ranks, colours, scatter and heatmap; replace threshold-count KPIs with averages | [Two-score alignment](#phase-4-p45-unify-displayed-scores-and-dashboard-consistency-2026-11-13), [average KPIs](#phase-4-p45-average-rain-and-wind-2026-11-13) |
+| 8 | Recover from forecast-window reloads, reuse full forecasts, scope warnings correctly and adjust the shared request cap | [Window recovery](#phase-4-p45-forecast-window-reload-recovery-2026-11-13), [request cap](#phase-4-request-cap-adjustment-2026-11-14) |
+| 9 | Validate real behaviour and error paths, run controlled stress simulations, remove unused code and preserve reproduction helpers | [Checkpoint 6](#phase-4-p45-checkpoint-6-validation-and-documentation-2026-11-13), [semantic checks](#phase-45-semantic-consistency-and-test-quality-audit-2026-11-14), [cleanup](#phase-45-remove-unused-code-and-preserve-reproduction-2026-11-14) |
+| 10 | Prepare source/setup/delivery documentation, complete provider-reuse checks and prepare accurate review evidence | [P6.1](#phase-6-p61-delivery-documentation-preparation-2026-11-14), [provider follow-up](#phase-5-provider-identity-reuse-and-diagnostic-acceptance-2026-11-14) |
+
+Entries below retain the development sequence, including superseded choices,
+defects, corrections and checks at the time. Current formulas live in
+[SCORING.md](SCORING.md), implementation checkpoints in
+[Phase 4](PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign), and the
+latest test evidence in [Phase 5](PHASE5_QUALITY_REVIEW.md#provider-identity-and-diagnostic-follow-up--14-november-2026).
+Historical test counts and pending reviews are not fresh results or approvals.
+The requester confirmed the final preview on 14 November; peer review and
+publication of these additions remain pending. Phone/Mac checks were later
+excluded from this audit; earlier requests for those checks are retained as
+historical context, not completed acceptance.
+
+---
+
+## Phase 4: P4.5 Canva integration and executive redesign (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Extend Weather Insights with the complete Canva-inspired redesign,
+working through validated Phase 4 checkpoints. Use the HTML
+and desktop/mobile references for presentation only; derive all content from
+the existing project data, rules and teacher guidance. Reuse components, resolve
+gaps without unnecessary complexity, preserve genuine history, and present the
+result and proposed commit grouping before committing or pushing.
+
+The supplied [Canva website](https://antelope-cr6jd3.my.canva.site/), HTML
+and desktop/phone references describe the
+desired presentation, not a replacement application or a weather dataset.
+The adaptation therefore connects native Streamlit controls and existing
+Python services to the reference layout. Its example cities, temperatures,
+scores and seasonal range are not imported as real results. Season comes
+from the Madrid date and the existing validated seasonal reference.
+The planned sequence is baseline and data gaps, shared calculations, visual
+foundation, Landing/Searcher, executive Dashboard, then validation.
+Desktop/mobile references informed the layout; they are not evidence that
+either platform passed a visual test.
+
+**Got:** Added a shared date-derived season helper, executive summaries, driving
+groups and daily forecast slices using the existing scoring engine. Retained
+the saved forecast batch for consistent daily aggregation. Added theme/CSS,
+local credited hero imagery, Landing navigation and redesigned Searcher and
+Dashboard presentation. Kept all 83 map destinations, removed Dashboard filters,
+preserved comparison/simultaneous-preference analytics and added the all-place
+table. Fixed nullable ranks discovered by integration tests. A live provider
+issue returned Eixample for Barcelona; verified explicit city ID 3128760 and
+added a strict override without accepting a district alias. Updated affected
+specification, phase and delivery documents; Phase 1/history remain intact.
+
+**Checked:** Baseline 438 passed / 2 platform skips; focused calculation run
+70 passed; affected integration run 72 passed after the nullable-rank fix.
+The initial live AppTest load saved 3,280 genuine records and ranked 82/83;
+Searcher reused 82 batches without duplicating saves. Original 8,004 records
+remained byte-for-byte as the CSV prefix. The Barcelona ID follow-up validated
+and saved 40 periods. Further final snapshot checks are recorded below. The
+user confirmed active local app use; preserve their incoming records and use
+an isolated snapshot for tests. Computer Use stopped because browser URL
+identification was unreliable; no browser visual pass is claimed.
+
+**Kept / changed / rejected:** Kept course OOP/package structure, dotenv,
+existing temperatures/thresholds, Searcher scoring, forecast validation and
+save path. Rejected template weather, duplicate scoring formulas, invented
+coverage, relaxed city identity and false authorship. New charts compute from
+genuine saved data; synthetic inputs stay in tests. Google fonts have fallback
+fonts and the hero is stored locally. UI selector compatibility still needs
+desktop/mobile review on the pinned Streamlit version.
+
+**Human review:** Pending. Asier is the actual requester. Selin, Christian and
+Gabriel are proposed reviewers for their respective areas, not asserted authors
+or approvers. Live browser, Mac and clean-clone delivery gates remain visible.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+**Final checkpoint:** Credential-free isolated Windows suite: **454 passed,
+2 POSIX-only skips in 54.68 seconds**. Flake8, locked install/dependency checks,
+source/wheel builds, 83 local documentation links and key-exclusion scan passed.
+The first full redesign validation run identified remaining legacy initial-navigation and
+Barcelona-request test assumptions; corrected them without removing their
+security/error assertions, and included HTML output in the secret checks.
+Fresh saved-data replay after the Barcelona fix gave 83/83 for 1, 3 and 5 days
+and 415/415 daily cells over five days. Frozen data: 11,324 records, all original
+8,004 retained, SHA256
+`70e161e45f722b257859fb3de3d7d3722a12984059274d0382ee76c01b5762ff`.
+User collection may continue beyond that snapshot. Browser visual parity,
+phone interaction, Mac verification and human approval remain pending.
+No files were staged, committed or pushed.
+
+
+## Phase 4: P4.5 automatic Dashboard overview (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Make the Dashboard weather overview load automatically in the
+application, preserving real-data validation, caching and safe retries.
+
+**Got:** Added automatic loading on first Dashboard opening and forecast-window
+changes. Retained Refresh for manual updates/retries. Recorded attempted windows
+in session state to avoid repeated requests on ordinary reruns and return
+navigation. Failed changes retain the last successful snapshot and its warning.
+Updated the active README and phase definitions, keeping historical evidence.
+
+**Checked:** 94 focused offline UI tests passed, including first opening, window
+changes using saved batches without new HTTP or duplicate saves, failure-loop
+prevention, manual retry and preserving the previous snapshot. Final isolated
+Windows suite: 457 passed, 2 POSIX-only skips. Project Flake8 and git diff
+whitespace checks passed. The first verification copy was stale; it was synced
+before these final checks. Tests used an isolated dataset, not the user's
+actively growing live CSV. No new live API or browser visual pass is claimed.
+
+**Kept / changed / rejected:** Kept the existing service, freshness rules,
+seasonal criteria, weather-only ranks and Searcher's explicit Search action.
+Changed only Dashboard load triggers. No background polling or automatic
+failure retry loop was added. Real weather records and local secrets preserved.
+
+**Human review:** Pending; confirm first opening, day changes and manual retry
+in the running preview. Browser/mobile and Mac acceptance remain pending.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 compact Canva-style recommendations (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Adapt the Trip Searcher results to the supplied Canva reference:
+compact numbered destination cards with labeled facts instead of large metric
+panels, using the project's real catalog and forecast results. The design
+places the destination and rank first, then compact travel and activity
+facts. Detailed comparisons remain available without repeating the shortlist.
+The following Top 10 removal records the subsequent choice to retain only
+five recommendation cards plus the complete ranking.
+
+**Got:** Added white cards with gold ranks, location subtitles and pale-green
+departure/region/activity/size/driving/trip-fit labels. Added the personalized
+selection heading and actual searched-window badge. Top-ten cards and the full
+ranking are expandable. Shared CSS wraps the labels at narrow widths.
+
+**Checked:** 83 affected offline Searcher, integration, redesign and API-security
+tests passed. Updated score assertions to read the rendered cards and compare
+them with the unchanged full ranking and genuine historical examples. Project
+Flake8 and git diff whitespace checks passed after formatting cleanup. Tests
+ran against an isolated dataset; no live fetch or visual parity pass is claimed.
+
+**Kept / changed / rejected:** Kept ranking formulas, filters, available-city
+rules, genuine data and safe failure handling. Changed presentation only.
+Detailed weather metrics and forecast coverage remain in the full ranking;
+template values were not copied into application data.
+
+**Human review:** Pending desktop/mobile comparison with the supplied reference.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+### P4.5 review adjustment: remove duplicate recommendations (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Remove the Top 10 destinations section because the top five
+recommendation cards already provide the intended shortlist.
+
+**Got:** Removed the duplicate expander and updated the README and P4.5 notes.
+
+**Checked:** Confirmed the Top 10 render block is absent and the top-five cards
+and full-ranking expander remain. Git diff whitespace check passed. No tests
+rerun for this removal of a presentation-only block.
+
+**Kept / changed / rejected:** Preserved scores, data, top five and full ranking.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 table-style daily weather heatmap (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Match the supplied destination-by-day heatmap reference with a
+compact table, destination labels, visible daily scores and green cell shading.
+
+**Got:** Replaced the Plotly heatmap with an accessible HTML table styled to
+the reference. All catalog destinations remain; day columns follow the selected
+window. Added fixed headers/row labels, scrolling, visible scores and grey
+unavailable cells. Retained cell time/coverage/reason descriptions and the
+missing-data explanation table. Removed the superseded chart rendering code.
+
+**Checked:** 83 affected offline UI, analytics and integration tests passed in
+42.05 seconds, including all-83 row/day coverage and unavailable-cell behavior.
+Project Flake8 and git diff whitespace checks passed. Tests used the isolated
+dataset, without live API requests. No visual pixel-parity pass is claimed.
+
+**Kept / changed / rejected:** Changed presentation only. Kept the genuine
+forecast inputs, daily scoring, selected window and explicit missing data;
+did not import the reference image's example scores.
+
+**Human review:** Pending desktop/mobile comparison in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 complete destination catalogue (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Expand the All 83 destinations table to include every field shown
+in the supplied reference, using actual project data and forecast freshness.
+
+**Got:** Added weather score, forecast window, temperature, rain, wind,
+activities and driving estimates in reference order. Included window dates,
+retrieval time, age, freshness, rank, region, size, coverage and unavailable
+reasons. Kept native sorting and pinned destination names for horizontal scroll.
+
+**Checked:** 71 affected offline Dashboard, redesign and integration tests
+passed. Extended partial-data assertions to verify all 83 destinations remain,
+the requested columns exist, and missing weather is not replaced with zero.
+Corrected a missing import in the first assertion version by using the existing
+DataFrame missing-value check. Project Flake8 and diff whitespace checks passed.
+Tests ran in the isolated copy; no live data changes or visual pass are claimed.
+
+**Kept / changed / rejected:** Presentation only; existing scoring and cache
+behavior retained. Used Next N days to describe the actual rolling window;
+rain/wind are labeled as maximum daytime-slot values, temperature as the mean.
+No reference-image values were added to the real dataset.
+
+**Human review:** Pending in the local desktop/mobile preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 hours-and-minutes presentation (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Convert displayed minute-based durations throughout the app into
+hours and minutes, such as 4:30, including driving bands and destination tables.
+
+**Got:** Added shared duration formatting for cards, tables, map details and
+forecast ages. Tables use h:mm labels and consistently padded hours so sorting
+remains chronological. Ages over 24 hours retain total hours; missing values
+remain missing. Source data and all scoring/threshold calculations are unchanged.
+
+**Checked:** 95 affected offline tests passed in 43.58 seconds, including 61,
+270, 409 and 1,501 minutes, missing values, and sorting beyond 100 hours.
+Project Flake8 and diff whitespace checks passed after formatting cleanup.
+Tests used an isolated copy and did not alter live weather records.
+
+**Kept / changed / rejected:** Presentation changed; minute-based CSV/model
+fields, driving penalties, cache ages and band boundaries retained. No numeric
+time was relabeled as hours without conversion.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4/5: full redesign and reproducibility validation (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Validate the entire current redesign against the project outline and
+teacher requirements. Ensure calculations are shared and testable, documentation
+matches the implemented behavior, and teammates can reproduce the published
+version from GitHub rather than relying on local visual changes.
+
+**Got:** Audited calculation ownership, instructor requirements, package/assets,
+data and setup instructions. Corrected stale manual-load/filter instructions,
+credential timing, phase status framing and redesigned P6.2 acceptance steps.
+Recorded current evidence and remaining human/platform/publication gates in
+Phase 5. Existing application logic required no change in this audit.
+
+**Checked:** Fresh credential-free snapshot and new locked environment; local
+package import, dependency check, 458 passing tests with 2 POSIX-only Windows
+skips, project lint, source/wheel builds and HTTP 200 startup health. Verified
+42 implementation/asset/reference hashes, 83 local document links, configured
+key exclusion and 11,324 genuine records across 83 destinations with committed
+history retained. No active dataset modifications or new live API requests.
+
+**Kept / changed / rejected:** Kept source units, shared scoring, OOP, storage,
+genuine history, phase ownership and actual AI attribution. Updated current
+documentation rather than rewriting historical evidence. Rejected treating an
+uncommitted snapshot as a reviewed GitHub clean clone or claiming human/visual
+acceptance from automated test counts.
+
+**Human review:** Pending desktop/mobile, Mac and reviewer evidence. P6.2 and
+P6.3 remain open; teammates need the reviewed published version to reproduce it.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 average-day ordering and Dashboard simplification (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Sort the daily weather heatmap from the highest average across days
+to the lowest, and remove the Weather comparison and all preferences met
+section. Defer publication until review.
+
+**Got:** Added independently testable daily mean ordering in executive.py and
+a visible average column. Labeled partial coverage, excluded missing days and
+placed no-data destinations last. Removed the legacy tabs and unused chart
+renderers; updated current specifications, README and delivery checks.
+
+**Checked:** Full isolated suite: 455 passed, 2 POSIX-only Windows skips in
+57.59 seconds. Lint/diff checks passed after formatting cleanup. Corrected new
+synthetic test IDs to match the existing ES-00000 model contract. Five obsolete
+chart-only tests were retired, two mean/order tests added, and integration
+checks migrated to real remaining views without dropping core error/data tests.
+No new live request or screenshot acceptance is claimed.
+
+**Kept / changed / rejected:** Preserved weather formulas, whole-window ranking,
+source data and persistence. Remaining analytical views span comparisons and
+derived metrics; the map and scatter still supply two real-data charts.
+Partial daily averages are explicit rather than treating missing days as zero.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+## Phase 4: P4.5 OpenStreetMap dashboard map (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Adapt the Dashboard map to the supplied OpenStreetMap visual
+reference, using actual project destinations and weather data. Defer commits and publication until review.
+
+**Got:** Replaced Scattergeo with an OSM raster background through existing
+Plotly/MapLibre. Added bordered green/grey destination circles, a separate
+blue Madrid origin, zoom/reset controls, a rounded map panel and visible OSM
+credit. Escaped catalogue text in hover content and aligned current map
+documentation and acceptance checks.
+
+**Checked:** Reviewed official OSM copyright/tile policy and Plotly map
+documentation. Targeted tests: 74 passed. Full isolated suite: 455 passed,
+2 POSIX-only Windows skips in 57.66 seconds; Flake8 passed. Tests check the
+tile style/attribution, 83 destination markers, separate origin coordinates
+and existing data/error behavior. Browser/mobile visual review is pending.
+
+**Kept / changed / rejected:** Preserved real source data, scores, weather
+requests and storage. Reused existing dependencies without a new map key.
+Madrid is a blue circle rather than the template's exact teardrop icon.
+Tile requests use browser caching; no bulk/offline tile download was added.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+## Phase 4: P4.5 concise visualization tooltips (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Keep hover information relevant and concise across visualizations.
+Use the existing weather-score-versus-driving-time tooltip as the reference
+and retain its useful details. Preserve the three-hour freshness behavior.
+
+**Got:** Simplified map and heatmap tooltips, retaining comparison essentials
+and plain missing-data explanations. Kept the approved scatter's city, score,
+driving time/distance and rank, formatting driving duration as h:mm. Full
+metadata remains in the catalogue. No automatic refresh timer was introduced.
+
+**Checked:** Existing isolated map/UI/integration tests: 67 passed. Rechecked
+the final scatter/heatmap presentation: 1 passed. Flake8 clean. No live API
+request or active weather-file write was performed by these checks.
+
+**Kept / changed / rejected:** Kept calculations, forecast caching, data
+storage and shared units. Removed redundant map metadata and heatmap slot
+diagnostics from hover only; retained date boundaries to explain rolling days.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 seasonal and preferred-condition scoring (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Implement the agreed seasonal Dashboard and personalized Trip
+Searcher scoring throughout Weather Insights. Use gradual temperature,
+rain and wind components, modest Dashboard cloud weighting, desired-condition
+categories, worst-quarter aggregation and driving penalties. Align all affected
+views, specifications and phase records; run the full tests and repository
+checks. Defer commits and publication until review.
+
+The original pass/fail thresholds made nearby temperatures look too
+different and left several displayed scores difficult to interpret. The
+discussion considered a fixed year-round temperature curve and weather-only
+Dashboard ranking, then agreed seasonal Dashboard bands and a driving-time
+penalty in both views. Rain and wind selections express conditions actively
+preferred, including Medium and High rain, rather than maximum tolerances.
+Wind uses gradual interpolation; cloud has a small Dashboard contribution,
+and humidity is retained in data without its own score. Searcher excludes
+cloud to avoid contradicting a preference for rain. An 80/20 mean and
+worst-quarter aggregation rewards consistent conditions. SCORING.md owns
+the precise weights, boundaries and capped driving-time deduction. These
+are agreed product preferences, not an objective weather-safety index.
+
+**Got:** Added a pure shared scoring module and validated preference modes;
+updated analytics, category controls, rankings, summaries, map, scatter, heatmap
+and catalogue labels. Added scoring-version result invalidation while retaining
+service recovery state. Created SCORING.md and aligned README, API/reference
+documentation and affected phase records. Preserved the existing weather CSV
+schema, real data, three-hour cache policy and package/OOP structure.
+
+**Checked:** Full isolated suite: 486 passed, 2 POSIX-only skips on Windows.
+Flake8 and dependency checks passed; source/wheel packaging succeeded; isolated
+Streamlit startup health returned HTTP 200. Independent frozen-data calculations
+verified scores, including Low-rain/Moderate-wind cards. Tests cover missing
+fields, season/category boundaries, ties, travel caps, fresh data, mode/state
+separation and persistence recovery. Audited all 83 destinations, required
+latest-forecast fields, preservation of 11,324 genuine records, local Markdown
+links and credential exclusions. No new live API request or active weather-file
+write was performed by validation. Browser/mobile and Mac checks remain pending.
+
+**Kept / changed / rejected:** Kept actual contribution attribution and dated
+historical records. Replaced binary scoring and maximum-only UI semantics with
+the approved continuous model. Dashboard now includes driving in its general
+score; pre-driving weather comfort remains separately visible. Missing fields
+are not invented and weights are not redistributed. No additional dependency,
+background polling service or production data migration was introduced.
+
+**Human review:** Pending in the application preview; automated results do not claim
+peer approval or completion of manual acceptance.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 partial weather-response validation failure (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Investigate the Searcher warning that a weather response could not
+be validated, while preserving usable results and the agreed scoring behavior.
+
+**Got:** Identified Valladolid's coordinate response as Delicias. Verified and
+configured provider city ID 3106672; retained name/country/proximity checks.
+Named cities in safe partial-failure warnings and corrected the result caption
+to show preferred rain/wind categories. Documented evidence and restart needs.
+
+**Checked:** Two live forecast requests: coordinate response rejected; explicit
+ID response validated and its 40 genuine records saved. A read-only five-day
+analysis passed with 15/15 daytime slots. Full isolated suite: 489 passed,
+2 Windows POSIX skips; Flake8 passed. Tests cover wrong identities, safe city
+warnings, continued partial results and saved preference labels. No key exposed.
+
+**Kept / changed / rejected:** Kept catalog coordinates, genuine records,
+scoring and validation safeguards. Did not accept Delicias as a city alias or
+invent weather. Tests used isolated data; only the validated live fetch appended
+production records through WeatherStore.
+
+**Human review:** Pending after restarting the local app and repeating search.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 complete verified provider mapping (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Extend the existing verified city-ID mapping to all 83 destinations
+to prevent coordinate requests returning neighbouring districts. The earlier
+Barcelona/Eixample and Valladolid/Delicias failures showed that changing
+display names or accepting a nearby district would hide the identity error.
+Reuse the existing mapping reference instead of creating another catalogue
+or weakening validation. Verify the
+mapping, save genuine successful responses and add regression coverage.
+
+**Got:** Populated the existing reference JSON with unique provider IDs from
+saved evidence, verified on both endpoints. Enforced ID consistency/uniqueness;
+missing mappings now fail without coordinate fallback. Updated test doubles,
+the diagnostic script, reference/API docs and affected phase logs.
+
+**Checked:** 166/166 live current/forecast responses validated; 3,403 genuine
+records saved with real timestamps through the existing paced service/store.
+Prior records were preserved. Full isolated suite: 494 passed, 2 POSIX-only skips on Windows; Flake8 passed.
+Checks cover all catalog IDs, outgoing parameters, wrong IDs, missing mappings,
+duplicate/conflicting configuration, safe partial failures and historical data.
+The local key was used without disclosure; app refreshes were paused for writes.
+
+**Kept / changed / rejected:** Kept catalog coordinates/names/routes, raw CSV
+schema, scoring, prior observations and reviewed aliases. Reused existing JSON,
+client and persistence code; no new dependency or database. Historical provider
+IDs remain historical rather than being overwritten. District mismatches are
+not silently accepted and availability is not guaranteed against API outages.
+
+**Human review:** Pending after restarting the local preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 simplify Searcher ranking details (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Confirm that recommendation cards match the ranking table, then
+remove the strict all-preferences percentage and both daytime-slot columns
+from the Searcher display.
+
+**Got:** Removed those three table columns and their formatting; aligned the
+README, scoring specification and Phase 2/4 descriptions. Kept final trip score
+and preference match, with unavailable statuses and reasons.
+
+**Checked:** Existing isolated Searcher and full app integration tests:
+38 passed; Searcher lint passed. Card/table final scores share the same rows.
+No new live weather request or production data write was performed.
+
+**Kept / changed / rejected:** Display-only simplification. Kept analytical
+diagnostics, ranking formulas, strict completeness checks and stored data.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 align score terminology throughout the app (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Explain whether Preference match and Trip fit are identical and
+align score terminology across cards, tables, explanations and documentation.
+
+**Got:** Renamed the Searcher final-score column to Trip fit /100, matching
+its cards; retained Preference match /100 for weather before driving. Added
+a concise explanation. Aligned Dashboard captions with Destination score
+and Weather comfort, and documented the four terms in SCORING.md.
+
+**Checked:** 59 affected isolated Searcher/integration/presentation/summary
+tests passed. Lint passed after a line-wrap correction. Checked that removed
+diagnostic columns remain absent and user-facing Score /100/Trip score wording
+is replaced in Searcher. No live API request or production-data write.
+
+**Kept / changed / rejected:** Wording only. Preserved exact scoring, ordering,
+stable internal result fields and the distinction between personalized Searcher
+preferences and the Dashboard's shared seasonal assessment.
+
+**Human review:** Pending after clicking Rerun in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 remove Searcher Status column (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Remove the Status column from the Searcher ranking table.
+
+**Got:** Removed the column; unavailable explanations now appear as conditional
+captions below the table. Updated README, scoring documentation and phase log.
+
+**Checked:** Existing isolated Searcher/app integration tests: 38 passed;
+lint passed. Partial-failure checks still verify usable results and reasons.
+
+**Kept / changed / rejected:** Display only; scoring, validation and raw data
+unchanged. No API requests or production data writes.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 clearer map score colours (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Make map score differences easier to distinguish, with green for
+highly recommended destinations and red at zero, using clear ranges.
+
+**Got:** Added five fixed red-to-green Destination score bands, a horizontal
+numeric legend and range caption. Kept grey unavailable and blue Madrid.
+Updated README, SCORING.md and the phase record.
+
+**Checked:** Existing isolated Dashboard/presentation tests: 56 passed;
+lint passed. Tests exercise map serialization and all-destination rendering.
+Desktop/mobile visual review remains pending; no live weather request.
+
+**Kept / changed / rejected:** Colour/legend changes only. Preserved final
+scores, driving penalties, ranking, map coordinates and source data. Numeric
+hover and legend support interpretation without relying on colour alone.
+
+**Human review:** Pending in the application preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 unify displayed scores and Dashboard consistency (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Apply the agreed two-score contract: personal Trip score in Searcher
+and standard Destination score across Dashboard, both including driving time.
+Ensure views of the same city/window agree and avoid duplicate score logic.
+
+Earlier iterations exposed Preference match, Weather comfort and Trip fit
+alongside final scores. Comparing a pre-driving scatter value with a
+post-driving card made the figures appear inconsistent. The agreed outcome
+is exactly one public score in each view: Trip score reflects personal
+preferences and driving; Destination score reflects standard seasonal
+criteria and driving. They may differ between views. Within Dashboard,
+the map, top five, scatter, driving groups and catalogue share the same
+whole-window result. Daily heatmap cells evaluate their own labelled day;
+their mean need not equal the whole-window score. Intermediate calculations
+remain internal and independently testable.
+
+**Got:** Removed extra pre-driving score columns; aligned cards, tables,
+scatter and explanations. Daily heatmap cells now include driving using the
+same engine. Consolidated competition ranks in analytics.destination_ranks;
+fixed the scatter score axis at 0–100 and disallowed negative driving time.
+Versioned session invalidation prevents old daily results mixing with new ones.
+Updated the canonical specification, README and affected phase records.
+
+**Checked:** Full isolated suite: 499 passed, 2 Windows POSIX skips; lint passed.
+Genuine-data checks verify all Dashboard views across 1–5-day windows and exact
+one-day heatmap/overview equality. Independent formula and partial-failure tests
+remain. No live API request, production-data write or synthetic data insertion.
+
+**Kept / changed / rejected:** Kept approved weather weights, whole-window
+scores, travel penalty, saved-data source, personal/standard mode separation and
+strict missing-data rules. Removed display ambiguity and duplicate ranking;
+did not remove useful isolated tests or add alternative scoring formulas.
+
+**Human review:** Pending after Rerun; daily periods can differ from the
+whole-window score and are labelled accordingly.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 top-five wind warning (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Show the high-wind warning only when affected destinations appear
+among the Searcher's top five recommendations.
+
+**Got:** The warning and recommendation cards now use the same selected rows.
+The message counts only affected top recommendations; lower-ranked results
+do not trigger it. The 39 km/h threshold and scoring remain unchanged.
+
+**Checked:** 28 Searcher tests passed in the isolated copy, including the
+fifth-result and sixth-result boundary cases without additional API calls.
+
+**Kept / changed / rejected:** Kept all results and forecasts; changed only
+the scope and wording of the warning.
+
+**Human review:** Pending browser rerun.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+## Phase 4: P4.5 average rain and wind (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Replace the rain-above-preference and wind-above-preference counts
+with average weather values across all 83 Dashboard destinations.
+
+**Got:** Added per-destination daytime rain-probability and wind-speed means
+to shared analytics. Executive KPIs and the decision summary use equal-weight
+averages across available destinations in the selected forecast window.
+Cards show percent or km/h and explicit contributing coverage. Missing data
+is excluded rather than treated as zero. Updated README, scoring specification
+and Phase 4 notes; session invalidation refreshes the new analytics fields.
+
+**Checked:** Full isolated suite: 501 passed, 2 platform skips; lint passed.
+Independent numeric expectations distinguish averages from maxima and verify
+partial/no-data behavior. No live API calls or changes to genuine weather data.
+
+**Kept / changed / rejected:** Kept both scoring formulas, rankings, full
+catalogue and Searcher warning behavior. Replaced the two threshold-count KPIs.
+
+**Human review:** Pending browser rerun.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 forecast-window reload recovery (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Fix invalid-settings errors when changing Dashboard forecast days.
+Keep the full five-day forecast and locally calculate the selected 1–5 days
+in either view, reusing fresh saved data.
+
+**Got:** Reproduced an obsolete session service rejecting current Destination
+classes after Python modules reload. The shared service getter now recreates
+that service safely. Unsaved records are retried first and retained if saving
+fails; safe storage guidance is displayed. No scoring or API-window changes.
+
+**Checked:** Isolated full suite: 504 passed, 2 platform skips; lint passed.
+Window transitions 3→2→1→3→4→5→2 retain all 83 destinations, reuse saved
+forecasts and make no additional requests or weather-file writes. A separate
+offline module-reload reproduction rejected valid cities before the fix and
+accepted all 83 afterwards. Pending-save success/failure cases are covered.
+
+**Kept / changed / rejected:** Kept full provider forecasts, three-hour reuse,
+analytics window selection and previous snapshots on real loading failures.
+Changed session-service compatibility handling rather than weakening checks.
+
+**Human review:** Pending rerun and refresh of the existing browser session.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 remove high-wind banner (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Remove the high-forecast-wind warning banner from the Dashboard.
+
+**Got:** Removed that Dashboard banner and its unused count. Searcher's
+top-five warning, wind averages, forecast data and scoring remain unchanged.
+
+**Checked:** Confirmed removal of the matching rendering block. No separate
+test count was recorded for this presentation change. Subsequent integrated
+validation is recorded in [checkpoint 6](#phase-4-p45-checkpoint-6-validation-and-documentation-2026-11-13);
+that later run is not presented as a test performed during this removal.
+
+**Kept / changed / rejected:** Changed only the requested Dashboard message.
+
+**Human review:** Pending browser rerun.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: P4.5 checkpoint 6 validation and documentation (2026-11-13)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Complete validation of the redesigned application before moving
+forward. Consolidate the Phase 4 extension and affected documentation, check
+alignment with the assignment, run the full suite and bounded failure/load
+simulations, and inspect the running app in VS Code. Keep genuine data and
+credentials safe; do not commit or push. Exclude phone and Mac checks from
+this audit, as subsequently requested.
+
+**Got:** Consolidated current scope/scoring/progress/delivery documentation and
+provenance. Corrected an obsolete Dashboard criteria caption, clarified maximum
+catalogue rain/wind labels, adapted KPI columns to preview width and fixed false
+changed-settings notices after class reload. Added three isolated stress tests
+and a reload regression. Kept existing failure tests rather than duplicating
+their coverage. Phase 5 records exact checks, limits and next dependencies.
+
+**Checked:** Final isolated Windows suite: 508 passed, two Unix-permission skips
+in 71.68 seconds; Flake8 clean. Fresh locked offline installation, dependency/
+lock checks and source/wheel builds passed. Stress checks passed for 50 all-83
+window changes without repeat requests/saves, eight concurrent writer threads
+without duplicate/lost rows, and a 33,200-row history. VS Code checks passed for
+all five Dashboard windows, Searcher, invalid temperature/Reset, navigation,
+map, cards, bands, sorted heatmap and catalogue. Validated the frozen 15,607-row
+genuine dataset, 83 unique mappings, local document links and configured-key
+exclusion. Tests did not contaminate genuine data.
+
+**Kept / changed / rejected:** Kept the agreed two-score formula, raw schema,
+reference data, Phase 1 history and .gitignore. Compared preference values
+instead of weakening validation. Preserved historical review records while
+removing superseded development instructions. No extra framework, database
+or provider stress was added. Phone/Mac checks are outside scope, not passed.
+
+**Human review:** Pending review of the complete candidate and its actual
+Windows evidence. No teammate approval or instructor acceptance is inferred.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: request-cap adjustment (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Raise the application's request cap to 55 per minute after
+checking OpenWeather's published allowance.
+
+**Got:** Updated the default and shared process limiter from 40 to 55 per
+rolling minute, the API contract and Phase 4 follow-up. Parameterized the
+existing limiter boundary check to exercise the real 55-call cap as well as
+the small synthetic case; retained shared-queue/retry-accounting checks.
+
+**Checked:** 64 offline client, service and stress tests passed in 9.63 seconds;
+Flake8 clean for changed Python files. No live provider load test was made.
+Public pricing lists 60 calls/minute for the free five-day forecast service;
+the FAQ confirms limits are shared across account keys. Private plan not read.
+
+**Kept / changed / rejected:** Kept forecast reuse, timeouts, retry limits,
+storage and scoring. This cap-only change retains burst/wait behavior;
+smoother pacing and explicit waiting messages remain separate improvements.
+Restart Streamlit after pending saves finish to use a fresh shared limiter.
+
+**Human review:** Pending; no live timing guarantee or reviewer approval.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 4: align Searcher validation wording (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Remove obsolete probability/wind-limit wording from the Searcher
+error now that rain and wind are preferred categories. Identify the actual
+invalid temperature range shown in the screenshot.
+
+**Got:** Inverted temperatures now produce a temperature-specific correction.
+Other preference-validation failures use neutral guidance and suggest Reset.
+The existing invalid-temperature test checks the displayed message as well as
+the disabled Search button and absence of requests.
+
+**Checked:** All 30 Searcher tests passed in 5.36 seconds; changed-file Flake8
+clean. Tests use fake HTTP and temporary data; no live request was made.
+
+**Kept / changed / rejected:** Kept category scoring and input validation.
+Changed presentation only; no raw weather data or score calculation changed.
+
+**Human review:** Pending rerun of the preview.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+## Phase 4/5: semantic consistency and test-quality audit (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Audit the project end to end against the agreed behavior and
+teacher requirements. Correct stale alerts/docs, irrelevant hardcoding and
+redundancy; verify that tests detect real faults rather than merely passing.
+Preserve genuine data and credentials; do not commit or push.
+
+**Got:** Fixed coverage-refresh batch-stop handling and reference/category
+consistency; corrected Dashboard wording and dynamic counts; removed retired
+Dashboard filter/dimming code and obsolete tests. Strengthened non-vacuous
+cross-view checks, corrected an outdated cap assertion and aligned current docs.
+
+**Checked:** Reproduced failing regressions before fixing them; final frozen
+suite 506 passed, 2 POSIX skips (71.24s), Flake8 clean. Locked fresh install,
+builds, installed-wheel imports and dependency check passed. Three isolated
+wrong-formula variants were detected by numerical test failures. The full
+suite includes genuine replay, AppTest and bounded offline stress scenarios.
+Detailed evidence and limits are in Phase 5's 14 November semantic audit.
+
+**Kept / changed / rejected:** Kept the approved formulas, 55-call cap,
+three-hour forecast reuse, original records and source references. Removed
+unused behavior rather than counting its tests as current UI coverage. No
+live API load test or new rendered-browser check is claimed; phone/Mac remain
+out of scope. Historical logs and actual attribution remain intact.
+
+**Human review:** Pending review of this implementation.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+## Phase 4/5: remove unused code and preserve reproduction (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Review all source and tests for unused code and unnecessary duplication
+after the redesign. Keep mandatory teacher requirements and helpers needed by
+any reader, including the instructor, to reproduce the app from the repository
+with their own API key. Explain empty package files and generated artifacts;
+check repository practices without committing or pushing.
+
+**Got:** Removed three unused helpers, unused call parameters, an obsolete rank
+alias and one duplicate limiter test. Shared immutable genuine replay inputs
+avoid repeated CSV setup. Added a package-initializer description, explicit
+UTF-8 stylesheet reading, and current reproduction/cleanup documentation.
+
+**Checked:** Baseline 506 passed/2 skipped; cleaned suite 505 passed/2 skipped
+(70.96s). Affected checks and renamed test passed; Flake8, locked clean-copy
+install, package build, dependency check and credential-free Streamlit HTTP
+startup passed. Both GitHub branches reported protected; detailed rules were
+inaccessible to the integration. Full details and limits are recorded in Phase 5.
+
+**Kept / changed / rejected:** Preserved setup/diagnostic helpers, blank key
+template, references, assets, genuine data, OOP architecture and meaningful
+tests. Kept computed properties and callback contracts rather than treating
+every static-analysis flag as dead code. No formula or user-facing feature was
+removed. A clean copy is not approval of a future published commit or proof of
+an untested OS; the instructor's independent reproduction gate remains.
+
+**Human review:** Pending review of the implementation.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+## Phase 6: P6.1 delivery documentation preparation (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Proceed to P6.1 after confirming the final local preview review.
+Prepare the delivery documentation and accurate next steps, deferring commits
+and publication until the requester is ready.
+
+**Got:** Updated README, Phase 4 adoption status, project navigation and Phase 6
+delivery preparation. Corrected two stale test-count summaries, recorded the
+requester's review and retained teammate review and reviewed-commit
+clean-clone acceptance as open gates. Following the requester's clarification,
+described destination selection as AI-assisted curation against project criteria
+and removed the unsupported INE selection-data gate, preserving distinct
+coordinate, route and weather-source attribution.
+
+**Checked:** Compared current documentation with the tested code and instructor
+requirements; rechecked public provider/source guidance and repository delivery
+contents. The preceding full run had 505 passes and two POSIX-only skips, plus
+lint/install/build/startup and independent scoring checks. P6.1 changes only
+documentation. Five additional genuine-data consistency tests passed on
+the newer 22,487-row snapshot; record integrity and local links passed. The
+requester confirmed the free OpenWeather plan; its published ODbL terms were
+checked and a weather-data notice added. No new full suite or live provider
+run is claimed.
+
+**Kept / changed / rejected:** Kept functionality, tests, genuine data, setup
+helpers, historical evidence and actual attribution. Distinguished requester
+review from Gabriel's approval; did not infer source permissions, publication
+or a grade from automated test results.
+
+**Human review:** Requester confirmed final preview review; Gabriel's P6.1
+review remains pending.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+## Phase 5: provider identity reuse and diagnostic acceptance (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Correct the remaining provider-identity reuse and diagnostic-result
+gaps, rerun the affected checks and complete suite, and continue Phase 6 with
+accurate evidence. This technical follow-up is recorded with the subsequent
+authorization to document the complete development work.
+
+**Got:** Updated service reuse to compare every saved record with the requested
+provider city ID before accepting a fresh in-memory or disk batch. Mapping
+changes require a newly validated response; failed replacement requests do not
+silently reuse the old identity. Updated the optional API diagnostic so failed
+or missing location checks produce an unsuccessful exit and explicit
+location_checks_pass/overall_pass fields. Kept HTTP evidence distinct from
+location acceptance. Updated the affected tests, API/scoring documentation and
+Phase 5/6 records without changing the UI or scoring rules.
+
+**Checked:** New regression cases exposed the gaps before correction. All 56
+affected tests then passed. The first full run exposed a historical replay
+assumption that accepted obsolete provider IDs; corrected that test to check
+the current mapping, require requests for obsolete identities, retain simulated
+failures as unavailable and independently compare unchanged matching records.
+Final frozen-copy suite: 523 passed, 2 POSIX-only Windows skips in 80.71 seconds;
+Flake8 passed. Used a fresh locked offline environment and temporary test data.
+The genuine 22,487-row snapshot was unchanged; no live API calls or credentials
+were needed. These are the recorded implementation checks, not a new test run
+performed while editing this log.
+
+**Kept / changed / rejected:** Preserved matching-cache reuse, historical
+records, strict identity validation, raw schema, scoring, request limit and
+cache-age policy. Rejected treating HTTP success as location correctness or
+weakening the replay to pass. Checks cover current and forecast data, existing
+services and restarted services, wrong identities, missing checks, replacement
+failures and genuine matching data.
+
+**Human review:** Gabriel's P6.1 review remains pending. Automated evidence and
+the requester's preview approval do not constitute teammate acceptance or the
+future P6.2 clean-clone verification.
+
+**Commit / PR:** Pending; these changes are not yet committed or published.
+Add the actual commit and PR references after authorization.
+
+
+## Phase 6: P6.1 integrate the validated application into asier/feature (2026-11-14)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Bring the validated P4.5 application and its development records into
+the main Weather Insights working folder on asier/feature, so the requester can
+review and make the commit. Preserve existing work, credentials and genuine
+weather history; leave staging, committing and publishing to the requester.
+
+**Got:** Integrated 52 changed/new project files, including source, tests,
+theme/assets, reference mapping and documentation. Updated current development
+labels to reflect asier/feature. Both worktrees shared the same code baseline;
+the live dev comparison showed only its merge commit and no baseline file
+differences. Preserved the main folder's 280 additional genuine records when
+combining histories: 22,767 records across 83 destinations and 654 fetch groups.
+Kept a backup outside the repository. Retained the destination's own API-key
+file and environment; did not copy Git metadata or generated files.
+
+**Checked:** Ran uv sync --locked --offline in the main folder and confirmed
+the installed weather_app imports from that folder. Full offline suite in its
+own environment: 523 passed, 2 POSIX-only Windows skips in 82.90 seconds.
+Flake8 and dependency compatibility passed. The combined data loads through
+WeatherStore with unique record keys and valid catalogue membership; both
+source histories are preserved with no conflicting duplicate records. Checked
+documentation links, whitespace, secret exclusions and the unchanged published
+PROMPTS.md prefix. No new live provider request or browser/phone/Mac test was
+performed for integration.
+
+**Kept / changed / rejected:** Kept the validated application behaviour, formulas,
+dependencies, reference catalogue and actual attribution. Preserved local-only
+weather observations instead of overwriting them. Historical test counts remain
+dated evidence; the new combined dataset is documented separately. This is local
+integration, not publication to dev or peer approval.
+
+**Human review:** Requester review before committing; Gabriel's P6.1 review and
+P6.2 reviewed-commit clean-clone acceptance remain pending.
+
+**Commit / PR:** Not created. No files staged, no commit, push or merge performed.
+
+
+## Publication checkpoint: P4.5/P6.1 review submission (2026-11-14)
+
+The requester authorized committing the complete integrated candidate on
+asier/feature, pushing that branch and opening a PR into dev with gabrielstec
+as reviewer. The commit carries the Codex co-author trailer. Earlier pending
+commit statements record their original checkpoints and are not current
+publication instructions. GitHub's PR and commit history provide the actual
+submission references; Gabriel's approval and merge are not claimed here.
+
+Pre-publication verification confirmed the code/configuration and genuine data
+still match the integrated 523-pass/2-skip candidate. Only documentation status
+changed afterward. Full-suite results remain the 82.90-second integration run;
+no new application-test run is claimed for these editorial changes.

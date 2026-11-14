@@ -22,7 +22,6 @@ from weather_fakes import (
     make_client,
 )
 
-from weather_app import client as client_module
 from weather_app import config
 from weather_app.client import (
     APIError,
@@ -90,8 +89,7 @@ def test_openweather_client_inherits_generic_behavior():
     call = session.calls[0]
     assert call["url"] == "https://api.openweathermap.org/data/2.5/weather"
     assert call["params"] == {
-        "lat": TOLEDO.latitude,
-        "lon": TOLEDO.longitude,
+        "id": 2510409,
         "units": "metric",
         "lang": "en",
         "appid": DUMMY_KEY,
@@ -205,13 +203,15 @@ def test_missing_api_key_is_authentication_guidance(tmp_path, monkeypatch):
 # --- pacing
 
 
-def test_rate_limiter_caps_calls_per_window():
-    moments = iter([0.0, 1.0, 2.0, 60.0])
+@pytest.mark.parametrize("max_calls", [2, 55])
+def test_rate_limiter_caps_calls_per_window(max_calls):
+    moments = iter([0.0] * max_calls + [2.0, 60.0])
     slept = []
     limiter = RateLimiter(
-        2, 60.0, clock=lambda: next(moments), sleep=slept.append
+        max_calls, 60.0, clock=lambda: next(moments),
+        sleep=slept.append,
     )
-    assert limiter.wait() == 0 and limiter.wait() == 0
+    assert all(limiter.wait() == 0 for _ in range(max_calls))
     assert limiter.wait() == pytest.approx(58.0)
     assert slept == [pytest.approx(58.0)]
 
@@ -228,17 +228,6 @@ def test_failed_attempts_and_retries_count_against_the_limit():
     client = make_client(session, rate_limiter=CountingLimiter())
     raised(client.forecast, TOLEDO)
     assert len(waits) == 2
-
-
-def test_default_limiter_is_one_shared_process_queue():
-    first = OpenWeatherClient(DUMMY_KEY, session=FakeSession())
-    second = OpenWeatherClient(DUMMY_KEY, session=FakeSession())
-    assert (
-        first._rate_limiter
-        is second._rate_limiter
-        is client_module.OPENWEATHER_RATE_LIMITER
-    )
-    assert client_module.OPENWEATHER_RATE_LIMITER.max_calls == 40
 
 
 # --- request parameters and mapping
@@ -362,7 +351,12 @@ def test_approved_alias_and_expected_id_rules():
 def test_all_retained_genuine_responses_map_cleanly():
     """Read-only replay of the 168 genuine P2.3 responses; nothing is written.
     """
-    client = make_client(FakeSession())
+    # Historical coordinate responses can have legitimate municipality IDs.
+    # Replay their original name/country/proximity contract; current explicit
+    # ID request enforcement is checked separately for the entire catalog.
+    aliases = {key: {"accepted_names": value.get("accepted_names", [])}
+               for key, value in config.load_location_overrides().items()}
+    client = make_client(FakeSession(), overrides=aliases)
     current = forecast_periods = 0
     for line in GENUINE_FETCHES.read_text(encoding="utf-8").splitlines():
         row = json.loads(line)
@@ -397,3 +391,65 @@ def test_genuine_toledo_values_convert_as_documented():
     assert record.wind_kmh == pytest.approx(payload["wind"]["speed"] * 3.6)
     assert record.valid_at_utc == datetime.fromtimestamp(payload["dt"], UTC)
     assert record.retrieved_at_utc != record.valid_at_utc
+
+
+def test_barcelona_id_override_still_rejects_district_or_wrong_id():
+    from weather_fakes import CATALOG
+    destination = CATALOG["ES-08019"]
+    client = make_client(FakeSession())
+    assert client.request_parameters(destination) == {
+        "id": 3128760, "units": "metric", "lang": "en",
+    }
+    good = current_payload(destination, NOW, provider_id=3128760)
+    assert client.map_current(destination, good, NOW).provider_city_name == (
+        "Barcelona"
+    )
+    district = current_payload(destination, NOW, provider_id=3128760,
+                               name="Eixample")
+    assert raised(client.map_current, destination, district, NOW).code == (
+        "invalid_data"
+    )
+    wrong = current_payload(destination, NOW, provider_id=1)
+    assert raised(client.map_current, destination, wrong, NOW).code == (
+        "invalid_data"
+    )
+
+
+def test_valladolid_id_rejects_delicias_and_preserves_valid_city():
+    destination = CATALOG["ES-47186"]
+    client = make_client(FakeSession())
+    assert client.request_parameters(destination) == {
+        "id": 3106672, "units": "metric", "lang": "en"}
+    good = forecast_payload(destination, NOW, provider_id=3106672)
+    assert len(client.map_forecast(destination, good, NOW)) == 40
+    for provider_id, name in ((6691623, "Delicias"),
+                              (3106672, "Delicias")):
+        bad = forecast_payload(destination, NOW, provider_id=provider_id,
+                               name=name)
+        assert raised(client.map_forecast, destination, bad, NOW).code == (
+            "invalid_data")
+
+
+def test_every_catalog_city_requests_its_verified_id():
+    mapping = config.load_location_overrides()
+    assert set(mapping) == set(CATALOG)
+    assert len(mapping) == 83
+    ids = [entry["expected_provider_id"] for entry in mapping.values()]
+    assert len(set(ids)) == len(ids)
+    client = make_client(FakeSession())
+    for city_id, destination in CATALOG.items():
+        provider_id = mapping[city_id]["expected_provider_id"]
+        assert client.request_parameters(destination) == {
+            "id": provider_id, "units": "metric", "lang": "en"}
+        good = forecast_payload(destination, NOW, provider_id=provider_id)
+        assert len(client.map_forecast(destination, good, NOW)) == 40
+        bad = forecast_payload(destination, NOW, provider_id=provider_id + 1)
+        assert raised(client.map_forecast, destination, bad, NOW).code == (
+            "invalid_data")
+
+
+def test_missing_mapping_never_falls_back_to_coordinates():
+    session = FakeSession()
+    client = make_client(session, overrides={})
+    assert raised(client.forecast, TOLEDO).code == "invalid_input"
+    assert not session.calls

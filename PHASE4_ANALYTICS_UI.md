@@ -1,12 +1,18 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-Updated: 12 November 2026. **Implemented and reviewed:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12). P4.4 independent Dashboard approved by Asier and merged in PR #15 (dev 1e43be3). P5.1-P5.4 are merged; P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); Mac and visual results remain unconfirmed.
+> **Current development:** P4.5 extends the existing application with the
+> Canva-inspired interface and executive analytics; publication is pending. [SCORING.md](SCORING.md) is the current formula;
+> [Phase 5 latest checks](PHASE5_QUALITY_REVIEW.md#provider-identity-and-diagnostic-follow-up--14-november-2026)
+> records current verification. Dated baseline records below are historical,
+> not acceptance of this redesign. No publication or peer approval is implied.
+
+Historical baseline as of 12 November 2026. **Implemented and reviewed:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12). P4.4 independent Dashboard approved by Asier and merged in PR #15 (dev 1e43be3). P5.1-P5.4 are merged; P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); The current P4.5 Windows checkpoint is complete; phone/Mac checks are outside this audit. See the extension below.
 
 ## Purpose and dependencies
 
 Deliver Searcher and Dashboard on the same data and calculations, then connect the user journey. Preparation can use the reviewed result shape; acceptance needs actual Phase 3 components and P2.5 verification.
 
-## Deliverables
+## Historical baseline deliverables
 
 | Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
 | --- | --- | --- | --- | --- | --- | --- |
@@ -17,7 +23,7 @@ Deliver Searcher and Dashboard on the same data and calculations, then connect t
 
 ## Implementation and acceptance
 
-Asier owns app.py/searcher.py and Searcher preferences/state. Selin owns dashboard.py/charts and its independent overview state. Both use the same analytical engine and service/save path; they evaluate their own windows and criteria. Searcher applies product_defaults.json on initial load or explicit reset and preserves manual edits. Dashboard takes seasonal criteria for each explicit overview load, with its own selected day window. Build size/activity options from real catalog values and show All explicitly. Display units, valid dates and data age. Keep synthetic UI tests separate from real demonstrations. Use native Streamlit controls and headless AppTest for interaction checks.
+Asier owns app.py/searcher.py and Searcher preferences/state. Selin owns dashboard.py/charts and its independent overview state. Both use the same analytical engine and service/save path; they evaluate their own windows and criteria. Searcher applies product_defaults.json on initial load or explicit reset and preserves manual edits. In P4.5, Dashboard takes seasonal criteria on first opening, window changes or manual Refresh, with its own selected day window. Build size/activity options from real catalog values and show All explicitly. Display units, valid dates and data age. Keep synthetic UI tests separate from real demonstrations. Use native Streamlit controls and headless AppTest for interaction checks.
 
 Read [Phase 2](PHASE2_SCOPE.md) for product rules, shared schema and the worked example; [API contract](WEATHER_API_CONTRACT.md) for provider behavior; [roles](TEAMROLES.MD) for ownership. Each owner includes tests/docs/fixes. Follow [plan maintenance](PROJECT_PHASES.md#plan-maintenance) when decisions change. The instructor README governs final acceptance; plans are not proof of completed functionality.
 
@@ -45,7 +51,7 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-P4.1-P4.4 and P5.1-P5.4 are approved and merged. Gabriel reviews Asier's P5.5 integration fixes and evidence next; then Phase 6 prepares delivery. Dated implementation records below retain their original submission state; later approvals supersede their pending notes. P5.5 moves the map heading outside Plotly and adds a slot-boundary explanation to both views without changing their ranking rules.
+Complete the P4.5 review below. The following P4.1–P4.4 descriptions and counts record the earlier interface; their superseded formulas and pending-at-the-time statuses are not current requirements.
 
 
 ### P4.1 implementation and state contract
@@ -106,3 +112,128 @@ PR #15 was approved by Asier and merged into dev `1e43be3`. Local Windows revali
 ### Storage-recovery follow-up - 13 November 2026
 
 Searcher and Dashboard now show shared safe storage guidance, the number of destinations skipped after the first storage failure, and collected records still waiting to save. Refresh retries retained saves before new requests. This is the P5.5 recovery follow-up, not a scoring or chart redesign; see Phase 5 for tests and pending review. Confirm the guidance on desktop/mobile before delivery.
+
+## P4.5 Canva-inspired executive redesign
+
+13–14 November 2026. Actual implementation: **AsierMarmol / OpenAI Codex**.
+This extends the reviewed P4.1–P4.4 application; its commit and PR are pending.
+The [development record](PROMPTS.md#phase-4-extension-and-delivery-development-record)
+preserves the requests, design decisions, implementation changes and checks.
+Proposed reviews: Selin (presentation), Christian (analytics), Gabriel
+(integration). These assignments do not claim their work or approval.
+
+### Why this extension exists
+
+The group chose a clearer travel-oriented interface and an executive overview
+of all 83 mainland-Spain destinations. Canva supplies layout, colours and
+imagery, never example weather or formulas. Iterative feedback converged on
+one score per view, consistent travel context, concise hovers and fewer
+duplicated panels. The original OOP, API, safe persistence and package remain.
+
+### Consolidated scope
+
+- Landing, responsive theme/navigation, local assets and truthful source credits.
+- Searcher: preferred weather categories, compact top five, complete ranking,
+  one Trip score, h:mm travel, and high-wind notice only for affected top five.
+- Dashboard: independent 1–5-day selector, automatic initial/window load,
+  manual retry, all-83 OSM map, fixed score colours, five KPI cards, deterministic
+  summary, top five, score-versus-driving scatter, driving bands, daily heatmap
+  and sortable catalogue. No destination filters or high-wind banner.
+- Shared seasonal/gradual scoring, driving penalty in both views, full-forecast
+  reuse, exact provider-ID mapping, strict missing-data handling and reload-safe
+  service recovery. [SCORING.md](SCORING.md) owns the final calculation details.
+- Removed duplicate top-ten results, old comparison/all-preference panels and
+  redundant score/status/slot-count columns from Searcher, retaining validation
+  internally and unavailable reasons where relevant.
+
+### Implementation checkpoints
+
+| Step | Deliverable | Evidence / current state |
+| --- | --- | --- |
+| 1. Baseline and Canva adaptation | Review existing behaviour, reference HTML/layouts, real-data gaps and constraints | Baseline HEAD `923de369a581869f2e183b0ba6c6471325816185`; original automated baseline 438 passed / 2 Windows skips |
+| 2. Calculations | Gradual seasonal/personal scoring, preferred categories, driving penalties, executive means and daily values | Implemented; independent numeric/reference, boundary and missing-data tests |
+| 3. Visual foundation | Theme, assets, navigation and season | Implemented; local assets, fallback fonts and responsive styling |
+| 4. Landing/Searcher | Product explanation, controls, compact results | Implemented; state, filters, reset, errors and score-consistency tests |
+| 5. Executive Dashboard | All-83 map/KPIs, top five, scatter, driving groups, sorted heatmap, catalogue and automatic loading | Implemented; shared score/rank, mean KPI and full-forecast reuse checks |
+| 6. Validate/document | Regression, failure/load simulations, visual review, aligned plans | Current evidence and remaining gates in [Phase 5](PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026) |
+
+### Checkpoint 6 review changes
+
+Consolidated the development notes into a current specification and retained
+historical baseline reviews separately. Removed a leftover old-threshold caption;
+labelled catalogue rain/wind as maxima to distinguish them from average KPI
+cards; made KPI columns adapt to available width in the VS Code preview.
+Fixed false changed-settings messages after Python class reload by comparing preference values, with a regression test. No formula or raw data was changed by these corrections.
+Added bounded, offline all-catalog/cache, parallel-save and larger-history
+simulations. Intentional failures remain isolated from the genuine CSV/API.
+
+### Adoption gate and next work
+
+Publication and peer review remain pending. On 14 November the requester
+confirmed the final preview review. Latest automated validation: 523 passed,
+two POSIX skips and clean lint; VS Code preview evidence is dated 13 November. Review the complete
+candidate diff and genuine-data provenance before publication. Phone/Mac checks are outside this audit by
+user instruction. Obtain peer review of this version as listed in Phase 5. Proposed coherent changesets:
+(1) scoring/data/service foundation with tests/specification; (2) presentation
+and assets with UI tests; (3) integrated validation/delivery documentation.
+Review the genuine dataset as its own clearly described part of publication.
+Do not manufacture teammate authorship or split changes to imply work that did
+not happen. No staging, commit, push, PR or merge is authorized by this audit.
+After an authorized reviewed merge, perform P6.2 and then P6.3.
+
+
+### Loading follow-up — 14 November 2026
+
+After a fresh search appeared stalled and later completed, the user approved
+raising the shared request cap from 40 to 55/minute. The public free-plan limit
+is 60/minute; see WEATHER_API_CONTRACT.md. Current scores, saving and cache
+rules are unchanged. Historical 40/minute notes above describe earlier runs.
+The exact cause of that particular delay was not captured. Waiting/retry
+messages and smoother pacing remain a separate usability improvement; this
+cap adjustment does not claim to implement them or guarantee loading duration.
+
+
+### Validation wording follow-up — 14 November 2026
+
+Searcher now identifies an inverted temperature range directly, without
+referring to obsolete editable rain/wind limits. Other invalid preferences
+receive neutral validation/Reset guidance. Preferred-category scoring is
+unchanged. All 30 Searcher tests and changed-file lint passed; no publication.
+
+### Semantic audit follow-up — 14 November 2026
+
+The shared request path now preserves batch stops during cached-coverage
+refreshes. Searcher reset categories follow reference values consistently.
+Dashboard messages describe the actual unfiltered catalogue, with dynamic
+accessible destination counts. Removed unused city/activity/size filter helpers
+and map-dimming support from the retired Dashboard interaction; Searcher
+filtering is unchanged. These corrections keep UI, code and tests aligned
+without adding a second scoring implementation. See [verified evidence](PHASE5_QUALITY_REVIEW.md#semantic-and-test-quality-audit--14-november-2026).
+No formula, original data, credentials or Git publication changed.
+
+### Cleanup without changing behavior — 14 November 2026
+
+Removed unused age/cache/error-export helpers and unnecessary summary/KPI
+arguments. Dashboard uses the canonical `destination_ranks` name directly.
+The visual layout, preference controls, formulas, recovery and caching behavior
+are preserved. Setup/diagnostic helpers, data and assets remain portable.
+See [cleanup and reproducibility evidence](PHASE5_QUALITY_REVIEW.md#cleanup-and-reproducibility-review--14-november-2026).
+
+
+### Implementation refinements and acceptance
+
+The six checkpoints above are the implementation sequence, not six additional
+tasks. Iterative product feedback refined those deliverables: Canva cards led
+to a single top-five shortlist; the executive view retained all destinations;
+and scoring evolved from thresholds/weather-only ranking to the two-score
+contract. Shared scores and ranks now feed the visualizations. See the
+[detailed development sequence](PROMPTS.md#phase-4-extension-and-delivery-development-record)
+for the actual requests, rejected alternatives and dated verification.
+
+The API/service work supports this same extension: full-forecast reuse and
+local window selection, all-83 provider mappings, module-reload recovery,
+cached identity checks and truthful diagnostic failure results. No new
+database or parallel scoring engine was introduced. The final provider follow-up
+and 523-pass/2-skip result are recorded in
+[Phase 5](PHASE5_QUALITY_REVIEW.md#provider-identity-and-diagnostic-follow-up--14-november-2026).
+This closes implementation checks, not peer review, publication or P6.2/P6.3.

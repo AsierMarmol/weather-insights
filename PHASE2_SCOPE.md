@@ -1,10 +1,12 @@
 # Phase 2 - Scope and Data Preparation
 
-Updated: 12 November 2026.
+> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+
+Updated: 13 November 2026 (P4.5 local specification).
 
 ## Current checkpoint
 
-Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); Mac and visual results remain unconfirmed; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Catalog/source limitations remain documented in the reference notes.
+Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); Current local redesign validation is recorded in [Phase 5](PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026); historical reviews do not approve it. Catalog/source limitations remain documented in the reference notes.
 
 ## Deliverables
 
@@ -24,26 +26,22 @@ A local Streamlit application recommends mainland-Spain destinations for car tri
 
 Users select the next **1-5 rolling days from use**, default **3**. Capture a common aware UTC search time. Evaluate native three-hour timestamps with `run_at < valid_at <= run_at + 24 * days hours`, keeping Europe/Madrid local daytime **09:00 inclusive to 18:00 exclusive**. All expected daytime periods must exist; no interpolation or shortened fifth day.
 
-Initial settings come from [product_defaults.json](data/reference/product_defaults.json): winter 10-18 C, spring 18-26 C, summer 22-30 C, autumn 16-24 C; precipitation probability <=30%; wind <=25 km/h. Seasons use Europe/Madrid months (Dec-Feb, Mar-May, Jun-Aug, Sep-Nov). These are editable preferences, not climate averages. Initialize on first use or explicit reset only; preserve manual choices across navigation, reruns and season boundaries. Apply identical preferences to all destinations.
+Initial settings come from [product_defaults.json](data/reference/product_defaults.json): winter 10-18 C, spring 18-26 C, summer 22-30 C, autumn 16-24 C; Searcher preferred Low rain (0–30%) and Moderate wind (20–<29 km/h). Dashboard uses continuous rain/wind scoring and equal-city average rain/wind KPI cards; there are no exceedance-count KPIs. Seasons use Europe/Madrid months (Dec-Feb, Mar-May, Jun-Aug, Sep-Nov). These are editable preferences, not climate averages. Initialize on first use or explicit reset only; preserve manual choices across navigation, reruns and season boundaries. Apply identical preferences to all destinations.
 
 Activities: Coast, Nature, History and heritage, Food and gastronomy, Urban experiences. Sizes: Large city, Medium city, Small city or town. Both selectors visibly default to **All** and derive available values from the catalog. Match ANY selected activity and ANY selected size; combine the two groups with AND. Empty internal selections mean All. These are eligibility filters, not score weights.
 
-For each complete forecast period, award one check for temperature within the inclusive range, one for probability <= limit and one for wind <= limit. Imperfect weather remains eligible. Missing values/coverage make a destination unavailable, not a zero-score success.
-
-```text
-weather_match = 100 * passed_checks / (3 * evaluated_periods)
-travel_penalty = min(car_duration_min / 60, 5)
-final_score = max(weather_match - travel_penalty, 0)
-all_preferences_pct = 100 * suitable_period_count / evaluated_periods
-```
-
-Suitable periods satisfy all three preferences simultaneously. This explanatory percentage adds no extra score weight. Sort unrounded final score descending, weather match descending, driving minutes ascending, then city_id ascending. Distance is informational, not a second penalty.
+For each required daytime slot, calculate the weighted gradual score from
+[SCORING.md](SCORING.md). Aggregate 80% mean plus 20% lowest-quarter mean;
+subtract min(2 * driving hours, 15) in both views, floored at zero. Exact
+target-match counts remain separate diagnostics, not the scoring formula.
+Searcher ranks by final score, match, driving time and city ID. Dashboard
+ties share competition rank on final score and use city ID for display order.
 
 ## Views and analyses
 
 - **Searcher (Asier):** its own editable days/weather/activity/size controls; up to five available recommendations plus the full eligible ranking; distances, drive times, score explanation, coverage and unavailable states.
-- **Dashboard (Selin):** since P4.4 (12 November 2026), an independent weather overview of all 83 destinations on a map with its own 1-5-day window and Load/refresh, seasonal default criteria and a weather-only ranking (weather match %, no driving penalty, shared ranks for ties). It still uses the same service, cache, save path and analytics; see [Phase 4](PHASE4_ANALYTICS_UI.md#p44-independent-spain-weather-dashboard---12-november-2026).
-- Three analyses: suitability ranking; cross-city weather comparison (mean temperature, maximum precipitation probability and maximum wind over the same daytime periods); count/percentage of periods meeting all preferences. Label aggregations and units explicitly: maximum period probability is not whole-trip probability, and forecast periods are not guaranteed good-weather hours.
+- **Dashboard (Selin, original component owner):** independent all-83 overview with automatic initial/window loading, its own 1–5-day selection, standard seasonal criteria and Destination score including driving. Map, cards, scatter, bands and catalogue share the loaded score/rank. The local P4.5 extension is recorded with actual authorship in Phase 4.
+- Three analyses: suitability ranking; Destination score versus driving effort and time-band comparisons; destination-by-day score heatmap. Rain/wind mean KPIs and explicit maximum catalogue fields supplement these. Forecast periods are not guaranteed good-weather hours, and maximum slot probability is not whole-trip probability.
 - At least two labeled charts must use genuine fetched/logged data. Save every fresh successful request with retrieval and provider timestamps. Cache displays do not create new records. No historical-trend chart, forecast-versus-reality feature or continuous collector is required.
 
 ## P2.4 shared data and calculation specification
@@ -53,10 +51,10 @@ Use standard-library dataclasses, one normalized weather CSV and simple result d
 | Object / output | Contract |
 | --- | --- |
 | Destination | Nine catalog fields; numeric coordinates/route values; activities tuple; computed drive_hours and useful repr/str |
-| SearchPreferences | days, temperature_min_c, temperature_max_c, max_precipitation_probability_pct, max_wind_kmh, activities tuple, destination_sizes tuple; empty tuples mean All |
+| SearchPreferences | days, temperature_min_c, temperature_max_c, max_precipitation_probability_pct, max_wind_kmh, activities tuple, destination_sizes tuple, scoring_mode, rain_preference, wind_preference, seasonal_bands; empty filter tuples mean All; numeric limits remain compatibility/diagnostic fields |
 | WeatherRecord | Exactly the CSV fields below; aware UTC datetimes internally; optional numeric metrics are None; one UUID fetch_id for each fresh HTTP response |
 | Service result | records list, from_cache bool, error None or code/message with optional storage_guidance/skipped metadata (see API contract); codes: invalid_input, authentication, location_not_found, rate_limited, network, provider, invalid_data, storage |
-| Analysis result | city_id, status, reason, run_at_utc, days, forecast_retrieved_at_utc, expected_periods, evaluated_periods, temperature_passes, precipitation_passes, wind_passes, weather_match_pct, travel_penalty, final_score, suitable_period_count, all_preferences_pct, mean_temperature_c, max_precipitation_probability_pct, max_wind_kmh |
+| Analysis result | city_id, status, reason, run_at_utc, days, forecast_retrieved_at_utc, expected_periods, evaluated_periods, temperature_passes, precipitation_passes, wind_passes, weather_match_pct, travel_penalty, final_score, suitable_period_count, all_preferences_pct, mean_temperature_c, mean_precipitation_probability_pct, mean_wind_kmh, max_precipitation_probability_pct, max_wind_kmh |
 
 Application store: `data/weather/weather_records.csv`, created by P3.2 and extended by P2.5:
 
@@ -72,7 +70,7 @@ Schema version 1; kind current/forecast; coordinates and provider identity descr
 | Gabriel: client.py, config.py, service.py | JSONAPIClient._get_json(path, params); derived OpenWeatherClient.current(destination)/.forecast(destination); WeatherService.current/forecast(destination, force_refresh=False) and .forecast_many(destinations, force_refresh=False); config.get_api_key(), load_product_defaults() and load_location_overrides() |
 | Christian: analytics.py | analyse_destinations(destinations, forecasts_by_city, preferences, run_at_utc) -> full ordered list of result dictionaries |
 | Asier: searcher.py, app.py | initial_preferences(now_utc, defaults), Searcher controls/state and shared service wiring |
-| Selin: dashboard.py | render_dashboard_page() over the full catalog, with overview_preferences, weather_ranks, map_points/map_figure; catalog dictionaries use activity lists and canonical names |
+| Selin: dashboard.py | render_dashboard_page() over the full catalog, with overview_preferences, destination_ranks, map_points/map_figure; catalog dictionaries use activity lists and canonical names |
 
 Store a whole forecast response as one fetch group. Latest forecast must be one newest group, never stitched from different issues. Repeated saves of the same (fetch_id, city_id, kind, valid_at_utc) are idempotent; a distinct fresh response gets a new fetch_id. Serialize writes per local process; handle failed/partial writes explicitly. The service saves once, then caches. Do not claim analytical success after failed persistence. Initial JSONL evidence can be imported deliberately without inventing retrieval times; do not mix synthetic fixtures into it.
 
@@ -80,17 +78,14 @@ Analytics is pure: no network, credentials, file writes, UI or implicit clock. R
 
 Searcher state: search_preferences, search_run_at_utc, search_analysis_rows. Since P4.4 the Dashboard keeps separate dashboard_* state and never reads or changes search_* results. The two views share the same session service and persisted forecasts. A new search recomputes coverage for its common time, using cached forecasts only when usable.
 
-### Small worked example
+### Worked calculations
 
-Synthetic test inputs only, not real weather history: one day, three complete daytime periods, temperature 16-24 C, probability <=30%, wind <=25 km/h. Each tuple below is (temperature C, probability %, wind km/h).
-
-| City | Three period inputs | Passed checks / 9 | All-three periods / 3 | Drive minutes | Final score |
-| --- | --- | --- | --- | --- | --- |
-| Toledo | (16,30,25); (20,0,10); (24,30,25) | 9 | 3 | 61 | 100 - 61/60 = 98.983333... |
-| Segovia | (25,20,20); (20,31,20); (20,20,26) | 6 | 0 | 75 | 200/3 - 75/60 = 65.416666... |
-| Seville | (16,0,0); (24,30,25); (25,31,26) | 6 | 2 | 351 | 200/3 - 5 = 61.666666... |
-
-Segovia and Seville have identical weather points but different simultaneous suitability (0% vs 66.666...%). Christian turns this example and threshold, tie, missing/fifth-day, stale and clock-change cases into tests of the actual engine. No separate example-checking application is required.
+The former pass/fail worked example is superseded by [comfort-v2](SCORING.md).
+Independent numerical cases live in tests/test_scoring.py and frozen CSV
+acceptance uses tests/scoring_reference.py, which imports no production scoring.
+SearchPreferences now also carries scoring_mode, rain_preference,
+wind_preference and immutable monthly seasonal_bands. Raw CSV fields remain unchanged; result dictionaries add mean rain/wind
+fields for KPI aggregation. weather_match_pct is now an internal index.
 
 ## Teacher requirements
 
@@ -132,7 +127,8 @@ approval or commit/push/merge without authorization.
 
 ## Next action
 
-P2.5 was accepted in PR #9, and P4.1-P4.4/P5.1-P5.4 are merged. Gabriel confirms the remaining P5.5 Mac and visual checks while Asier prepares P6.1; see [Phase 5](PHASE5_QUALITY_REVIEW.md). Keep review status honest using [plan maintenance](PROJECT_PHASES.md#plan-maintenance).
+The Phase 2 foundation is accepted historically. Review the P4.5 updates and their integration evidence in [current checkpoint](PROJECT_PHASES.md); do not repeat P2.5 or create a second save path.
+
 
 ### P2.5 verification - 12 November 2026
 
@@ -164,3 +160,33 @@ The configured key was absent from tracked working-tree files; the credential fi
 P2.5 pre-commit lint follow-up: the initial validation did not include Flake8. After Asier flagged the editor diagnostics, a full scan found 529 formatting findings, including 517 long lines. Wrapped code/comments/docstrings and corrected whitespace in 17 Python files. All 18 Python syntax trees match the pre-format version after normalizing docstring whitespace; Flake8 now reports zero findings and all 237 tests pass. Added Flake8 to locked development dependencies and the README verification commands. No data, business-rule or `.gitignore` change was made by this cleanup; review remains pending.
 
 12 November acceptance update: PR #9 was approved by Gabriel and Christian and merged into dev as f61c850. The P2.5 review gate is complete; earlier pending-review notes are historical.
+
+## P4.5 experiment: executive presentation rules — 13 November 2026
+
+The group selected Canva as visual direction only. Current formulas, categories,
+aggregation, missing-data handling and two-score terminology live in
+[SCORING.md](SCORING.md); do not duplicate or infer them from template values.
+
+- Landing derives the Madrid season from shared reference months.
+- Searcher keeps personal preferences, All filters, five compact cards and full
+  ranking. No duplicate top-ten list or extra displayed score is needed.
+- Dashboard is unfiltered across all 83 locations, with automatic initial and
+  window-change loads, manual retry and independent state. All whole-window
+  visuals consume the same saved snapshot and final score, including driving.
+- Executive KPIs show coverage, mean Destination score, leader, mean daytime
+  rain probability and mean wind speed with contributing count. No-data is not zero.
+- Map/leader/top-five/scatter/driving-band/catalogue values agree. The OSM blue
+  Madrid origin (40.4168, -3.7038) is context only and excluded from all counts.
+- Daily heatmap uses successive rolling 24-hour slices; sort by mean of
+  available daily final scores and mark partial coverage. These are forecasts,
+  not historical observations. The labelled daily mean can differ from the
+  nonlinear whole-window result.
+- Driving groups are [0,120), [120,240), [240,360), [360,infinity) minutes.
+  Formatting uses h:mm without altering numeric calculations or reference data.
+- The original comparison/all-preferences tabs are removed. Current analytical
+  views are compound rankings, score-versus-travel comparisons and daily
+  destination comparisons, covering comparison and derived-metric categories.
+
+`scoring.py` owns scoring; `analytics.py` validates/calculates; `executive.py`
+summarizes canonical results. UI code only formats/groups these results.
+Current implementation and validation are in [Phase 4](PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign).

@@ -27,7 +27,9 @@ These are project conventions based on GeoNames populated-place estimates, not o
 
 ## Sources and limits
 
-Prepared 11 November 2026 using [INE hotel-tourism table 2078](https://www.ine.es/jaxiT3/Tabla.htm?t=2078), [GeoNames](https://www.geonames.org/about.html) reference populations/coordinates, [Spain.info](https://www.spain.info/en/destinations/) visitor information and [OSRM/OpenStreetMap](https://project-osrm.org/docs/v5.24.0/api/) route estimates. Retain source attribution. Selection used populated places of at least 20,000, excluding Madrid and islands; it is a curated list, not every tourist destination.
+Prepared 11 November 2026. On 14 November the requester clarified that the destinations were selected with AI assistance using the agreed project criteria: mainland-Spain car trips from Madrid and the activity categories above. This is a curated project selection, not an official tourism ranking or an exhaustive destination list. Activity tags are project classifications, not weather API fields or verified official labels. Earlier references to INE/Spain.info do not establish that an INE tourism dataset was imported to generate the list.
+
+Selection is separate from field provenance: retain the documented [GeoNames](https://www.geonames.org/about.html) coordinate/population references, [OSRM/OpenStreetMap](https://project-osrm.org/docs/v5.24.0/api/) route estimates and OpenWeather identity checks below. This clarification does not change or independently revalidate those numeric fields.
 
 All routes use origin 40.4168,-3.7038 (approximate Madrid Km0), snapped by OSRM about 90 metres to a road. Estimates exclude live traffic, parking, stops and access guarantees. Kilometres are informational; driving minutes supply the capped penalty in [Phase 2](../../PHASE2_SCOPE.md).
 
@@ -42,4 +44,75 @@ Reference coordinates/population estimates use GeoNames; its [data terms](https:
 
 Route estimates were obtained using OSRM and OpenStreetMap data. Credit **OpenStreetMap contributors**, with the [copyright notice](https://www.openstreetmap.org/copyright) and [Open Database License](https://opendatacommons.org/licenses/odbl/). These are modeled driving estimates, not a live routing service or a claim of road access. Source license obligations continue to apply to derived data; attribution alone is not a blanket redistribution clearance.
 
-INE table 2078 and Spain.info are selection/content references. The [INE legal notice](https://www.ine.es/aviso_legal/) was not readable through the review tool, so its conditions are not asserted verified. Confirm applicable INE/Spain.info reuse conditions before final delivery; no tourism prose or imagery is newly copied by this documentation update. OpenWeather canonical names/overrides and weather-data terms are described in the [weather provenance record](../weather/README.md).
+Clarified 14 November: the earlier INE/Spain.info selection attribution was not established by the requester's AI-assisted selection process. The unreadable INE notice is therefore not a project acceptance gate. Do not describe the catalogue as an INE-derived tourism ranking. The INE-style municipality identifiers are separate from the destination-selection method. OpenWeather canonical names/overrides and weather-data terms remain described in the [weather provenance record](../weather/README.md).
+
+## Barcelona identity follow-up — 13 November 2026
+
+During the dashboard experiment, a live coordinate forecast request returned
+Eixample and was correctly rejected by the existing city-name check. The
+historical Barcelona records identify provider city **3128760**. A live explicit
+ID request verified Barcelona, Spain, at 41.3888, 2.159 and successfully saved
+40 forecast periods. The existing override file now requests that ID and checks
+both the ID and Barcelona name. Eixample is not accepted as an alias. Catalog
+coordinates, driving estimates, IDs and names are unchanged. This correction
+belongs to the experiment until reviewed and merged.
+
+Current P4.5 implementation: [comfort-v2 scoring](../../SCORING.md) uses seasonal Dashboard comfort, preferred Searcher ranges and a driving penalty in both views. Raw sources/assets remain unchanged; no scores or synthetic weather are written to the genuine weather CSV.
+
+
+## Valladolid identity follow-up — 13 November 2026
+
+A live coordinate request for catalog Valladolid (41.65541, -4.72353)
+returned Delicias, provider ID 6691623. The client correctly rejected it.
+An explicit request using previously recorded Valladolid provider ID 3106672
+returned Valladolid, ES, at 41.6552, -4.7237. All 40 forecast records validated
+and were saved through WeatherStore. The reference override now requests and
+checks that ID; the name, country and proximity safeguards remain in place.
+No catalog coordinates, route estimates or accepted district aliases changed.
+Restart the local app after changing overrides: a running session's client
+retains the configuration with which it was created.
+
+
+## Complete provider city-ID mapping — 13 November 2026
+
+All **83 destinations** now request a unique verified OpenWeather city ID using
+the existing `weather_location_overrides.json`. The nine-column destination CSV
+is unchanged. Catalog IDs, names, coordinates and routes remain separate from
+provider identifiers. Existing accepted bilingual/translated labels remain;
+unreviewed districts are not added as aliases.
+
+Candidates came from genuine saved responses, using the latest provider ID
+per destination. Nine destinations had multiple historical municipality/city
+IDs; historical observations were preserved, not rewritten. Every selected
+ID passed a live explicit-ID request to both current weather and forecast:
+**166/166 successful responses**, with name/approved alias, country ES and
+distance within 10 km checked. The existing paced service saved all **3,403
+genuine records** (83 current + 83 × 40 forecast) with real timestamps.
+
+Requests no longer silently fall back to coordinates when a mapping is absent.
+Configuration rejects duplicate IDs and disagreement between requested and
+expected IDs. Tests require complete catalog coverage and verify outgoing
+parameters, response identity rejection, safe failure and historical replay.
+Historical coordinate responses are replayed under their original name/country/
+proximity checks; current ID enforcement is tested separately for all 83 cities.
+
+**Maintenance:** when adding or replacing a destination, derive a candidate ID
+from trustworthy provider evidence, verify both endpoints and the real location,
+save successful observations, then update this mapping and run the suite.
+Do not accept a new provider name automatically. Restart Streamlit after mapping
+changes so its session client reloads the configuration. This prevents the
+observed coordinate-to-district ambiguity; API outages and provider changes can
+still produce explicit errors.
+
+Validation: **494 passed, 2 POSIX-only skips on Windows**; Flake8 passed. Automated tests used the isolated
+copy; live verification used the actual service/store with app refreshes paused.
+Testing worktree only. No staging, commit, push, PR or merge.
+
+
+## Checkpoint 6 reference audit — 13 November 2026
+
+The 83-row catalogue, product defaults and provider mapping are unchanged by
+this validation. All 83 destinations have unique expected provider IDs.
+The audit reused the existing live verification evidence; offline stress tests
+did not issue provider requests or rewrite catalogue coordinates.
+See [current validation](../../PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).

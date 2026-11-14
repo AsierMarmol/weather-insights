@@ -1,28 +1,13 @@
-"""P3.3 analytical engine: trip suitability ranking, cross-city weather
-comparison
-and forecast periods meeting all preferences.
+"""Pure validated forecast analytics for both application views.
 
-Implements the rules in PHASE2_SCOPE.md ("Product rules" and "P2.4 shared
-data
-and calculation specification"). The engine is pure: it performs no network
-access, reads no credentials or files, writes nothing and never reads the
-clock. Callers pass one explicit, common UTC search time.
+SCORING.md owns the current formula; scoring.py supplies slot functions and
+80/20 aggregation. This module applies coverage, freshness and driving rules
+once, returning canonical final_score values for whole windows and daily
+slices. It performs no HTTP, credential access, file writes or clock reads.
 
-All three analyses are columns of the same result dictionaries, so the
-Searcher
-and the Dashboard consume one calculation:
-
-* ranking: ``weather_match_pct``, ``travel_penalty`` and ``final_score`` in
-the
-  agreed order;
-* weather comparison: ``mean_temperature_c``,
-``max_precipitation_probability_pct``
-  (the highest single-period probability, not a whole-trip probability) and
-  ``max_wind_kmh`` over the same daytime periods;
-* simultaneous suitability: ``suitable_period_count`` and
-``all_preferences_pct``.
-
-Values are unrounded; rounding belongs to display.
+Source means/maxima support comparisons and executive summaries. Exact target
+pass counts are retained as internal diagnostics, not extra displayed scores.
+All values remain unrounded until presentation.
 """
 
 from __future__ import annotations
@@ -30,6 +15,8 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+
+from weather_app.scoring import aggregate, slot_score
 
 from weather_app.models import (
     Destination,
@@ -44,7 +31,8 @@ DAYTIME_END_HOUR = 18  # exclusive
 PERIOD_STEP = timedelta(hours=3)  # native provider forecast grid
 # older than this is stale; equal is allowed
 FORECAST_MAX_AGE = timedelta(hours=3)
-MAX_TRAVEL_PENALTY = 5.0
+MAX_TRAVEL_PENALTY = 15.0
+TRAVEL_POINTS_PER_HOUR = 2.0
 
 AVAILABLE = "available"
 UNAVAILABLE = "unavailable"
@@ -83,6 +71,8 @@ RESULT_FIELDS = (
     "suitable_period_count",
     "all_preferences_pct",
     "mean_temperature_c",
+    "mean_precipitation_probability_pct",
+    "mean_wind_kmh",
     "max_precipitation_probability_pct",
     "max_wind_kmh",
 )
@@ -231,31 +221,19 @@ def _analyse_one(
         return _unavailable(base, MISSING_PERIODS, retrieved_at)
 
     periods = [by_time[time] for time in expected]
-    if any(
-        getattr(p, name) is None for p in periods for name in _REQUIRED_METRICS
-    ):
+    required = _REQUIRED_METRICS + (
+        ("cloud_pct",) if preferences.scoring_mode == "dashboard" else ()
+    )
+    if any(getattr(p, name) is None for p in periods for name in required):
         return _unavailable(base, MISSING_METRICS, retrieved_at)
 
-    temperature_ok = [
-        preferences.temperature_min_c
-        <= p.temperature_c
-        <= preferences.temperature_max_c
-        for p in periods
-    ]
-    rain_ok = [
-        p.precipitation_probability_pct
-        <= preferences.max_precipitation_probability_pct
-        for p in periods
-    ]
-    wind_ok = [p.wind_kmh <= preferences.max_wind_kmh for p in periods]
-
+    scored = [slot_score(p, preferences) for p in periods]
+    temperature_ok, rain_ok, wind_ok = zip(*(flags for _, flags in scored))
     evaluated = len(periods)
-    passed = sum(temperature_ok) + sum(rain_ok) + sum(wind_ok)
-    suitable = sum(
-        t and r and w for t, r, w in zip(temperature_ok, rain_ok, wind_ok)
-    )
-    weather_match = 100 * passed / (3 * evaluated)
-    travel_penalty = min(destination.car_duration_min / 60, MAX_TRAVEL_PENALTY)
+    suitable = sum(all(flags) for _, flags in scored)
+    weather_match = aggregate([score for score, _ in scored])
+    travel_penalty = min(destination.car_duration_min / 60
+                         * TRAVEL_POINTS_PER_HOUR, MAX_TRAVEL_PENALTY)
 
     row = dict(base)
     row.update(
@@ -272,6 +250,10 @@ def _analyse_one(
         suitable_period_count=suitable,
         all_preferences_pct=100 * suitable / evaluated,
         mean_temperature_c=sum(p.temperature_c for p in periods) / evaluated,
+        mean_precipitation_probability_pct=sum(
+            p.precipitation_probability_pct for p in periods
+        ) / evaluated,
+        mean_wind_kmh=sum(p.wind_kmh for p in periods) / evaluated,
         max_precipitation_probability_pct=max(
             p.precipitation_probability_pct for p in periods
         ),
@@ -311,20 +293,7 @@ def forecasts_from_service(
     return forecasts
 
 
-def analyse_destinations(
-    destinations: Sequence[Destination],
-    forecasts_by_city: Mapping[str, Sequence[WeatherRecord]],
-    preferences: SearchPreferences,
-    run_at_utc: datetime,
-) -> list[dict]:
-    """Return the full ordered analysis for every eligible destination.
-
-    Available rows come first, sorted by final score (descending), weather
-    match (descending), driving minutes (ascending) and city_id. Unavailable
-    rows follow, sorted by city_id. Destinations removed by the activity/size
-    filters are omitted. Invalid inputs raise ``ValueError`` prefixed with
-    ``invalid_input`` before any processing.
-    """
+def _validate_inputs(destinations, forecasts_by_city, preferences, run_at_utc):
     if not isinstance(preferences, SearchPreferences):
         raise ValueError(
             "invalid_input: preferences must be SearchPreferences"
@@ -347,6 +316,26 @@ def analyse_destinations(
                 f"invalid_input: duplicate destination {destination.city_id}"
             )
         seen.add(destination.city_id)
+    return run_at
+
+
+def analyse_destinations(
+    destinations: Sequence[Destination],
+    forecasts_by_city: Mapping[str, Sequence[WeatherRecord]],
+    preferences: SearchPreferences,
+    run_at_utc: datetime,
+) -> list[dict]:
+    """Return the full ordered analysis for every eligible destination.
+
+    Available rows come first, sorted by final score (descending), weather
+    match (descending), driving minutes (ascending) and city_id. Unavailable
+    rows follow, sorted by city_id. Destinations removed by the activity/size
+    filters are omitted. Invalid inputs raise ``ValueError`` prefixed with
+    ``invalid_input`` before any processing.
+    """
+    run_at = _validate_inputs(
+        destinations, forecasts_by_city, preferences, run_at_utc
+    )
 
     expected = expected_period_times(run_at, preferences.days)
     drive_minutes = {d.city_id: d.car_duration_min for d in destinations}
@@ -370,3 +359,47 @@ def analyse_destinations(
     )
     unavailable.sort(key=lambda row: row["city_id"])
     return available + unavailable
+
+
+def daily_weather(destinations, forecasts, preferences, run_at_utc):
+    """Score each successive 24-hour slice of the same saved snapshot.
+
+    Reuse the full engine's validation, daytime grid and weighted scoring.
+    Freshness is evaluated at the overview load time, never at a future
+    day's start. Missing days remain unavailable; no interpolation occurs.
+    """
+    run_at_utc = _validate_inputs(
+        destinations, forecasts, preferences, run_at_utc
+    )
+    times = expected_period_times(run_at_utc, preferences.days)
+    cells = []
+    for day in range(1, preferences.days + 1):
+        start = run_at_utc + timedelta(days=day - 1)
+        end = run_at_utc + timedelta(days=day)
+        expected = [t for t in times if start < t <= end]
+        for destination in destinations:
+            if not is_eligible(destination, preferences):
+                continue
+            row = _analyse_one(
+                destination, forecasts.get(destination.city_id),
+                preferences, run_at_utc, expected,
+            )
+            cells.append({
+                "city_id": destination.city_id, "day": day,
+                "start": format_utc(start), "end": format_utc(end),
+                "status": row["status"], "reason": row["reason"],
+                "score": row["final_score"],
+                "expected_periods": row["expected_periods"],
+                "evaluated_periods": row["evaluated_periods"],
+            })
+    return cells
+
+
+def destination_ranks(rows):
+    """Shared Dashboard ranks from unrounded final scores (ties: 1, 1, 3)."""
+    scores = {r["city_id"]: r["final_score"] for r in rows
+              if r["status"] == AVAILABLE}
+    rank_by_score = {}
+    for rank, score in enumerate(sorted(scores.values(), reverse=True), 1):
+        rank_by_score.setdefault(score, rank)
+    return {city: rank_by_score[score] for city, score in scores.items()}

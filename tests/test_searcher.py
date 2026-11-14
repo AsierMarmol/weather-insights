@@ -57,6 +57,9 @@ def ui(monkeypatch, tmp_path):
     monkeypatch.setattr(searcher, "utc_now", clock)
     monkeypatch.setattr(WeatherService, "from_environment", factory)
     app = AppTest.from_file(str(ROOT / "app.py"), default_timeout=15)
+    # Reserve the load for each test's configured scenario.
+    app.session_state.dashboard_attempted_days = 3
+    app.session_state.view = "Searcher"
     return app, service, session, clock, places, factory
 
 
@@ -78,7 +81,7 @@ def test_initial_preferences_by_season(month, low, high):
         prefs.days == 3 and prefs.activities == prefs.destination_sizes == ()
     )
     assert prefs.max_precipitation_probability_pct == 30
-    assert prefs.max_wind_kmh == 25
+    assert prefs.max_wind_kmh == 28
 
 
 def test_initial_preferences_uses_madrid_month_and_requires_aware_time():
@@ -99,19 +102,19 @@ def test_controls_do_not_fetch_and_preserve_edits_across_navigation(ui):
     assert not app.exception
     assert app.multiselect(key="_trip_activities").value == ["All"]
     assert app.multiselect(key="_trip_sizes").value == ["All"]
-    assert app.select_slider(key="_trip_days").value == 3
+    assert app.selectbox(key="_trip_days").value == 3
     app.number_input(key="_trip_min").set_value(12.0).run()
-    app.select_slider(key="_trip_days").set_value(5).run()
+    app.selectbox(key="_trip_days").set_value(5).run()
     app.sidebar.radio[0].set_value("Dashboard").run()
     clock.now = NOW.replace(month=12)
     app.sidebar.radio[0].set_value("Searcher").run()
     assert not app.exception
     assert app.number_input(key="_trip_min").value == 12.0
-    assert app.select_slider(key="_trip_days").value == 5
+    assert app.selectbox(key="_trip_days").value == 5
     assert not session.calls and not factory.called
     app.button(key="reset_preferences").click().run()
     assert app.number_input(key="_trip_min").value == 10.0
-    assert app.select_slider(key="_trip_days").value == 3
+    assert app.selectbox(key="_trip_days").value == 3
 
 
 def test_search_top_five_matches_full_ranking_and_cache(ui):
@@ -119,12 +122,13 @@ def test_search_top_five_matches_full_ranking_and_cache(ui):
     app.run().button(key="run_search").click().run()
     assert not app.exception
     assert len(session.calls) == len(places) == 6
-    assert len(app.metric) == 15  # Three metrics for each of five cards.
+    assert len(card_scores(app)) == 5
     rows = app.session_state.search_analysis_rows
     assert len(rows) == 6 and all(r["status"] == "available" for r in rows)
     table = app.dataframe[0].value
-    assert table["Score / 100"].tolist() == [r["final_score"] for r in rows]
-    assert [float(m.value) for m in app.metric[::3]] == [
+    assert table["Trip score / 100"].tolist() == [
+        r["final_score"] for r in rows]
+    assert card_scores(app) == [
         round(r["final_score"], 1) for r in rows[:5]
     ]
     saved = service.store.path.read_bytes()
@@ -142,6 +146,10 @@ def test_invalid_temperature_prevents_request(ui):
     app, _, session, _, _, _ = ui
     app.run().number_input(key="_trip_min").set_value(30.0).run()
     assert not app.exception and app.error
+    assert app.error[0].value == (
+        "Minimum temperature cannot be higher than maximum "
+        "temperature. Adjust your temperature range."
+    )
     assert app.button(key="run_search").disabled
     assert session.calls == []
 
@@ -191,7 +199,9 @@ def test_partial_failure_is_visible_and_keeps_other_results(ui):
     assert sum(r["status"] == "available" for r in rows) == 5
     assert rows[-1]["city_id"] == SEGOVIA.city_id
     assert any("find this place" in w.value for w in app.warning)
-    assert "find this place" in app.dataframe[0].value.iloc[-1]["Status"]
+    assert "Status" not in app.dataframe[0].value.columns
+    assert any("Segovia: The weather provider could not find this place."
+               in c.value for c in app.caption)
 
 
 def test_missing_key_has_safe_message_no_traceback(ui):
@@ -262,7 +272,9 @@ def test_genuine_saved_sample_renders_without_live_http(ui):
         "Toledo",
         "Segovia",
     ]
-    assert [float(m.value) for m in app.metric[::3]] == [83.9, 50.8, 46.9]
+    # Frozen CSV independently evaluated with preferred Low rain and
+    # Moderate wind, 80/20 aggregation and two points per driving hour.
+    assert card_scores(app) == [74.0, 69.6, 67.1]
 
 
 def test_old_results_show_age_warning_without_refetch(ui):
@@ -318,7 +330,7 @@ def test_all_failed_search_has_safe_reasons(ui, code):
     assert any("No complete usable forecasts" in w.value for w in app.warning)
     assert any(searcher.MESSAGES[code] in w.value for w in app.warning)
     assert all("never-show" not in w.value for w in app.warning)
-    assert app.dataframe[0].value["Score / 100"].isna().all()
+    assert app.dataframe[0].value["Trip score / 100"].isna().all()
 
 
 def test_reference_file_failure_displays_guidance(ui, monkeypatch):
@@ -360,3 +372,126 @@ def test_storage_guidance_persists_and_refresh_recovers(ui, monkeypatch):
     assert service.unsaved_record_count == 0
     assert len(session.calls) == len(places)
     assert len(service.store.load()) == 40 * len(places)
+
+
+def card_scores(app):
+    import re
+    html = next(element.proto.body for element in app.get('html')
+                if 'class="wi-trip-list"' in element.proto.body)
+    return [float(value) for value in re.findall(
+        r'class="wi-trip-fit">([0-9.]+)/100', html)]
+
+
+def test_weather_categories_preserve_values_reset_and_do_not_fetch(ui):
+    app, _, session, _, _, factory = ui
+    # Existing sessions may still contain the former numeric settings.
+    app.session_state._trip_wind = 25.0
+    app.session_state._trip_rain = 35.0
+    app.run()
+    assert not app.exception
+    assert app.selectbox(key="_trip_wind").value == 28.0
+    assert app.selectbox(key="_trip_rain").value == 60.0
+    app.selectbox(key="_trip_wind").set_value(38.0).run()
+    app.selectbox(key="_trip_rain").set_value(100.0).run()
+    prefs = app.session_state.search_preferences
+    assert prefs.wind_preference == "Fresh"
+    assert prefs.rain_preference == "High"
+    assert prefs.scoring_mode == "searcher"
+    assert prefs.max_wind_kmh == 38.0
+    assert prefs.max_precipitation_probability_pct == 100.0
+    app.button(key="reset_preferences").click().run()
+    assert app.selectbox(key="_trip_wind").value == 28.0
+    assert app.selectbox(key="_trip_rain").value == 30.0
+    assert not app.exception
+    assert not session.calls and not factory.called
+
+
+def test_invalid_response_names_city_and_preserves_other_results(ui):
+    from weather_fakes import FakeResponse
+    app, _, session, clock, _, _ = ui
+    original = catalog_handler(clock)
+
+    def district_response(url, params):
+        response = original(url, params)
+        body = response.json()
+        if body.get("city", {}).get("name") == "Segovia":
+            body["city"]["name"] = "Different district"
+        return FakeResponse(200, body)
+
+    session.handler = district_response
+    app.run().button(key="run_search").click().run()
+    assert not app.exception
+    assert any("Segovia: The weather response could not be validated."
+               in w.value for w in app.warning)
+    assert sum(r["status"] == "available"
+               for r in app.session_state.search_analysis_rows) == 5
+
+
+def test_result_caption_uses_chosen_preferred_ranges(ui):
+    app, _, _, _, _, _ = ui
+    app.run()
+    app.selectbox(key="_trip_rain").set_value(60.0).run()
+    app.selectbox(key="_trip_wind").set_value(19.0).run()
+    app.button(key="run_search").click().run()
+    assert not app.exception
+    captions = " ".join(c.value for c in app.caption)
+    assert "preferred rain probability: Medium (>30–60%)" in captions
+    assert "preferred wind: Gentle (<20 km/h)" in captions
+    assert "wind ≤19" not in captions
+
+
+@pytest.mark.parametrize("wind_index,expected_count", [(5, 0), (4, 1)])
+def test_wind_warning_only_counts_visible_recommendations(
+    ui, wind_index, expected_count
+):
+    app, _, session, _, _, _ = ui
+    app.run().button(key="run_search").click().run()
+    rows = [dict(row) for row in app.session_state.search_analysis_rows]
+    assert len(rows) == 6
+    for row in rows:
+        row["max_wind_kmh"] = 10
+    rows[wind_index]["max_wind_kmh"] = 39
+    app.session_state.search_analysis_rows = rows
+    calls_before = len(session.calls)
+    app.run()
+    assert not app.exception
+    warnings = [
+        w.value for w in app.warning if "high forecast wind" in w.value
+    ]
+    assert len(warnings) == expected_count
+    if expected_count:
+        assert warnings[0].startswith("1 of your top recommendations")
+    assert len(session.calls) == calls_before
+
+
+@pytest.mark.parametrize("remaining", [0, 40])
+def test_service_reload_preserves_unsaved_records(monkeypatch, remaining):
+    from types import SimpleNamespace
+
+    class State(dict):
+        __getattr__ = dict.__getitem__
+        __setattr__ = dict.__setitem__
+
+    stale = SimpleNamespace(unsaved_record_count=40)
+
+    def retry():
+        stale.unsaved_record_count = remaining
+        return remaining
+
+    stale.retry_unsaved = Mock(side_effect=retry)
+    state = State(weather_service=stale)
+    monkeypatch.setattr(searcher, "st", SimpleNamespace(session_state=state))
+    fresh = WeatherService(Mock(), Mock())
+    factory = Mock(return_value=fresh)
+    monkeypatch.setattr(WeatherService, "from_environment", factory)
+    if remaining:
+        with pytest.raises(searcher.PendingServiceReloadError):
+            searcher.get_service()
+        assert state.weather_service is stale
+        assert stale.unsaved_record_count == 40
+        factory.assert_not_called()
+    else:
+        assert searcher.get_service() is fresh
+        assert searcher.get_service() is fresh
+        factory.assert_called_once()
+    stale.retry_unsaved.assert_called_once()
