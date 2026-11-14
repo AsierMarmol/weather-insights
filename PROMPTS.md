@@ -2070,3 +2070,38 @@ relying on red alone. No new alert threshold or scoring penalty was added.
 
 **Human review / commit:** Prepared locally for requester review; not committed
 or pushed. The final reviewed dev candidate still needs the P6.2 clone checks.
+
+---
+
+## Phase 6: P6.2 Alejandra clean-clone verification (2026-11-14)
+
+**Requested by:** Alejandra Medina (alemedinabarreto).
+
+**AI collaborator:** Claude Code (Anthropic Claude Opus 5.5).
+
+**Asked:** Perform P6.2 from a new clone of dev following README only, run the
+locked install, dependency check, import, full tests and Flake8, check the app
+live, report honestly without changing code or tests; then add the clone
+results and the genuine records created to the feature branch and commit.
+
+**Got:** A clean-clone run on dev `d1c3bdf` (macOS 15.7.8, Python 3.14.7,
+uv 0.12.9): 524 passed, 1 Windows-only skip, both POSIX permission tests
+passing, Flake8 clean, and the live Landing, Dashboard (all five windows) and
+Searcher checks recorded in [Phase 6](PHASE6_DELIVERY.md#p62-alejandra-clean-clone-run--14-november-2026).
+The 3,320 genuine forecast rows saved during the run were appended to the
+latest dev data through `WeatherStore.append`.
+
+**Checked:** Score agreement across map, scatter, top five, driving bands and
+heatmap from chart data in every window; Searcher cards against an offline
+recompute; append-only data diff with unique keys. The canvas tables, map
+tiles, hovers and layout were not inspected; no failure paths were provoked live.
+
+**Kept / changed / rejected:** No code, tests or scoring changed. The run is
+recorded against `d1c3bdf`; it is not relabelled as covering `f26e908`.
+
+**Human review:** Christian's review of the P6.2 reports is pending. P6.2 is
+not complete: Alejandra repeats it on the final reviewed dev commit, and
+Gabriel's report is still required.
+
+**Commit / PR:** Committed on `Alejandra/feature`, authorized by Alejandra;
+not pushed or merged.
