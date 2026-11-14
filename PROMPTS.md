@@ -2105,3 +2105,35 @@ Gabriel's report is still required.
 
 **Commit / PR:** Committed on `Alejandra/feature`, authorized by Alejandra;
 not pushed or merged.
+
+
+## Phase 6: final-code live-save check and current status (2026-11-14)
+
+**Requested by:** AsierMarmol. **AI collaborator:** OpenAI Codex.
+
+**Asked:** Accept Gabriel's later validation alongside Alejandra's earlier
+run, complete the final-code fresh-fetch/save check, and update stale
+review/merge status. Christian reviews Alejandra's report.
+
+**Got:** Verified PR #23 merged with Alejandra's approval and PR #25 merged
+with Christian's approval. Used production code at `83cc7f9` for one real
+Toledo forecast, saved and read back 40 records, then verified reuse through
+the same and a restarted service without extra requests or duplicate rows.
+Preserved the genuine records in the project CSV (30,447 rows). Updated
+active delivery status and linked the [evidence](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026).
+
+**Checked:** Genuine timestamps and provider validation, identical readback,
+one HTTP request, no additional requests on reuse, idempotent append and
+preservation of all previous rows. Historical reports remain unchanged.
+
+**Kept / changed / rejected:** No application or scoring changes. The group
+accepts Gabriel's later coverage instead of another full Alejandra rerun;
+her old report is not relabelled as a final-code test. Christian's approval
+of Gabriel's report is not treated as approval of Alejandra's. No fabricated
+review, visual check or submission is recorded.
+
+**Human review / publication:** [Requested Christian's acknowledgement](https://github.com/AsierMarmol/weather-insights/pull/24#issuecomment-6885326286)
+on PR #24; his response is pending. Follow-up validation passed 50 tests with
+two POSIX-only Windows skips; local documentation links resolve and application
+code is unchanged. Documentation and genuine data are prepared locally; no
+commit/push/merge or P6.3 submission is performed in this step.

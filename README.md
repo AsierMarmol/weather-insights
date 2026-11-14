@@ -1,11 +1,11 @@
 # Weather Insights
 
-> **Current reviewed version:** P4.5/P6.1 was approved by Gabriel and merged
-> into `dev` through [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21) (`3444728`).
+> **Current reviewed dev:** `83cc7f9`, including merged PRs #23–#25.
+> Alejandra approved the typing/warning-marker update; Christian approved Gabriel's final-code report.
 > [SCORING.md](SCORING.md) defines the current formula;
 > [Latest local validation](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026): **525 passed, 2 Windows skips; type checks and lint clean**.
-> The typing and warning-marker follow-ups require Alejandra's review and merge into dev.
-> Next: P6.2 independent clean-clone verification, then P6.3 final delivery.
+> The final-code fresh-fetch/save check passed; [P6.2 status](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026) records the remaining review acknowledgement.
+> Next: acceptance closure and P6.3 final publication/submission.
 
 
 A five-person Python/Streamlit project recommending mainland-Spain car trips from Madrid using weather preferences and driving time.
@@ -16,8 +16,8 @@ The reviewed application includes Landing, Trip Searcher and the independent
 all-83 Dashboard. It retains the original OOP/API/store architecture and
 genuine data. Canva supplies visual direction only, not weather or scoring.
 Gabriel approved the P4.5/P6.1 update on 14 November 2026, and PR #21 was
-merged into dev. P6.2 clean-clone acceptance and P6.3 final delivery remain
-pending. See [project phases](PROJECT_PHASES.md) for owners and next steps.
+merged into dev. P6.2 now has both dated reports and a final-code live-save check; reviewer
+acknowledgement and P6.3 publication remain pending. See [project phases](PROJECT_PHASES.md) for owners and next steps.
 
 ## Requirements
 
@@ -269,12 +269,11 @@ Read the [catalog sources](data/reference/README.md), [saved-data record](data/w
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). The current committed-version
-Windows audit passed **523 tests, with 2 POSIX-only skips**; lint and bounded
-stress checks passed. Gabriel approved PR #21 and it is merged into dev.
-Gabriel and Alejandra each perform P6.2 at the end of preparation, reviewed
-by Christian, before P6.3 delivery. Each member
-must still be able to explain the application.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). The latest dev Windows audit
+passed **525 tests, with 2 POSIX-only skips**; types, lint and stress checks passed.
+The [P6.2 evidence](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026) distinguishes both teammates' tested versions
+and the successful final-code live-save check. Each member must still be able
+to explain the application before P6.3 delivery.
 
 ## Latest audit
 
@@ -283,8 +282,7 @@ The [delivery-readiness recheck](PHASE5_QUALITY_REVIEW.md#delivery-readiness-rec
 The [final pre-clone audit](PHASE5_QUALITY_REVIEW.md#final-pre-clone-validation--14-november-2026) validated the
 candidate before the warning-marker update against the assignment and applicable class practices.
 All 523 tests passed (2 Windows skips), with type/lint, install/build, data,
-independent scoring and deliberate-fault checks passing. The typing follow-up
-is not yet published. The subsequent [warning-marker validation](PHASE5_QUALITY_REVIEW.md#high-wind-card-marker-follow-up--14-november-2026) passed 525 passed, 2 skipped, type checks and lint. Earlier committed-version evidence follows.
+independent scoring and deliberate-fault checks passing. That typing follow-up was subsequently approved and merged in PR #23. The subsequent [warning-marker validation](PHASE5_QUALITY_REVIEW.md#high-wind-card-marker-follow-up--14-november-2026) recorded 525 passing tests, 2 skips, and clean type checks and lint. Earlier committed-version evidence follows.
 
 
 The [post-commit validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
@@ -308,7 +306,7 @@ assets, theme and genuine accumulated dataset travel with the repository.
 Nothing in the runtime source requires Asier's Windows path or copied settings.
 
 For grading, use the final reviewed `main` commit after publication. Until then,
-`dev` contains the reviewed P4.5/P6.1 update from PR #21 (`3444728`).
+`dev` contains the reviewed updates through PR #25 (`83cc7f9`).
 Record the tested commit with `git rev-parse HEAD` and follow the verification
 commands above. P6.2 independently verifies the reviewed version; the local
 automated audit does not replace that acceptance step.

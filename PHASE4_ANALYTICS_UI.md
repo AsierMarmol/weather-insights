@@ -178,8 +178,8 @@ approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21), merg
 The [post-commit audit](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
 passed 523 tests with two POSIX-only Windows skips and clean lint.
 VS Code preview evidence remains dated 13 November; this audit did not repeat
-browser, phone or Mac checks. Gabriel and Alejandra each perform P6.2
-after final preparation, with Christian reviewing both reports, before P6.3. Actual implementation remains attributed to
+browser, phone or Mac checks. The later [P6.2 reports and live-save check](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026)
+record actual tested versions and the revised acceptance scope before P6.3. Actual implementation remains attributed to
 AsierMarmol and OpenAI Codex; review is distinct from authorship.
 
 ### Loading follow-up — 14 November 2026

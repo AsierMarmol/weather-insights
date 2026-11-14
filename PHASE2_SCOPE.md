@@ -6,7 +6,7 @@ Updated: 14 November 2026. P4.5 is merged; current local verification is recorde
 
 ## Current checkpoint
 
-Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); P4.5/P6.1 was approved by Gabriel and merged in PR #21. The latest local typing and pre-clone checks are recorded in [Phase 5](PHASE5_QUALITY_REVIEW.md#final-pre-clone-validation--14-november-2026); these follow-up changes await their own commit and review. Catalog/source limitations remain documented in the reference notes.
+Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); P4.5/P6.1 was approved by Gabriel and merged in PR #21. The latest local typing and pre-clone checks are recorded in [Phase 5](PHASE5_QUALITY_REVIEW.md#final-pre-clone-validation--14-november-2026); the typing/warning-marker follow-ups were approved by Alejandra and merged in PR #23. Catalog/source limitations remain documented in the reference notes.
 
 ## Deliverables
 

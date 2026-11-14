@@ -5,11 +5,11 @@
 Updated: 14 November 2026. **Current local candidate: 525 passed,
 two POSIX-only Windows skips; type checks and lint clean.**
 The [delivery-readiness recheck](#delivery-readiness-recheck--14-november-2026)
-records the latest run. Typing and warning-marker changes require Alejandra's review and merge into dev. Earlier semantic/cleanup/integration results retain their
+records the latest run. Typing and warning-marker changes were approved by Alejandra and merged in PR #23. Earlier semantic/cleanup/integration results retain their
 dated timings and datasets. Gabriel approved PR #21 and it is merged into dev.
-P6.2 independent clean-clone acceptance and P6.3 delivery remain open.
+Current [P6.2 live-save/review status](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026) supersedes the older pending-rerun notes; P6.3 delivery remains open.
 The original P5.1–P5.5 table and dated entries below are historical evidence.
-No new live API, browser, phone or Mac result is claimed.
+The earlier offline audits below remain scoped as recorded; Phase 6 now records a separate final-code live API/save check.
 
 ## Purpose and dependencies
 

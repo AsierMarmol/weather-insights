@@ -2,17 +2,14 @@
 
 ## Current checkpoint
 
-**P4.5/P6.1 approved and merged; typing fixes and warning markers validated locally before P6.2.**
-The [type-checking follow-up](PHASE5_QUALITY_REVIEW.md#type-checking-follow-up--14-november-2026) passes locally;
-Alejandra reviews these changes before merge and the final P6.2 tests.
-Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21) on 14 November 2026; it merged into dev
-as `3444728`. Its files match audited feature commit `8b1210e` exactly.
-[Phase 4](PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign)
-summarizes the changes; [Phase 5](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026)
-records the latest checks and limitations. [SCORING.md](SCORING.md) owns the
-two-score model. [PROMPTS.md](PROMPTS.md#phase-4-extension-and-delivery-development-record)
-preserves the development sequence. The PR #21 redesign is available on dev;
-the typing and warning-marker follow-ups require Alejandra's review before merge.
+**Current dev: `83cc7f9`; implementation reviewed, final live-save check passed.**
+PR #23 was approved by Alejandra and merged. PR #24 retains her earlier
+clean-clone report; Gabriel's final-code report in PR #25 was approved by
+Christian. The group accepts that later coverage without requiring another
+complete Alejandra rerun. Christian's acknowledgement of her earlier report
+remains pending. [Phase 6](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026) owns current acceptance details;
+[Phase 5](PHASE5_QUALITY_REVIEW.md) owns automated evidence and limitations.
+[SCORING.md](SCORING.md) remains the two-score specification.
 
 | Phase | Outcome | Current state |
 | --- | --- | --- |
@@ -21,24 +18,16 @@ the typing and warning-marker follow-ups require Alejandra's review before merge
 | [3 — Core](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Original components accepted; redesign shares these components |
 | [4 — Interface](PHASE4_ANALYTICS_UI.md) | Landing, Searcher and executive Dashboard | P4.1–P4.4 reviewed historically; P4.5 approved and merged in PR #21 |
 | [5 — Quality](PHASE5_QUALITY_REVIEW.md) | Integrated tests, rubric and failure handling | P5.5 reviewed historically; current redesign evidence recorded separately |
-| [6 — Delivery](PHASE6_DELIVERY.md) | Reviewed documentation, clean clone, submission | P6.1 approved and merged; P6.2 next; P6.3 pending |
+| [6 — Delivery](PHASE6_DELIVERY.md) | Reviewed documentation, clean clone, submission | P6.1 merged; P6.2 technical evidence recorded, acknowledgement pending; P6.3 pending |
 
 ## Next actions and owners
 
-1. **P6.2: Gabriel and Alejandra, reviewed by Christian.** After the final
-   documentation changes and any fixes are reviewed and merged, each clones
-   the same reviewed dev commit into a fresh
-   directory, follow README only, use a personal key, and record the exact
-   commit, environment, tests/type checks/lint and agreed visual checks. Do not copy an
-   existing environment or credentials. The [post-commit audit](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
-   passed 523 tests with two Windows POSIX skips; it is supporting evidence,
-   not independent P6.2 acceptance. No new phone/Mac result is claimed.
-2. **P6.3: Asier, reviewed by Gabriel.** After P6.2, confirm data/source
-   conditions, team understanding, instructor access and submission channel;
-   then perform authorized dev → main publication and record submission.
-
-Gabriel's PR #21 approval closes the integration review. It does not itself
-document a new Mac or browser run. Dated earlier checks retain their scope.
+1. **Christian:** acknowledge Alejandra's earlier report and the combined
+   [P6.2 evidence](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026); his PR #25 approval already covers Gabriel's report.
+2. **Asier:** review/commit the local live-check records and status updates,
+   obtain review/merge, then complete P6.3 with Gabriel reviewing. Confirm
+   instructor access/channel and team understanding; publish reviewed dev
+   to main and record the real submission. Main is still the starter version.
 
 ## Original baseline history
 

@@ -1,28 +1,29 @@
 # Phase 6 - Documentation and Delivery
 
-Updated 14 November 2026. The original P6.1 preparation/publication history is
-retained below. P4.5/P6.1 was approved by Gabriel and merged in PR #21.
-The independent reviewed-version clean-clone gate remains P6.2.
+Updated 14 November 2026. Current reviewed dev is `83cc7f9`.
+PR #23 is approved by Alejandra and merged; PR #24 retains her earlier
+clean-clone evidence; PR #25 records Gabriel's final-code validation and
+Christian's approval. Historical reports below retain their actual scope.
 
-| Step | Deliverable | Owner | Reviewer | Dependency and current status |
+| Step | Deliverable | Owner | Reviewer | Current status |
 | --- | --- | --- | --- | --- |
-| P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version and Christian's review remain pending. Gabriel's [report](#p62-report---gabriel-14-november-2026) covers final dev `252e2cb` (automated and live checks passed; no live fresh save on this code because all forecasts were under three hours old) |
-| P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
+| P6.1 | README, delivery contents, real data/source/AI evidence | Asier | Gabriel; Alejandra reviewed PR #23 | Implementation and typing/warning-marker changes reviewed and merged |
+| P6.2 | Clean-clone evidence and final-code fetch/save verification | Gabriel and Alejandra; Asier for the live-save follow-up | Christian | Gabriel's final-code report approved in PR #25; fresh-fetch/save check passed. Christian's acknowledgement of Alejandra's earlier report remains pending; see [current evidence](#p62-final-code-live-save-and-acceptance-status--14-november-2026) |
+| P6.3 | Reviewed publication and submission | Asier | Gabriel | Pending acceptance closure, final reviewed dev-to-main publication and submission |
 
 ## Next action
 
-The locally validated [typing and warning-marker follow-ups](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026) require Alejandra's review
-and merge into dev before the final P6.2 runs. Its automated checks do
-not replace either independent acceptance report.
+The group decision is to use Gabriel's final-code validation alongside
+Alejandra's earlier clean-clone report; a second complete Alejandra rerun is
+no longer required by the project plan. This changes the acceptance plan,
+not the versions that were actually tested. Christian approved Gabriel's
+PR #25; Alejandra's PR #24 was approved by Asier, not Christian.
 
-
-**Gabriel and Alejandra each perform P6.2, reviewed by Christian.** Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21)
-and it merged into dev as `3444728`. Clone reviewed dev into a new directory,
-record the exact commit and follow README only. [Post-commit validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
-passed against identical files but does not close this independent gate.
-Local Streamlit is the delivery target; hosting is optional. The full
-repository is needed: a wheel alone lacks app.py and external data/assets.
+Complete Christian's review acknowledgement, review/commit the local
+live-check evidence and genuine records, then follow P6.3. The final code
+matches Gabriel's tested `252e2cb`; later merges changed documentation/data.
+Local Streamlit remains the delivery target. Deliver the complete repository;
+a wheel alone does not contain app.py, external reference data or assets.
 
 ## Delivery contents and final checklist
 
@@ -54,17 +55,18 @@ Do not include real credential files, copied virtual environments, caches, tempo
 
 ### P6.2 clean-clone acceptance - Gabriel and Alejandra, reviewed by Christian
 
-P6.1 is reviewed and merged in PR #21. Run P6.2 at the end of preparation,
-after the final documentation cleanup and any fixes are reviewed and merged,
-before P6.3 publication/submission. Gabriel and Alejandra each test the same
-reviewed dev commit independently, using separate fresh directories, their
-own environments and personal API keys. Both reports are required; this
-assignment does not mark either run complete. Use only README instructions. Record `git rev-parse HEAD`, operating system, Python/uv versions and actual results. Do not copy another clone's environment or credentials.
+The original plan requested two complete runs on the same final dev commit.
+The [current acceptance decision](#p62-final-code-live-save-and-acceptance-status--14-november-2026) supersedes that repeat-run
+requirement: Alejandra's original report remains dated evidence; Gabriel's
+final-code run supplies the later coverage, supplemented by the live-save
+check below. Christian reviews the evidence without reattributing either run.
+The checks below remain the acceptance checklist; unobserved visual behavior
+is not converted into a pass by this planning change.
 
 1. Clone reviewed dev and run `uv sync --locked`, package import, `uv pip check`, the full offline test suite, Flake8 and `uv run --locked pyright` as documented in README. If using VS Code, select the new clone's `.venv` and check Pylance too. Keep the app stopped during tests. On macOS the two Unix permission tests should run, not be dismissed as Windows skips.
 2. Configure a personal key locally and start Streamlit. Check Landing and Dashboard before Searcher, automatic Dashboard loading, the all-83 map, hover, executive tables, Destination-score-versus-driving scatter and daily heatmap; verify 1/5-day selection, navigation and independent state. Check the agreed delivery viewport; this local audit excludes phone/Mac acceptance. Live loads create real saved records and count against the account quota.
 3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. When a top-five high-wind alert appears, verify that the affected cards carry the red dot and High wind label. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
-4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes the candidate, both reports must cover the final reviewed version before P6.2 is closed. Preserve new real records and inspect the diff before proposing them for commit.
+4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes runtime behavior, record a targeted retest of that change before closing P6.2. Preserve new real records and inspect the diff before proposing them for commit.
 
 ### P6.2 report - Gabriel, 14 November 2026
 
@@ -371,3 +373,49 @@ retrieved 14 November 2026 21:03:10–21:04:12 UTC, one fetch group per city).
 They were appended unchanged to the dev data after PR #23's 3,480 rows,
 using `WeatherStore.append`: 29,567 records, all keys unique, no existing row
 changed.
+
+
+## P6.2 final-code live save and acceptance status — 14 November 2026
+
+**Group decision:** accept Gabriel's final-code validation together with
+Alejandra's earlier clean-clone evidence, rather than require her to repeat
+the complete run. Alejandra tested `d1c3bdf`; Gabriel retested `252e2cb`.
+The current `83cc7f9` has identical application code/tests/assets/configuration
+to Gabriel's tested version; subsequent merges added documentation and data.
+Christian approved [PR #25](https://github.com/AsierMarmol/weather-insights/pull/25).
+His review of Alejandra's [PR #24](https://github.com/AsierMarmol/weather-insights/pull/24)
+has not been recorded; its merged approval was from Asier. No approval is inferred.
+
+**Live verification by Asier with OpenAI Codex:** tested production code at
+`83cc7f9c79cbe1c59bbdfdeed0dfe92c83399234`. The requester stopped the app before preserving
+data. One real forecast request for Toledo (`ES-45168`) at
+`2026-11-14T22:36:05.745088+00:00` produced 40 validated forecast records,
+fetch ID `3860ffee-a708-484a-ba03-6790147d9402`. The production WeatherService and WeatherStore
+saved the response to a separate local CSV; a new WeatherStore read back
+the exact records. A repeated call and a restarted service reused the saved
+forecast with zero extra HTTP requests. Re-appending the same batch wrote
+zero rows and preserved the saved bytes. No fake response or frozen clock
+was used; credentials were never printed or copied into the repository.
+
+The genuine batch was then retained through WeatherStore.append in the
+project CSV: **30,407 -> 30,447 unique records**, with all earlier bytes
+preserved. The final-code fresh-fetch/save/readback/reuse gap is closed.
+This is a service/storage live check, not a new browser or Mac walkthrough.
+The visual limitations in the teammate reports remain disclosed; the
+requester's earlier preview review is separate evidence.
+
+**Follow-up checks:** 50 fetch/save/recovery and genuine-data acceptance
+tests passed, with two POSIX-only Windows skips, after retaining the live
+batch. All 156 local Markdown links resolved before adding the external
+review-request link. No application code changed; the prior full 525-pass
+Windows run remains the full-suite evidence for this code version.
+
+**Review request:** [Christian was asked on PR #24](https://github.com/AsierMarmol/weather-insights/pull/24#issuecomment-6885326286) to acknowledge
+Alejandra's earlier report alongside his approved Gabriel report and this
+live-save evidence. His response is pending; no approval is inferred.
+
+**Remaining:** Christian's review acknowledgement of Alejandra's earlier
+report and the combined acceptance scope; review/publication of this local
+documentation/data follow-up; P6.3 publication to main and actual submission.
+No commit, push, merge, reviewer approval or submission is performed by this
+record. This section supersedes older pending-rerun and pending-PR-23 wording.
