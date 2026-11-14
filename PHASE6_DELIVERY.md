@@ -7,7 +7,7 @@ The independent reviewed-version clean-clone gate remains P6.2.
 | Step | Deliverable | Owner | Reviewer | Dependency and current status |
 | --- | --- | --- | --- | --- |
 | P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | At the end of preparation, after final documentation/fixes merge; before P6.3 |
+| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Gabriel's report recorded below (dev `d1c3bdf`, macOS); Alejandra's report and Christian's review pending; before P6.3 |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
 
 ## Next action
@@ -60,6 +60,98 @@ assignment does not mark either run complete. Use only README instructions. Reco
 2. Configure a personal key locally and start Streamlit. Check Landing and Dashboard before Searcher, automatic Dashboard loading, the all-83 map, hover, executive tables, Destination-score-versus-driving scatter and daily heatmap; verify 1/5-day selection, navigation and independent state. Check the agreed delivery viewport; this local audit excludes phone/Mac acceptance. Live loads create real saved records and count against the account quota.
 3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
 4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes the candidate, both reports must cover the final reviewed version before P6.2 is closed. Preserve new real records and inspect the diff before proposing them for commit.
+
+### P6.2 report - Gabriel, 14 November 2026
+
+**Tester:** Gabriel Polan Barros Stec (Gabrielstec). **AI collaborator:**
+Claude Code (Anthropic Claude Opus 5.5), which ran the commands and drove the
+in-app browser at Gabriel's request. This is one of the two required reports;
+it does not close P6.2 or record Christian's review.
+
+**Commits and environment.** Fresh `git clone --branch dev` from GitHub into
+new directories; no environment, key or local configuration was copied. Live
+checks ran on `34447285c0fda927f2bb4ee77da8651ec12879a2` (PR #21). Dev then
+advanced to `d1c3bdfb5cd30a68fb66af4051b7b764d512f8f9` (PR #22, seven Markdown
+files only; `git diff` confirmed `src`, `tests`, `app.py`, `scripts`, `data`,
+`assets`, `.streamlit`, `pyproject.toml`, `uv.lock`, `.python-version`,
+`.gitignore` and `variables.env.example` identical), so the automated and
+no-key checks were repeated on a second fresh clone of `d1c3bdf`. macOS 26.6.2
+(arm64), Python 3.14.0, uv 0.12.9. The personal key was entered locally in the
+ignored `variables.env`; it was never displayed.
+
+**Automated checks (app stopped), identical on both commits.**
+
+| Command | Result |
+| --- | --- |
+| `uv sync --locked` | Succeeded |
+| `uv pip check` | All installed packages are compatible |
+| `uv run --locked python -c "import weather_app; ..."` | Package import OK |
+| `uv run --locked python -m pytest -q -ra` | 524 passed, 1 skipped (`test_storage_recovery.py:122`, Windows file sharing); 32-35 s |
+| `uv run --locked flake8 src tests scripts app.py` | No findings |
+
+Both POSIX permission tests (`test_saving_keeps_the_files_permissions`,
+`test_first_saved_file_follows_the_umask`) ran and passed. The genuine weather
+CSV was byte-identical after testing.
+
+**Manual and live checks (`3444728`, 1024x768 in-app browser).**
+
+- Landing loads; navigation works; the season card shows Autumn 16–24 °C,
+  matching `product_defaults.json`. Searcher defaults also match (3 days,
+  16–24 °C, Low rain, Moderate wind, Activities and Size All).
+- Dashboard opened before Searcher and loaded automatically ("83 of 83 ... 83
+  saved forecast(s) reused"). Windows 1, 2, 3, 4 and 5 each reused the saved
+  forecasts; every window kept all 83 destinations on the map and scatter.
+- In every window the map and scatter scores agree for all 83 destinations at
+  full precision, and the KPI average, leader, top five, driving bands and
+  visible catalogue rows agree with them. Four 4-day scores recomputed by hand
+  from the CSV with the SCORING.md formula matched exactly (Elche 86.2997,
+  Alicante 85.9091, Toledo 71.8666, Santiago de Compostela 42.4494).
+- Heatmap: 83 rows; each day is its own 24-hour window; Daily avg is the mean
+  of the day scores and rows are sorted by it; 64 of 83 averages differ from
+  the whole-window score, as documented. In the 1-day window every Day 1 value
+  equals the overview score.
+- Searcher: Coast replaced All (37 matches); Coast plus Small city or town gave
+  21; both match the catalogue. Controls showed "Settings changed" and did not
+  fetch. Reset restored every default. Low/Medium/High rain and the four wind
+  categories are offered; a High rain search ranked dry coastal forecasts lower.
+- Cards equal the first five full-ranking rows in Trip score and driving time
+  (cards `4:01 h`, table `04:01`, padded for sorting); the full ranking had 83
+  rows (75 read, all descending, none blank) and 21 rows for the filtered search.
+- The views kept independent settings and snapshots across navigation.
+- High-wind notice, Strong wind preferred: "1 of your top recommendations ..."
+  was correct; only A Coruña in the top five reached 39+ km/h (48.0), while a
+  second windy destination outside the top five was not counted. No notice
+  appeared with defaults (top-five maxima 6.7-22.4 km/h).
+- After the saved forecasts passed three hours, one 21-destination Searcher
+  search fetched fresh data ("0 reused") and saved 840 genuine forecast rows
+  (21 fetch groups x 40 periods, retrieved 2026-11-14 21:05:35-37 UTC, valid
+  times after retrieval, no blank required metrics, unique keys, earlier bytes
+  unchanged). Repeating the search ("21 reused") and switching to 5 days
+  reused the full saved forecasts and appended nothing.
+- No key, `d1c3bdf`: Landing works; Dashboard shows the key message and the
+  `variables.env.example` setup step, 0/83 coverage and all 83 destinations as
+  "Weather not loaded" with no invented scores; nothing was written.
+
+**Not tested.** Live quota, network, storage and missing-weather states (none
+occurred; the offline suite covers them); map tiles, hover, zoom/reset and
+fonts were not judged visually (chart data was read directly); no live
+Dashboard fetch; Windows, phone and other viewports.
+
+**Defects.** None in the application. Cosmetic: the window option reads "Next 1
+days" and the wind notice "1 of your top recommendations include"; the
+smallest fix is singular wording for a count of 1. Documentation: the dated
+P6.1 preparation section above still says Gabriel's review "remains open"
+(superseded by the P6.1 review and merge note); README quotes the Windows
+result (523 passed, 2 skipped), equivalent to 524 passed, 1 skipped on macOS.
+
+**New genuine records.** 840 forecast rows exist only in the uncommitted CSV of
+the `3444728` test clone (22,767 to 23,607 rows). They are preserved there and
+are not part of this change; proposing them for commit needs a diff review.
+
+**Result.** The reviewed `d1c3bdf` repository installs, tests and runs from a
+fresh clone on macOS with no application failure found. Ready for final
+delivery from this tester's perspective once Alejandra's report and
+Christian's review complete P6.2.
 
 ### P6.3 final publication - Asier, reviewed by Gabriel
 
