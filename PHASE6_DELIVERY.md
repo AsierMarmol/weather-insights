@@ -7,7 +7,7 @@ The independent reviewed-version clean-clone gate remains P6.2.
 | Step | Deliverable | Owner | Reviewer | Dependency and current status |
 | --- | --- | --- | --- | --- |
 | P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version, Gabriel's report and Christian's review remain pending |
+| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version and Christian's review remain pending. Gabriel's [report](#p62-report---gabriel-14-november-2026) covers final dev `252e2cb` (automated and live checks passed; no live fresh save on this code because all forecasts were under three hours old) |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
 
 ## Next action
@@ -65,6 +65,134 @@ assignment does not mark either run complete. Use only README instructions. Reco
 2. Configure a personal key locally and start Streamlit. Check Landing and Dashboard before Searcher, automatic Dashboard loading, the all-83 map, hover, executive tables, Destination-score-versus-driving scatter and daily heatmap; verify 1/5-day selection, navigation and independent state. Check the agreed delivery viewport; this local audit excludes phone/Mac acceptance. Live loads create real saved records and count against the account quota.
 3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. When a top-five high-wind alert appears, verify that the affected cards carry the red dot and High wind label. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
 4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes the candidate, both reports must cover the final reviewed version before P6.2 is closed. Preserve new real records and inspect the diff before proposing them for commit.
+
+### P6.2 report - Gabriel, 14 November 2026
+
+**Tester:** Gabriel Polan Barros Stec (Gabrielstec). **AI collaborator:**
+Claude Code (Anthropic Claude Opus 5.5), which ran the commands and drove the
+in-app browser at Gabriel's request. This is one of the two required reports;
+it does not close P6.2 or record Christian's review.
+
+**Commits and environment.** Fresh `git clone --branch dev` from GitHub into
+new directories; no environment, key or local configuration was copied. Live
+checks ran on `34447285c0fda927f2bb4ee77da8651ec12879a2` (PR #21). Dev then
+advanced to `d1c3bdfb5cd30a68fb66af4051b7b764d512f8f9` (PR #22, seven Markdown
+files only; `git diff` confirmed `src`, `tests`, `app.py`, `scripts`, `data`,
+`assets`, `.streamlit`, `pyproject.toml`, `uv.lock`, `.python-version`,
+`.gitignore` and `variables.env.example` identical), so the automated and
+no-key checks were repeated on a second fresh clone of `d1c3bdf`. macOS 26.6.2
+(arm64), Python 3.14.0, uv 0.12.9. The personal key was entered locally in the
+ignored `variables.env`; it was never displayed.
+
+**Re-run after PR #23 and #24.** Dev then advanced to
+`252e2cbc3ae2c51647db3bb8cde1132412446ac1` (PR #24 on top of PR #23 `f26e908`).
+PR #23 changed application code (typing fixes and named high-wind
+recommendations); `252e2cb` differs from `f26e908` only in documentation and
+data. A third fresh clone of `252e2cb` passed every automated check below:
+526 passed, 1 skipped (same Windows-only test), both POSIX permission tests
+ran and passed, Flake8 no findings, `uv pip check` compatible, import OK, and
+the genuine CSV (29,567 rows) unchanged.
+
+**Live re-run on `252e2cb` (23:12-23:16 CET, personal key in the new clone's
+ignored `variables.env`).** Landing showed Autumn 16–24 °C. The Dashboard,
+opened before the Searcher, loaded automatically and reused all 83 saved
+forecasts (retrieved 22:27-22:28 CET by Alejandra's run). In windows 1-5 the
+map and scatter agreed for all 83 destinations at full precision, and the
+cards, leader, KPI average, driving bands and heatmap (83 rows, Daily avg =
+mean of days, sorted; Day 1 = overview in the 1-day window) agreed with them.
+Four 5-day scores recomputed by hand matched exactly (Elche 85.3590, Toledo
+74.0419, Santiago de Compostela 41.1936, Lugo 50.8622 via its provider city
+ID). Searcher defaults matched the reference; the default search reused 83
+forecasts and its five cards equal the first five of 83 ranking rows. With
+Strong wind the notice read "1 of your top recommendations include ..." and
+the new "High wind" marker appeared only on A Coruña (54.4 km/h maximum; the
+other four 8.4-22.8 km/h; no other destination reached 39 km/h). Coast gave 37
+and Coast plus Small city or town 21 matches without fetching; the views kept
+independent settings; a 5-day filtered search reused all 21 forecasts (cards
+equal the first five of 21 rows); Reset restored every default without
+fetching. Nothing was saved: the CSV stayed byte-identical. Because every
+forecast was fresh, no live fresh fetch and save ran on the PR #23 code; that
+path was exercised live on `3444728` (below) and by the offline suite.
+
+**Automated checks (app stopped), identical on `3444728` and `d1c3bdf`.**
+
+| Command | Result |
+| --- | --- |
+| `uv sync --locked` | Succeeded |
+| `uv pip check` | All installed packages are compatible |
+| `uv run --locked python -c "import weather_app; ..."` | Package import OK |
+| `uv run --locked python -m pytest -q -ra` | 524 passed, 1 skipped (`test_storage_recovery.py:122`, Windows file sharing); 32-35 s |
+| `uv run --locked flake8 src tests scripts app.py` | No findings |
+
+Both POSIX permission tests (`test_saving_keeps_the_files_permissions`,
+`test_first_saved_file_follows_the_umask`) ran and passed. The genuine weather
+CSV was byte-identical after testing.
+
+**Earlier manual and live checks (`3444728`, 1024x768 in-app browser).**
+
+- Landing loads; navigation works; the season card shows Autumn 16–24 °C,
+  matching `product_defaults.json`. Searcher defaults also match (3 days,
+  16–24 °C, Low rain, Moderate wind, Activities and Size All).
+- Dashboard opened before Searcher and loaded automatically ("83 of 83 ... 83
+  saved forecast(s) reused"). Windows 1, 2, 3, 4 and 5 each reused the saved
+  forecasts; every window kept all 83 destinations on the map and scatter.
+- In every window the map and scatter scores agree for all 83 destinations at
+  full precision, and the KPI average, leader, top five, driving bands and
+  visible catalogue rows agree with them. Four 4-day scores recomputed by hand
+  from the CSV with the SCORING.md formula matched exactly (Elche 86.2997,
+  Alicante 85.9091, Toledo 71.8666, Santiago de Compostela 42.4494).
+- Heatmap: 83 rows; each day is its own 24-hour window; Daily avg is the mean
+  of the day scores and rows are sorted by it; 64 of 83 averages differ from
+  the whole-window score, as documented. In the 1-day window every Day 1 value
+  equals the overview score.
+- Searcher: Coast replaced All (37 matches); Coast plus Small city or town gave
+  21; both match the catalogue. Controls showed "Settings changed" and did not
+  fetch. Reset restored every default. Low/Medium/High rain and the four wind
+  categories are offered; a High rain search ranked dry coastal forecasts lower.
+- Cards equal the first five full-ranking rows in Trip score and driving time
+  (cards `4:01 h`, table `04:01`, padded for sorting); the full ranking had 83
+  rows (75 read, all descending, none blank) and 21 rows for the filtered search.
+- The views kept independent settings and snapshots across navigation.
+- High-wind notice, Strong wind preferred: "1 of your top recommendations ..."
+  was correct; only A Coruña in the top five reached 39+ km/h (48.0), while a
+  second windy destination outside the top five was not counted. No notice
+  appeared with defaults (top-five maxima 6.7-22.4 km/h).
+- After the saved forecasts passed three hours, one 21-destination Searcher
+  search fetched fresh data ("0 reused") and saved 840 genuine forecast rows
+  (21 fetch groups x 40 periods, retrieved 2026-11-14 21:05:35-37 UTC, valid
+  times after retrieval, no blank required metrics, unique keys, earlier bytes
+  unchanged). Repeating the search ("21 reused") and switching to 5 days
+  reused the full saved forecasts and appended nothing.
+- No key, `d1c3bdf`: Landing works; Dashboard shows the key message and the
+  `variables.env.example` setup step, 0/83 coverage and all 83 destinations as
+  "Weather not loaded" with no invented scores; nothing was written.
+
+**Not tested.** Live quota, network, storage and missing-weather states (none
+occurred; the offline suite covers them); map tiles, hover, zoom/reset and
+fonts were not judged visually (chart data was read directly); no live
+Dashboard fetch; Windows, phone and other viewports.
+
+**Defects.** None in the application. Cosmetic: the window option reads "Next 1
+days" and the wind notice "1 of your top recommendations include"; the
+smallest fix is singular wording for a count of 1. Documentation: the dated
+P6.1 preparation section above still says Gabriel's review "remains open"
+(superseded by the P6.1 review and merge note); README quotes the Windows
+result (523 passed, 2 skipped), equivalent to 524 passed, 1 skipped on macOS.
+
+**New genuine records.** The live check saved 840 forecast rows in the
+`3444728` test clone. They are added to `data/weather/weather_records.csv` in
+this change through `WeatherStore.append` (29,567 to 30,407 records). Diff
+review: append-only, no existing line changed, the 840 added lines are
+byte-identical to the clone's saved rows, 21 fetch groups of 40 periods
+retrieved 2026-11-14 21:05:35-37 UTC, none previously present, a repeated
+append added 0, all keys unique and all city IDs in the catalogue (83 covered).
+The branch then passed 526 tests (1 Windows-only skip) and Flake8.
+
+**Result.** Final dev `252e2cb` installs, tests and runs from a fresh clone on
+macOS, with the automated and live checks above passing and no application
+failure found. Not repeated on this code: a live fresh fetch and save (all
+forecasts were fresh). The cosmetic wording above is unchanged in `252e2cb`.
+P6.2 still needs Alejandra's final re-run and Christian's review.
 
 ### P6.3 final publication - Asier, reviewed by Gabriel
 
