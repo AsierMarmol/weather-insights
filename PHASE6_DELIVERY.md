@@ -7,7 +7,7 @@ The independent reviewed-version clean-clone gate remains P6.2.
 | Step | Deliverable | Owner | Reviewer | Dependency and current status |
 | --- | --- | --- | --- | --- |
 | P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | At the end of preparation, after final documentation/fixes merge; before P6.3 |
+| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version, Gabriel's report and Christian's review remain pending |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
 
 ## Next action
@@ -186,3 +186,60 @@ passed on identical files. P6.2 remains open for Gabriel and Alejandra,
 reviewed by Christian;
 P6.3 remains open for Asier, reviewed by Gabriel. Approval alone is not a
 Mac/browser test report or final submission.
+
+
+## P6.2 Alejandra clean-clone run — 14 November 2026
+
+Tester: Alejandra Medina (alemedinabarreto). AI collaborator: Claude Code
+(Anthropic Claude Opus 5.5). Reviewer: Christian (pending). This run tested
+dev `d1c3bdfb5cd30a68fb66af4051b7b764d512f8f9` (PR #22) in a new folder
+(`git clone --branch dev`), with no copied environment, key or settings, on
+macOS 15.7.8 (arm64), Python 3.14.7, uv 0.12.9 and Git 2.50.1. A personal key
+was configured locally in the ignored `variables.env`. **PR #23 merged
+afterwards (`f26e908`) and changes code, so this run does not cover the final
+candidate; Alejandra must repeat P6.2 on the final reviewed dev commit.**
+
+The clone was placed outside the iCloud-synced Desktop. Inside iCloud Desktop,
+macOS can hide `.venv` `.pth` files and break the package import; this is a
+local environment issue, not an application defect.
+
+Automated (app stopped): `uv sync --locked` passed; `uv pip check` 44
+packages compatible; package import OK; `pytest -q -ra` **524 passed, 1
+skipped** in 30.80 s (skip: `test_storage_recovery.py:122`, Windows file
+sharing). Both POSIX permission tests ran and passed. Flake8 reported no
+findings. The genuine CSV checksum was unchanged by the suite.
+
+Live checks with `uv run --locked streamlit run app.py` (headless flag only to
+skip the welcome-email prompt), read through page text and chart data in
+Claude Code's built-in browser:
+
+- Landing showed Autumn 16–24 °C, matching `product_defaults.json`; navigation
+  worked. Searcher defaults: 3 days, 16–24 °C, Low rain (reference 30%),
+  Moderate wind (reference 25 km/h), All activities and sizes.
+- Dashboard loaded automatically before Searcher use. All five windows
+  worked with 83/83 ranked: 3 days and 1 day first, then 5, 4 and 2 days from
+  saved forecasts. In every window the map and scatter agreed on all 83
+  Destination scores; leader, top five, driving bands and KPI average matched.
+  Heatmap daily averages equalled their day means and sorted the rows; at one
+  day the heatmap equalled the whole-window score for all 83.
+- Searcher: Gentle/Medium categories, Coast (37) and Medium city (26) matched
+  catalog counts; a specific choice replaced All; Reset restored defaults and
+  labelled the old results. Five cards matched an offline recompute with the
+  app's analytics on the same saved data. No high-wind notice appeared
+  correctly: three lower-ranked cities reached 39 km/h, no top-five city did.
+- Dashboard (2 days) and Searcher (5 days) kept independent settings across
+  navigation.
+- The 1-day change fetched and saved fresh forecasts for all 83 cities; later
+  window changes and searches reused them without new rows.
+
+Not verified: the two canvas tables (Searcher full ranking, Dashboard
+catalogue), map tiles/colours, hovers and layout, because the browser pane was
+hidden; no live failure paths (covered by offline tests). Documentation notes,
+not application failures: README and plans still called `3444728` the current
+reviewed version at `d1c3bdf`; the Searcher menu says "Next 1 days".
+
+Genuine data: the run saved 3,320 forecast rows (83 cities × 40 periods,
+retrieved 14 November 2026 21:03:10–21:04:12 UTC, one fetch group per city).
+They were appended unchanged to the dev data after PR #23's 3,480 rows,
+using `WeatherStore.append`: 29,567 records, all keys unique, no existing row
+changed.
