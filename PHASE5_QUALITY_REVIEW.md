@@ -1,16 +1,15 @@
 # Phase 5 - Quality Review
 
-> **Current testing specification:** [Scoring model comfort-v2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
 
-Updated: 14 November 2026. **Current automated audit: 523 passed,
-two POSIX-only skips; lint clean.** The earlier checkpoint-6 Windows/VS Code
-preview evidence remains dated 13 November. The [provider-identity follow-up](#provider-identity-and-diagnostic-follow-up--14-november-2026)
-records the latest run; earlier semantic/cleanup entries retain their dated results. Phone and Mac checks are excluded from this
-audit at the user's request, not claimed as passed and not blockers here.
-Peer review, authorized adoption and final delivery remain separate.
-The original P5.1–P5.5 table and dated records below are historical baseline
-evidence. The current redesign evidence is in
-[checkpoint 6](#checkpoint-6-validation--13-november-2026).
+Updated: 14 November 2026. **Current committed-version audit: 523 passed,
+two POSIX-only Windows skips in 157.67 seconds; lint clean.**
+[Post-commit validation](#post-commit-validation--14-november-2026) records
+the latest run. Earlier semantic/cleanup/integration results retain their
+dated timings and datasets. Gabriel approved PR #21 and it is merged into dev.
+P6.2 independent clean-clone acceptance and P6.3 delivery remain open.
+The original P5.1–P5.5 table and dated entries below are historical evidence.
+No new live API, browser, phone or Mac result is claimed.
 
 ## Purpose and dependencies
 
@@ -61,10 +60,10 @@ Dated entries describe their original submission state. The deliverable table an
 
 ## Next action
 
-Review the locally validated P4.5 changes and proposed publication scope.
-Do not commit or push during testing. After explicit authorization and peer
-review, adopt the redesign through dev, then perform P6.2 from the reviewed
-commit and P6.3 delivery. Older review records do not approve this redesign.
+Gabriel and Alejandra each perform P6.2 against the same final reviewed dev
+commit, with Christian reviewing both reports. See [Phase 6](PHASE6_DELIVERY.md#p62-clean-clone-acceptance---gabriel-and-alejandra-reviewed-by-christian).
+PR #21 closes Gabriel's integration review; it does not replace independent
+clean-clone acceptance.
 
 ### P5.1 model/storage acceptance - 12 November 2026
 
@@ -623,8 +622,8 @@ P6.1 review and the reviewed-commit P6.2 clean-clone check remain pending.
 The P4.5 delivery candidate is now in the main weather-insights folder on
 asier/feature, uncommitted. Its own locked environment imports the local package.
 Full offline suite: **523 passed, 2 POSIX-only Windows skips in 82.90 seconds**;
-Flake8 and dependency compatibility passed. This is the latest execution;
-earlier frozen-copy runs retain their original timings and datasets.
+Flake8 and dependency compatibility passed. This was the pre-commit integration
+run; the post-commit section below records the subsequent execution.
 
 Combined genuine data: **22,767 records**, 87 current and 22,680 forecast,
 83 destinations and 654 fetch groups. Preserved all 22,487 candidate records
@@ -638,3 +637,34 @@ documentation, the integration record and the preserved data union differ.
 Credentials and the existing environment configuration are unchanged; neither
 environment nor Git metadata was copied. Publication and peer review remain
 pending. See [integration record](PROMPTS.md#phase-6-p61-integrate-the-validated-application-into-asierfeature-2026-11-14).
+
+
+## Post-commit validation — 14 November 2026
+
+Audited commit `8b1210e39879f39177bfe842fe743953046f0c4e` from a fresh Git
+archive and new locked environment. Gabrielstec approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21); it merged
+into dev as `34447285c0fda927f2bb4ee77da8651ec12879a2`. Both commits have
+identical Git trees. The approval says "Approved!" and does not report a new
+Mac or browser test. Earlier pending-publication entries describe their
+original checkpoints and are superseded by this publication record.
+
+- Full suite: **523 passed, 2 skipped in 157.67 seconds**. Only POSIX permission
+  tests skip on Windows. Flake8 and dependency compatibility passed.
+- Fresh locked installation, source/wheel builds, installed-wheel module
+  imports and credential-free Streamlit HTTP startup passed.
+- All **22,767 genuine records**, 83 destinations and 654 fetch groups passed
+  integrity checks. Historical replay ranked all 83 in each 1–5-day window;
+  map and driving-band values matched canonical scores.
+- Bounded stress tests, 1,000 varied scoring cases and 83,000 rank comparisons
+  passed. Unchanged tests rejected three deliberately wrong scoring variants.
+  Provider-change and wrong-location diagnostic probes passed.
+- All 143 local Markdown links/anchors resolved at the audited commit.
+  Credential-exclusion checks passed. Published PROMPTS content was retained.
+  Neither the committed snapshot nor original working-tree files were changed.
+
+This was an automated Windows audit using saved data and simulated failures,
+not fresh live API, visual browser, phone or Mac acceptance. The independent
+P6.2 clean-clone checks are assigned to Gabriel and Alejandra for the end
+of preparation, with Christian reviewing their independent reports.
+The following documentation cleanup records the actual approval/merge and
+current results; it does not change code, tests, data or PROMPTS.md.

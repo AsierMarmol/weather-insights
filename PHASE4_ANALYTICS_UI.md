@@ -1,10 +1,11 @@
 # Phase 4 - Analytics and Streamlit Interface
 
-> **Current development:** P4.5 extends the existing application with the
-> Canva-inspired interface and executive analytics; publication is pending. [SCORING.md](SCORING.md) is the current formula;
-> [Phase 5 latest checks](PHASE5_QUALITY_REVIEW.md#provider-identity-and-diagnostic-follow-up--14-november-2026)
-> records current verification. Dated baseline records below are historical,
-> not acceptance of this redesign. No publication or peer approval is implied.
+> **Current version:** P4.5's Canva-inspired interface and executive
+> analytics were approved by Gabriel and merged in [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21).
+> [SCORING.md](SCORING.md) defines the current formula;
+> [Phase 5 latest checks](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026) records verification.
+> Earlier dated baseline records retain their historical status.
+
 
 Historical baseline as of 12 November 2026. **Implemented and reviewed:** P4.1 approved by Gabriel and merged (PR #10); P4.2 approved by Asier and merged (PR #11); P4.3 approved by Gabriel and merged (PR #12). P4.4 independent Dashboard approved by Asier and merged in PR #15 (dev 1e43be3). P5.1-P5.4 are merged; P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); The current P4.5 Windows checkpoint is complete; phone/Mac checks are outside this audit. See the extension below.
 
@@ -116,11 +117,12 @@ Searcher and Dashboard now show shared safe storage guidance, the number of dest
 ## P4.5 Canva-inspired executive redesign
 
 13–14 November 2026. Actual implementation: **AsierMarmol / OpenAI Codex**.
-This extends the reviewed P4.1–P4.4 application; its commit and PR are pending.
+This extends P4.1–P4.4; commit `8b1210e` was approved by Gabriel
+and merged into dev as `3444728` through PR #21.
 The [development record](PROMPTS.md#phase-4-extension-and-delivery-development-record)
 preserves the requests, design decisions, implementation changes and checks.
-Proposed reviews: Selin (presentation), Christian (analytics), Gabriel
-(integration). These assignments do not claim their work or approval.
+Gabriel approved the integration in PR #21. Earlier proposed specialist
+reviews by Selin and Christian are not claimed as completed.
 
 ### Why this extension exists
 
@@ -155,7 +157,7 @@ duplicated panels. The original OOP, API, safe persistence and package remain.
 | 3. Visual foundation | Theme, assets, navigation and season | Implemented; local assets, fallback fonts and responsive styling |
 | 4. Landing/Searcher | Product explanation, controls, compact results | Implemented; state, filters, reset, errors and score-consistency tests |
 | 5. Executive Dashboard | All-83 map/KPIs, top five, scatter, driving groups, sorted heatmap, catalogue and automatic loading | Implemented; shared score/rank, mean KPI and full-forecast reuse checks |
-| 6. Validate/document | Regression, failure/load simulations, visual review, aligned plans | Current evidence and remaining gates in [Phase 5](PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026) |
+| 6. Validate/document | Regression, failure/load simulations, visual review, aligned plans | Approved in PR #21; [latest checks and remaining gates](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026) |
 
 ### Checkpoint 6 review changes
 
@@ -169,18 +171,14 @@ simulations. Intentional failures remain isolated from the genuine CSV/API.
 
 ### Adoption gate and next work
 
-Publication and peer review remain pending. On 14 November the requester
-confirmed the final preview review. Latest automated validation: 523 passed,
-two POSIX skips and clean lint; VS Code preview evidence is dated 13 November. Review the complete
-candidate diff and genuine-data provenance before publication. Phone/Mac checks are outside this audit by
-user instruction. Obtain peer review of this version as listed in Phase 5. Proposed coherent changesets:
-(1) scoring/data/service foundation with tests/specification; (2) presentation
-and assets with UI tests; (3) integrated validation/delivery documentation.
-Review the genuine dataset as its own clearly described part of publication.
-Do not manufacture teammate authorship or split changes to imply work that did
-not happen. No staging, commit, push, PR or merge is authorized by this audit.
-After an authorized reviewed merge, perform P6.2 and then P6.3.
-
+The requester confirmed final preview review on 14 November. Gabriel then
+approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21), merged into dev as `3444728`.
+The [post-commit audit](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
+passed 523 tests with two POSIX-only Windows skips and clean lint.
+VS Code preview evidence remains dated 13 November; this audit did not repeat
+browser, phone or Mac checks. Gabriel and Alejandra each perform P6.2
+after final preparation, with Christian reviewing both reports, before P6.3. Actual implementation remains attributed to
+AsierMarmol and OpenAI Codex; review is distinct from authorship.
 
 ### Loading follow-up — 14 November 2026
 

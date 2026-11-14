@@ -1,10 +1,12 @@
 # Scoring specification — comfort-v2.2
 
-Approved group product decisions, implemented in P4.5 and integrated into the local asier/feature working tree.
+Approved group product decisions, implemented in P4.5 and merged into dev
+through PR #21 after Gabriel's review.
 This supersedes the earlier equal-weight pass/fail scoring, weather-only
 Dashboard ranking and maximum-only Searcher controls. These are tourism
 preferences, not a validated physiological index, probability of good weather,
-or safety assessment. No GitHub publication or peer approval is claimed here.
+or safety assessment. Publication and remaining acceptance gates are recorded
+in [project phases](PROJECT_PHASES.md).
 
 ## Data and calculation ownership
 
@@ -193,4 +195,4 @@ after Python code reload is replaced only after its pending unsaved records
 have been recovered; failure keeps the old service and recovery guidance.
 This supports local editing, not lossless recovery after a process crash.
 
-Current verification and remaining gates: [Phase 5](PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).
+Current verification and remaining gates: [Phase 5](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026).

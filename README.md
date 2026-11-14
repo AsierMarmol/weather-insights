@@ -1,22 +1,22 @@
 # Weather Insights
 
-> **Current delivery candidate:** P4.5 is prepared on `asier/feature` for
-> review into `dev`. Gabriel's approval and the reviewed-commit clean-clone check remain pending. [SCORING.md](SCORING.md) is the current formula;
-> [Latest quality review](PHASE5_QUALITY_REVIEW.md#feature-integration-validation--14-november-2026)
-> records current verification. Dated baseline records below are historical,
-> not acceptance of this redesign. No publication or peer approval is implied.
+> **Current reviewed version:** P4.5/P6.1 was approved by Gabriel and merged
+> into `dev` through [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21) (`3444728`).
+> [SCORING.md](SCORING.md) defines the current formula;
+> [latest validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026) records **523 passed, 2 Windows skips**.
+> Next: P6.2 independent clean-clone verification, then P6.3 final delivery.
+
 
 A five-person Python/Streamlit project recommending mainland-Spain car trips from Madrid using weather preferences and driving time.
 
 ## Current status
 
-The local preview includes Landing, Trip Searcher and the independent all-83
-Dashboard. It retains the original OOP/API/store architecture and genuine data.
-The Canva template supplies visual direction only; its example weather and
-scoring are not used. P4.1–P4.4 and P5.5 have historical review records; the
-redesign has the requester's final preview review (14 November 2026),
-while teammate review and the reviewed-commit clean-clone check remain pending. See
-[project phases](PROJECT_PHASES.md) for the remaining work and owners.
+The reviewed application includes Landing, Trip Searcher and the independent
+all-83 Dashboard. It retains the original OOP/API/store architecture and
+genuine data. Canva supplies visual direction only, not weather or scoring.
+Gabriel approved the P4.5/P6.1 update on 14 November 2026, and PR #21 was
+merged into dev. P6.2 clean-clone acceptance and P6.3 final delivery remain
+pending. See [project phases](PROJECT_PHASES.md) for owners and next steps.
 
 ## Requirements
 
@@ -255,28 +255,23 @@ Read the [catalog sources](data/reference/README.md), [saved-data record](data/w
 
 The optional live diagnostic commands are documented in the API contract. They make real requests and append data; ordinary tests are offline. Do not run repeated full-catalog checks merely to reproduce old reports.
 
-Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). Current local Windows
-validation: **505 passed, 2 POSIX-only skips**, lint clean, including bounded
-stress checks. VS Code preview evidence is dated 13 November; the requester
-confirmed final preview review on 14 November. Phone/Mac checks are outside
-this local audit. P6.1 documentation is prepared for Gabriel's review; catalogue
-selection provenance is clarified in the reference notes. After authorized reviewed publication, perform P6.2
-on the adopted reviewed commit and P6.3 delivery. A tested local snapshot is
-not a reviewed GitHub version or an instructor grade. Every member must still
-be able to explain the application.
+Start at [PROJECT_PHASES.md](PROJECT_PHASES.md). The current committed-version
+Windows audit passed **523 tests, with 2 POSIX-only skips**; lint and bounded
+stress checks passed. Gabriel approved PR #21 and it is merged into dev.
+Gabriel and Alejandra each perform P6.2 at the end of preparation, reviewed
+by Christian, before P6.3 delivery. Each member
+must still be able to explain the application.
 
 ## Latest audit
 
-The [14 November semantic audit](PHASE5_QUALITY_REVIEW.md#semantic-and-test-quality-audit--14-november-2026) checked active wording, reference
-defaults, batch-stop handling, obsolete Dashboard filters and test validity.
-That audit passed **506 tests**, with two POSIX-only skips. The subsequent
-[cleanup review](PHASE5_QUALITY_REVIEW.md#feature-integration-validation--14-november-2026)
-passed **505 tests**, with the same two skips, after removing one duplicate test.
-Lint, locked installation and package builds passed. The earlier installed-wheel
-check remains dated evidence.
-Tests rejected three deliberately wrong calculation variants in disposable
-copies. No synthetic weather or credentials were added to the dataset.
-These are local checks, not peer approval or a fresh live-provider guarantee.
+The [post-commit validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
+tested `8b1210e`, whose files exactly match merged dev `3444728`.
+The full suite passed in **157.67 seconds**. Fresh locked installation,
+dependency checks, package builds/imports, credential-free Streamlit startup,
+genuine-data integrity and documentation links passed. Tests rejected three
+deliberately incorrect scoring variants. No live API, browser, phone or Mac
+check was performed in that audit. Earlier semantic/cleanup results remain
+dated evidence in Phase 5; they are not the current test count.
 
 ## Reproducing the project on another computer
 
@@ -290,10 +285,10 @@ assets, theme and genuine accumulated dataset travel with the repository.
 Nothing in the runtime source requires Asier's Windows path or copied settings.
 
 For grading, use the final reviewed `main` commit after publication. Until then,
-`dev` is the reviewed team baseline and these uncommitted feature changes cannot
-be obtained by cloning GitHub. Record the tested commit with `git rev-parse HEAD`
-and follow the verification commands above. P6.2 is the independent test of that
-exact published commit; a local test-copy run does not replace it.
+`dev` contains the reviewed P4.5/P6.1 update from PR #21 (`3444728`).
+Record the tested commit with `git rev-parse HEAD` and follow the verification
+commands above. P6.2 independently verifies the reviewed version; the local
+automated audit does not replace that acceptance step.
 
 ### Source files versus generated files
 

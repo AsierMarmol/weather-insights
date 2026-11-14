@@ -2,45 +2,40 @@
 
 ## Current checkpoint
 
-**P6.1: application and documentation prepared on asier/feature for review into dev; Gabriel approval pending.**
-P4.5 checkpoint 6 local validation is complete, and the requester confirmed
-final preview review on 14 November 2026. The P4.5 development update is
-awaiting peer approval and merge into dev.
+**P4.5/P6.1 approved and merged; next is P6.2 clean-clone verification.**
+Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21) on 14 November 2026; it merged into dev
+as `3444728`. Its files match audited feature commit `8b1210e` exactly.
 [Phase 4](PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign)
-summarizes the adopted changes and why; [Phase 5](PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026)
-records test/visual evidence and limitations. [SCORING.md](SCORING.md) owns the
-current two-score model. [PROMPTS.md](PROMPTS.md#phase-4-extension-and-delivery-development-record)
-records the detailed Canva-to-Streamlit development sequence and its decisions.
-Until the PR is merged, a dev pull does not contain this feature update.
+summarizes the changes; [Phase 5](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
+records the latest checks and limitations. [SCORING.md](SCORING.md) owns the
+two-score model. [PROMPTS.md](PROMPTS.md#phase-4-extension-and-delivery-development-record)
+preserves the development sequence. The update is available by cloning dev.
 
 | Phase | Outcome | Current state |
 | --- | --- | --- |
 | [1 — Setup](PHASE1_SETUP.md) | Environment, secure variables and GitHub workflow | Completed by Asier; historical record unchanged |
-| [2 — Scope/data](PHASE2_SCOPE.md) | Catalog, product/API contracts and save-path proof | Foundation accepted; P4.5 specifications updated locally |
+| [2 — Scope/data](PHASE2_SCOPE.md) | Catalog, product/API contracts and save-path proof | Foundation accepted; P4.5 specifications merged in PR #21 |
 | [3 — Core](PHASE3_CORE_DATA.md) | Models/storage, reusable API/service, analytics | Original components accepted; redesign shares these components |
-| [4 — Interface](PHASE4_ANALYTICS_UI.md) | Landing, Searcher and executive Dashboard | P4.1–P4.4 reviewed historically; P4.5 local validation/review |
+| [4 — Interface](PHASE4_ANALYTICS_UI.md) | Landing, Searcher and executive Dashboard | P4.1–P4.4 reviewed historically; P4.5 approved and merged in PR #21 |
 | [5 — Quality](PHASE5_QUALITY_REVIEW.md) | Integrated tests, rubric and failure handling | P5.5 reviewed historically; current redesign evidence recorded separately |
-| [6 — Delivery](PHASE6_DELIVERY.md) | Reviewed documentation, clean clone, submission | P6.1 documentation prepared; peer review pending; P6.2/P6.3 pending |
+| [6 — Delivery](PHASE6_DELIVERY.md) | Reviewed documentation, clean clone, submission | P6.1 approved and merged; P6.2 next; P6.3 pending |
 
 ## Next actions and owners
 
-1. Final preview review confirmed by Asier on 14 November. P6.1 documentation
-   is prepared; complete Gabriel's review. The [latest audit](PHASE5_QUALITY_REVIEW.md#feature-integration-validation--14-november-2026)
-   has 523 passed and two POSIX skips in 82.90 seconds in the main-project
-   environment after integration; lint and dependency checks passed.
-   Earlier installation/build checks are retained as dated evidence. Rendered VS Code
-   preview evidence is dated 13 November, not repeated by the 14 November audit.
-   Proposed specialist reviews: Christian (scores/data), Selin (UI), Gabriel
-   (integration). Phone/Mac checks are outside this audit by user instruction; no results
-   on those platforms are claimed.
-2. After explicit authorization, publish coherent reviewed changes through the
-   protected feature → dev workflow. Preserve actual authorship and AI records.
-3. **P6.2: Selin, reviewed by Christian.** Fresh clone of the agreed reviewed
-   commit; follow README only, run tests/lint, use a personal key and record
-   desktop/phone behaviour. No copied environment or credentials.
-4. **P6.3: Asier, reviewed by Gabriel.** Confirm data/source conditions,
-   contribution/understanding, instructor access and submission channel; then
-   authorized dev → main publication and actual submission receipt.
+1. **P6.2: Gabriel and Alejandra, reviewed by Christian.** After the final
+   documentation changes and any fixes are reviewed and merged, each clones
+   the same reviewed dev commit into a fresh
+   directory, follow README only, use a personal key, and record the exact
+   commit, environment, tests/lint and agreed visual checks. Do not copy an
+   existing environment or credentials. The [post-commit audit](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
+   passed 523 tests with two Windows POSIX skips; it is supporting evidence,
+   not independent P6.2 acceptance. No new phone/Mac result is claimed.
+2. **P6.3: Asier, reviewed by Gabriel.** After P6.2, confirm data/source
+   conditions, team understanding, instructor access and submission channel;
+   then perform authorized dev → main publication and record submission.
+
+Gabriel's PR #21 approval closes the integration review. It does not itself
+document a new Mac or browser run. Dated earlier checks retain their scope.
 
 ## Original baseline history
 
@@ -48,8 +43,8 @@ These are previously recorded reviews, not a fresh GitHub status query:
 foundation PR #3; core through #8; P2.5 #9; Searcher #10; Dashboard #11;
 integration #12; model/storage #13; API #14; independent Dashboard #15;
 analytics #17; chart acceptance #18; P5.5 #19 (then dev `2999dae`). P6.1
-documentation was prepared/pushed before the local redesign. Its current
-adoption/review state must be checked when publication resumes.
+documentation was prepared/pushed before the redesign. The current P4.5/P6.1
+update was subsequently approved and merged in PR #21, as recorded above.
 
 ## Dependencies and document ownership
 
