@@ -7,7 +7,7 @@ The independent reviewed-version clean-clone gate remains P6.2.
 | Step | Deliverable | Owner | Reviewer | Dependency and current status |
 | --- | --- | --- | --- | --- |
 | P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version and Christian's review remain pending. Gabriel's [report](#p62-report---gabriel-14-november-2026): automated checks passed on final dev `252e2cb`; his live checks ran on `3444728` and must be repeated on the PR #23 code |
+| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version and Christian's review remain pending. Gabriel's [report](#p62-report---gabriel-14-november-2026) covers final dev `252e2cb` (automated and live checks passed; no live fresh save on this code because all forecasts were under three hours old) |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
 
 ## Next action
@@ -91,10 +91,28 @@ recommendations); `252e2cb` differs from `f26e908` only in documentation and
 data. A third fresh clone of `252e2cb` passed every automated check below:
 526 passed, 1 skipped (same Windows-only test), both POSIX permission tests
 ran and passed, Flake8 no findings, `uv pip check` compatible, import OK, and
-the genuine CSV (29,567 rows) unchanged. **The live browser checks below were
-run on `3444728` and have not yet been repeated on the PR #23 code**, so this
-report covers the final candidate for automated checks only until that live
-re-run is recorded.
+the genuine CSV (29,567 rows) unchanged.
+
+**Live re-run on `252e2cb` (23:12-23:16 CET, personal key in the new clone's
+ignored `variables.env`).** Landing showed Autumn 16–24 °C. The Dashboard,
+opened before the Searcher, loaded automatically and reused all 83 saved
+forecasts (retrieved 22:27-22:28 CET by Alejandra's run). In windows 1-5 the
+map and scatter agreed for all 83 destinations at full precision, and the
+cards, leader, KPI average, driving bands and heatmap (83 rows, Daily avg =
+mean of days, sorted; Day 1 = overview in the 1-day window) agreed with them.
+Four 5-day scores recomputed by hand matched exactly (Elche 85.3590, Toledo
+74.0419, Santiago de Compostela 41.1936, Lugo 50.8622 via its provider city
+ID). Searcher defaults matched the reference; the default search reused 83
+forecasts and its five cards equal the first five of 83 ranking rows. With
+Strong wind the notice read "1 of your top recommendations include ..." and
+the new "High wind" marker appeared only on A Coruña (54.4 km/h maximum; the
+other four 8.4-22.8 km/h; no other destination reached 39 km/h). Coast gave 37
+and Coast plus Small city or town 21 matches without fetching; the views kept
+independent settings; a 5-day filtered search reused all 21 forecasts (cards
+equal the first five of 21 rows); Reset restored every default without
+fetching. Nothing was saved: the CSV stayed byte-identical. Because every
+forecast was fresh, no live fresh fetch and save ran on the PR #23 code; that
+path was exercised live on `3444728` (below) and by the offline suite.
 
 **Automated checks (app stopped), identical on `3444728` and `d1c3bdf`.**
 
@@ -110,7 +128,7 @@ Both POSIX permission tests (`test_saving_keeps_the_files_permissions`,
 `test_first_saved_file_follows_the_umask`) ran and passed. The genuine weather
 CSV was byte-identical after testing.
 
-**Manual and live checks (`3444728`, 1024x768 in-app browser).**
+**Earlier manual and live checks (`3444728`, 1024x768 in-app browser).**
 
 - Landing loads; navigation works; the season card shows Autumn 16–24 °C,
   matching `product_defaults.json`. Searcher defaults also match (3 days,
@@ -170,12 +188,11 @@ retrieved 2026-11-14 21:05:35-37 UTC, none previously present, a repeated
 append added 0, all keys unique and all city IDs in the catalogue (83 covered).
 The branch then passed 526 tests (1 Windows-only skip) and Flake8.
 
-**Result.** `d1c3bdf` installed, tested and ran from a fresh clone on macOS
-with no application failure found. Final dev `252e2cb` passes the automated
-clean-clone checks; the live browser checks still need repeating on it
-(PR #23 changed the Searcher and Dashboard code) before this report covers the
-final version. The cosmetic wording above is unchanged in `252e2cb`. P6.2
-also still needs Alejandra's final re-run and Christian's review.
+**Result.** Final dev `252e2cb` installs, tests and runs from a fresh clone on
+macOS, with the automated and live checks above passing and no application
+failure found. Not repeated on this code: a live fresh fetch and save (all
+forecasts were fresh). The cosmetic wording above is unchanged in `252e2cb`.
+P6.2 still needs Alejandra's final re-run and Christian's review.
 
 ### P6.3 final publication - Asier, reviewed by Gabriel
 
