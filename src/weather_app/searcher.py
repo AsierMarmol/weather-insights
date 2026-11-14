@@ -288,13 +288,13 @@ def _controls(catalog, defaults):
         with rain:
             st.selectbox(
                 "Preferred rain likelihood", list(RAIN_CHOICES),
-                format_func=RAIN_CHOICES.get, key="_trip_rain",
+                format_func=RAIN_CHOICES.__getitem__, key="_trip_rain",
                 help="Rewards this probability range, not rainfall intensity.",
             )
         with wind:
             st.selectbox(
                 "Preferred wind level", list(WIND_CHOICES),
-                format_func=WIND_CHOICES.get, key="_trip_wind",
+                format_func=WIND_CHOICES.__getitem__, key="_trip_wind",
                 help="Rewards the selected range, including its lower bound.",
             )
         activities, sizes = st.columns(2)
@@ -322,14 +322,13 @@ def _controls(catalog, defaults):
                 RAIN_CHOICES[st.session_state._trip_rain].split()[0]),
             wind_preference=(
                 WIND_CHOICES[st.session_state._trip_wind].split()[0]),
-            **{
-                field: (
-                    _selection(st.session_state[key])
-                    if field in {"activities", "destination_sizes"}
-                    else st.session_state[key]
-                )
-                for key, field in WIDGETS.items()
-            }
+            days=st.session_state._trip_days,
+            temperature_min_c=st.session_state._trip_min,
+            temperature_max_c=st.session_state._trip_max,
+            max_precipitation_probability_pct=st.session_state._trip_rain,
+            max_wind_kmh=st.session_state._trip_wind,
+            activities=_selection(st.session_state._trip_activities),
+            destination_sizes=_selection(st.session_state._trip_sizes),
         )
     except ValueError:
         if st.session_state._trip_min > st.session_state._trip_max:
@@ -442,7 +441,9 @@ def _render_results(catalog, current_preferences, defaults):
     table = ranking_table(rows, catalog)
     places = {d.city_id: d for d in catalog}
     recommendations = available[:defaults["recommendation_count"]]
-    high_wind = sum(r['max_wind_kmh'] >= 39 for r in recommendations)
+    high_wind_ids = {r['city_id'] for r in recommendations
+                     if r['max_wind_kmh'] >= 39}
+    high_wind = len(high_wind_ids)
     if high_wind:
         st.warning(f"{high_wind} of your top recommendations include "
                    "high forecast wind "
@@ -455,7 +456,7 @@ def _render_results(catalog, current_preferences, defaults):
             '<span class="wi-forecast-badge">OpenWeather forecast · '
             f'next {searched.days} day(s)</span></div>'
         )
-        recommendation_cards(recommendations, places)
+        recommendation_cards(recommendations, places, high_wind_ids)
     else:
         st.warning(
             "No complete usable forecasts for this search. "

@@ -15,6 +15,7 @@ from __future__ import annotations
 from collections.abc import Mapping, Sequence
 from datetime import datetime, timedelta, timezone
 from zoneinfo import ZoneInfo
+from typing import cast
 
 from weather_app.scoring import aggregate, slot_score
 
@@ -186,7 +187,9 @@ def _analyse_one(
     run_at: datetime,
     expected: list[datetime],
 ) -> dict:
-    base = {name: None for name in RESULT_FIELDS}
+    base: dict[str, str | float | None] = {
+        name: None for name in RESULT_FIELDS
+    }
     base.update(
         city_id=destination.city_id,
         run_at_utc=format_utc(run_at),
@@ -249,15 +252,17 @@ def _analyse_one(
         final_score=max(weather_match - travel_penalty, 0.0),
         suitable_period_count=suitable,
         all_preferences_pct=100 * suitable / evaluated,
-        mean_temperature_c=sum(p.temperature_c for p in periods) / evaluated,
+        mean_temperature_c=sum(
+            cast(float, p.temperature_c) for p in periods) / evaluated,
         mean_precipitation_probability_pct=sum(
-            p.precipitation_probability_pct for p in periods
+            cast(float, p.precipitation_probability_pct) for p in periods
         ) / evaluated,
-        mean_wind_kmh=sum(p.wind_kmh for p in periods) / evaluated,
+        mean_wind_kmh=sum(
+            cast(float, p.wind_kmh) for p in periods) / evaluated,
         max_precipitation_probability_pct=max(
-            p.precipitation_probability_pct for p in periods
+            cast(float, p.precipitation_probability_pct) for p in periods
         ),
-        max_wind_kmh=max(p.wind_kmh for p in periods),
+        max_wind_kmh=max(cast(float, p.wind_kmh) for p in periods),
     )
     return row
 

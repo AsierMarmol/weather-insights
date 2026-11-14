@@ -18,5 +18,13 @@ dependencies = [
 [dependency-groups]
 dev = [
     "flake8>=7.5.0",
+    "pyright==1.1.414",
     "pytest>=9.2.0",
 ]
+
+[tool.pyright]
+include = ["app.py", "src", "scripts", "tests"]
+typeCheckingMode = "basic"
+venvPath = "."
+venv = ".venv"
+executionEnvironments = [{ root = ".", extraPaths = ["src", "tests"] }]

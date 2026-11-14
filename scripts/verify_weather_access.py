@@ -14,6 +14,7 @@ import argparse
 import csv
 import json
 import math
+from typing import TypeGuard
 import unicodedata
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
@@ -46,7 +47,7 @@ def redact(value, secret):
     return value
 
 
-def finite_number(value):
+def finite_number(value: object) -> TypeGuard[float]:
     return (
         isinstance(value, (int, float))
         and not isinstance(value, bool)

@@ -7,6 +7,7 @@ instead of silently changing product defaults or provider requests.
 
 import json
 import math
+from typing import TypeGuard
 import os
 from zoneinfo import ZoneInfo
 from pathlib import Path
@@ -69,7 +70,7 @@ def _read_json(path: Path, label: str) -> dict:
     return data
 
 
-def _finite(value: object) -> bool:
+def _finite(value: object) -> TypeGuard[float]:
     return (
         isinstance(value, (int, float))
         and not isinstance(value, bool)

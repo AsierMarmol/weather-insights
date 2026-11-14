@@ -180,9 +180,10 @@ def test_genuine_snapshot_has_one_dashboard_score_across_views(
     table = _catalogue_table(frame, catalog, {}, at)
     scatter = scatter_figure(summary["rows"])
     assert "Weather comfort / 100" not in table.columns
-    assert list(scatter.data[0].y) == [
+    assert list(scatter.to_plotly_json()["data"][0]["y"]) == [
         r["final_score"] for r in summary["rows"]]
     for index, row in frame.iterrows():
+        assert isinstance(index, int)
         original = canonical[row["city_id"]]
         if original["status"] != "available":
             continue

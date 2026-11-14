@@ -9,6 +9,7 @@ than recomputed with the engine's own formulas.
 from __future__ import annotations
 
 import socket
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -53,15 +54,14 @@ def three(catalog):
 
 
 def prefs(**overrides):
-    values = dict(
+    base = SearchPreferences(
         days=1,
         temperature_min_c=16,
         temperature_max_c=24,
         max_precipitation_probability_pct=30,
         max_wind_kmh=25,
     )
-    values.update(overrides)
-    return SearchPreferences(**values)
+    return replace(base, **overrides)
 
 
 def record(
@@ -564,11 +564,13 @@ def test_rejects_invalid_run_time(three, run_at):
         analyse_destinations(three, worked_forecasts(), prefs(), run_at)
 
 
-def test_rejects_invalid_preferences_and_inputs(three):
+@pytest.mark.parametrize("invalid_preferences", [{"days": 1}])
+def test_rejects_invalid_preferences_and_inputs(three, invalid_preferences):
     with pytest.raises(ValueError):
         prefs(temperature_min_c=25, temperature_max_c=16)
     with pytest.raises(ValueError, match="invalid_input"):
-        analyse_destinations(three, worked_forecasts(), {"days": 1}, RUN_AT)
+        analyse_destinations(
+            three, worked_forecasts(), invalid_preferences, RUN_AT)
     with pytest.raises(ValueError, match="invalid_input"):
         analyse_destinations(
             three + three[:1], worked_forecasts(), prefs(), RUN_AT

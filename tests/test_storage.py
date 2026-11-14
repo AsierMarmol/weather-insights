@@ -5,6 +5,7 @@ temporary directories; the genuine data/weather folder is never touched.
 """
 
 import threading
+from dataclasses import replace
 from datetime import datetime, timedelta, timezone
 
 import pytest
@@ -33,12 +34,8 @@ def forecast(
     fetch_id, city_id="ES-45168", retrieved=RUN, periods=3, **metrics
 ):
     first = datetime(2026, 11, 12, 9, tzinfo=UTC)
-    values = dict(
-        temperature_c=20.0, wind_kmh=10.0, precipitation_probability_pct=20.0
-    )
-    values.update(metrics)
     return [
-        WeatherRecord(
+        replace(WeatherRecord(
             fetch_id=fetch_id,
             city_id=city_id,
             kind="forecast",
@@ -50,8 +47,9 @@ def forecast(
             cloud_pct=75.0,
             provider_city_id=2510409,
             provider_city_name="Toledo",
-            **values,
-        )
+            temperature_c=20.0, wind_kmh=10.0,
+            precipitation_probability_pct=20.0,
+        ), **metrics)
         for index in range(periods)
     ]
 

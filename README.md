@@ -3,7 +3,8 @@
 > **Current reviewed version:** P4.5/P6.1 was approved by Gabriel and merged
 > into `dev` through [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21) (`3444728`).
 > [SCORING.md](SCORING.md) defines the current formula;
-> [latest validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026) records **523 passed, 2 Windows skips**.
+> [Latest local validation](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026): **525 passed, 2 Windows skips; type checks and lint clean**.
+> The typing and warning-marker follow-ups require Alejandra's review and merge into dev.
 > Next: P6.2 independent clean-clone verification, then P6.3 final delivery.
 
 
@@ -57,7 +58,7 @@ During development, clone `dev` to get the reviewed team version; work on your o
 
 If you already have the project open, run only `uv sync --locked` from the directory containing `pyproject.toml` and `uv.lock`.
 
-This creates `.venv`, installs the local `weather-app` package and its dependencies, and includes the development tools pytest and Flake8. `--locked` uses the checked-in dependency resolution and reports an error if it no longer matches `pyproject.toml`. Share `.python-version` and `uv.lock` with the team; each person creates their own `.venv`.
+This creates `.venv`, installs the local `weather-app` package and its dependencies, and includes the development tools pytest, Flake8 and pinned Pyright. `--locked` uses the checked-in dependency resolution and reports an error if it no longer matches `pyproject.toml`. Share `.python-version` and `uv.lock` with the team; each person creates their own `.venv`.
 
 ## Configure your local API key
 
@@ -164,9 +165,22 @@ uv pip check
 uv run --locked python -c "import weather_app; print('weather_app import OK')"
 uv run --locked python -m pytest -q
 uv run --locked flake8 src tests scripts app.py
+uv run --locked pyright
 ```
 
 Expect Python 3.14.x, compatible dependencies, a successful package import and passing offline tests. Tests cover configuration, the diagnostic, models, catalog loading, storage, the analytics engine, the API client and the request/save service. Simulated requests and writes use fake HTTP and temporary files; genuine-data replay tests read fixed saved fetch groups without modifying them. Searcher interaction tests use headless AppTest with fake HTTP/temp stores or a read-only historical replay; Dashboard tests use AppTest with the full 83-destination catalog, fake HTTP, temporary stores and a read-only genuine replay; P4.3 integration tests run complete journeys through app.py, and P5.1 acceptance tests check model/storage behavior on the genuine data read-only. Synthetic tests do not write to the genuine weather dataset. Run tests while no app process is writing to that clone's weather CSV, or use a separate frozen copy: integrity tests intentionally detect changes to genuine data during a test. The two POSIX permission checks skip on Windows; see the [remaining acceptance checks](PHASE5_QUALITY_REVIEW.md#remaining-cross-platform-and-visual-checks) for the Mac/Linux command. Run Flake8 before committing; a successful run prints no findings. Keep Python lines within 79 characters and wrap long expressions, comments and docstrings rather than suppressing the checks.
+
+### Type checking in VS Code and the terminal
+
+Select this project's `.venv` with **Python: Select Interpreter** in VS Code.
+The global Python default does not override an existing workspace selection.
+Use **Python: Restart Language Server** after changing the environment.
+`uv run --locked pyright` checks app.py, src, scripts and tests using the shared
+basic configuration in pyproject.toml. Do not disable rules to hide errors.
+Pyright's first run may download Node.js if none is installed; this setup step
+needs internet access. It is a development tool, not an app runtime dependency.
+Pylance versions may include additional library type definitions, so inspect
+the Problems panel too. Passing pytest and Flake8 alone does not verify types.
 
 ## Troubleshooting
 
@@ -263,6 +277,15 @@ by Christian, before P6.3 delivery. Each member
 must still be able to explain the application.
 
 ## Latest audit
+
+The [delivery-readiness recheck](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026) repeated the complete validation after the high-wind markers: **525 passed, 2 Windows skips**, with type/lint, installation/build, data and independent scoring checks passing. P6.2 remains an independent check on the final reviewed dev commit.
+
+The [final pre-clone audit](PHASE5_QUALITY_REVIEW.md#final-pre-clone-validation--14-november-2026) validated the
+candidate before the warning-marker update against the assignment and applicable class practices.
+All 523 tests passed (2 Windows skips), with type/lint, install/build, data,
+independent scoring and deliberate-fault checks passing. The typing follow-up
+is not yet published. The subsequent [warning-marker validation](PHASE5_QUALITY_REVIEW.md#high-wind-card-marker-follow-up--14-november-2026) passed 525 passed, 2 skipped, type checks and lint. Earlier committed-version evidence follows.
+
 
 The [post-commit validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
 tested `8b1210e`, whose files exactly match merged dev `3444728`.

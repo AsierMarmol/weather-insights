@@ -414,6 +414,7 @@ def test_invalid_response_names_city_and_preserves_other_results(ui):
     def district_response(url, params):
         response = original(url, params)
         body = response.json()
+        assert isinstance(body, dict)
         if body.get("city", {}).get("name") == "Segovia":
             body["city"]["name"] = "Different district"
         return FakeResponse(200, body)
@@ -440,9 +441,11 @@ def test_result_caption_uses_chosen_preferred_ranges(ui):
     assert "wind ≤19" not in captions
 
 
-@pytest.mark.parametrize("wind_index,expected_count", [(5, 0), (4, 1)])
+@pytest.mark.parametrize("wind_index,wind_speed,expected_count", [
+    (5, 39, 0), (4, 38.9, 0), (4, 39, 1), (0, 50, 1),
+])
 def test_wind_warning_only_counts_visible_recommendations(
-    ui, wind_index, expected_count
+    ui, wind_index, wind_speed, expected_count
 ):
     app, _, session, _, _, _ = ui
     app.run().button(key="run_search").click().run()
@@ -450,7 +453,7 @@ def test_wind_warning_only_counts_visible_recommendations(
     assert len(rows) == 6
     for row in rows:
         row["max_wind_kmh"] = 10
-    rows[wind_index]["max_wind_kmh"] = 39
+    rows[wind_index]["max_wind_kmh"] = wind_speed
     app.session_state.search_analysis_rows = rows
     calls_before = len(session.calls)
     app.run()
@@ -459,6 +462,15 @@ def test_wind_warning_only_counts_visible_recommendations(
         w.value for w in app.warning if "high forecast wind" in w.value
     ]
     assert len(warnings) == expected_count
+    html = next(e.proto.body for e in app.get("html")
+                if 'class="wi-trip-list"' in e.proto.body)
+    cards = html.split('<article class="wi-trip-card">')[1:]
+    assert len(cards) == 5
+    for index, card in enumerate(cards):
+        marked = bool(expected_count and index == wind_index)
+        assert ('class="wi-wind-alert"' in card) == marked
+        assert ('class="wi-wind-dot"' in card) == marked
+        assert ("High wind</span>" in card) == marked
     if expected_count:
         assert warnings[0].startswith("1 of your top recommendations")
     assert len(session.calls) == calls_before

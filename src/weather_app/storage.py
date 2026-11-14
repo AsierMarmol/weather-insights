@@ -27,6 +27,7 @@ import threading
 import time
 from collections.abc import Sequence
 from pathlib import Path
+from typing import Callable, ParamSpec, TypeVar, cast
 
 from weather_app.models import (
     RECORD_FIELDS,
@@ -95,17 +96,25 @@ class StorageError(RuntimeError):
         self.guidance = guidance
 
 
-def _retry_file_lock(action, *args):
+_P = ParamSpec("_P")
+_T = TypeVar("_T")
+
+
+def _retry_file_lock(
+    action: Callable[_P, _T], *args: _P.args, **kwargs: _P.kwargs
+) -> _T:
     """Bound Windows access/lock retries; never replace a file in place."""
-    for attempt in range(3):
+    attempt = 0
+    while True:
         try:
-            return action(*args)
+            return action(*args, **kwargs)
         except OSError as error:
             if getattr(error, "winerror", None) not in {5, 32, 33}:
                 raise
             if attempt == 2:
                 raise
             time.sleep(0.1 * (attempt + 1))
+            attempt += 1
 
 
 def load_destinations(path: Path = CATALOG_PATH) -> list[Destination]:
@@ -147,9 +156,10 @@ def load_destinations(path: Path = CATALOG_PATH) -> list[Destination]:
     return destinations
 
 
-def _destination_from_row(row: dict[str, str | None]) -> Destination:
-    if None in row or any(row[name] is None for name in CATALOG_FIELDS):
+def _destination_from_row(raw: dict[str, str | None]) -> Destination:
+    if None in raw or any(raw[name] is None for name in CATALOG_FIELDS):
         raise ValueError("wrong number of fields")
+    row = cast(dict[str, str], raw)
     numbers = {}
     for name in (
         "car_distance_km",
@@ -183,7 +193,7 @@ class WeatherStore:
     __locks: dict[Path, threading.Lock] = {}
     __locks_guard = threading.Lock()
 
-    def __init__(self, path: Path = WEATHER_RECORDS_PATH) -> None:
+    def __init__(self, path: str | Path = WEATHER_RECORDS_PATH) -> None:
         self._path = Path(path).resolve()
         self.__validated_raw: bytes | None = None
         self.__validated_records: tuple[WeatherRecord, ...] = ()
@@ -418,7 +428,7 @@ class WeatherStore:
 
 def _csv_text(rows: list[dict[str, str]]) -> bytes:
     buffer = io.StringIO()
-    writer = csv.DictWriter(
+    writer: csv.DictWriter[str] = csv.DictWriter(
         buffer, fieldnames=RECORD_FIELDS, lineterminator="\n"
     )
     writer.writerows(rows)
