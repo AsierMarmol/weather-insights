@@ -7,7 +7,7 @@ The independent reviewed-version clean-clone gate remains P6.2.
 | Step | Deliverable | Owner | Reviewer | Dependency and current status |
 | --- | --- | --- | --- | --- |
 | P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version, Gabriel's report and Christian's review remain pending |
+| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version and Christian's review remain pending. Gabriel's [report](#p62-report---gabriel-14-november-2026): automated checks passed on final dev `252e2cb`; his live checks ran on `3444728` and must be repeated on the PR #23 code |
 | P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
 
 ## Next action
@@ -84,7 +84,19 @@ no-key checks were repeated on a second fresh clone of `d1c3bdf`. macOS 26.6.2
 (arm64), Python 3.14.0, uv 0.12.9. The personal key was entered locally in the
 ignored `variables.env`; it was never displayed.
 
-**Automated checks (app stopped), identical on both commits.**
+**Re-run after PR #23 and #24.** Dev then advanced to
+`252e2cbc3ae2c51647db3bb8cde1132412446ac1` (PR #24 on top of PR #23 `f26e908`).
+PR #23 changed application code (typing fixes and named high-wind
+recommendations); `252e2cb` differs from `f26e908` only in documentation and
+data. A third fresh clone of `252e2cb` passed every automated check below:
+526 passed, 1 skipped (same Windows-only test), both POSIX permission tests
+ran and passed, Flake8 no findings, `uv pip check` compatible, import OK, and
+the genuine CSV (29,567 rows) unchanged. **The live browser checks below were
+run on `3444728` and have not yet been repeated on the PR #23 code**, so this
+report covers the final candidate for automated checks only until that live
+re-run is recorded.
+
+**Automated checks (app stopped), identical on `3444728` and `d1c3bdf`.**
 
 | Command | Result |
 | --- | --- |
@@ -149,14 +161,21 @@ P6.1 preparation section above still says Gabriel's review "remains open"
 (superseded by the P6.1 review and merge note); README quotes the Windows
 result (523 passed, 2 skipped), equivalent to 524 passed, 1 skipped on macOS.
 
-**New genuine records.** 840 forecast rows exist only in the uncommitted CSV of
-the `3444728` test clone (22,767 to 23,607 rows). They are preserved there and
-are not part of this change; proposing them for commit needs a diff review.
+**New genuine records.** The live check saved 840 forecast rows in the
+`3444728` test clone. They are added to `data/weather/weather_records.csv` in
+this change through `WeatherStore.append` (29,567 to 30,407 records). Diff
+review: append-only, no existing line changed, the 840 added lines are
+byte-identical to the clone's saved rows, 21 fetch groups of 40 periods
+retrieved 2026-11-14 21:05:35-37 UTC, none previously present, a repeated
+append added 0, all keys unique and all city IDs in the catalogue (83 covered).
+The branch then passed 526 tests (1 Windows-only skip) and Flake8.
 
-**Result.** The reviewed `d1c3bdf` repository installs, tests and runs from a
-fresh clone on macOS with no application failure found. Ready for final
-delivery from this tester's perspective once Alejandra's report and
-Christian's review complete P6.2.
+**Result.** `d1c3bdf` installed, tested and ran from a fresh clone on macOS
+with no application failure found. Final dev `252e2cb` passes the automated
+clean-clone checks; the live browser checks still need repeating on it
+(PR #23 changed the Searcher and Dashboard code) before this report covers the
+final version. The cosmetic wording above is unchanged in `252e2cb`. P6.2
+also still needs Alejandra's final re-run and Christian's review.
 
 ### P6.3 final publication - Asier, reviewed by Gabriel
 
