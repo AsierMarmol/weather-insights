@@ -44,7 +44,7 @@ Open a new terminal after installation so `uv` is available.
 Windows, from a folder where you want to keep the project:
 
 ```powershell
-git clone --branch dev https://github.com/AsierMarmol/weather-insights.git
+git clone --branch main https://github.com/AsierMarmol/weather-insights.git
 Set-Location -LiteralPath .\weather-insights
 uv sync --locked
 ```
