@@ -44,7 +44,7 @@ Open a new terminal after installation so `uv` is available.
 Windows, from a folder where you want to keep the project:
 
 ```powershell
-git clone --branch dev https://github.com/AsierMarmol/weather-insights.git
+git clone --branch main https://github.com/AsierMarmol/weather-insights.git
 Set-Location -LiteralPath .\weather-insights
 uv sync --locked
 ```
@@ -52,13 +52,15 @@ uv sync --locked
 macOS:
 
 ```bash
-git clone --branch dev https://github.com/AsierMarmol/weather-insights.git
+git clone --branch main https://github.com/AsierMarmol/weather-insights.git
 cd weather-insights
 uv sync --locked
 ```
 
-During development, `dev` contains the reviewed team version. Final submission
-will use reviewed `main`; see the publication checklist before switching branches.
+Clone main to use the latest stable version of Weather Insights. 
+Follow the steps below to install the dependencies, configure your own OpenWeather API key,
+and run the app locally.
+
 For an existing clone, run `uv sync --locked` from the folder containing `pyproject.toml`.
 This creates `.venv`, installs the local `weather-app` package and its dependencies,
 and includes pytest, Flake8 and pinned Pyright. `--locked` checks that the committed
