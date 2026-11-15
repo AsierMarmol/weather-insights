@@ -16,11 +16,15 @@ Preserve the existing repository and environment; no setup restart is needed. Ph
 
 ## Updating this phase when something changes
 
-The task owner records the change and reason before dependent work continues. Check all six phase plans for impact, then update every affected step, dependency, finish condition and acceptance check in the same change. Also update the Phase 2 specification, TEAMROLES.MD, PROJECT_PHASES.md and application README when affected. Do not rewrite unaffected history or invent completion evidence.
+Follow [plan maintenance](PROJECT_PHASES.md#plan-maintenance). The implementation
+owner records the reason and updates affected steps, dependencies and acceptance
+checks; the named reviewer checks consistency. Preserve task IDs and original
+evidence. If a change invalidates a completed check, mark it Needs recheck with an
+owner rather than silently retaining Done. Check all phases for impact, but do
+not rewrite unaffected history or create a separate change register.
 
-Keep task IDs stable and assign one owner per broad deliverable, including its tests and documentation. If a previously completed check is invalidated, retain its old evidence and mark the affected task Needs recheck with a named owner; do not leave it silently Done. Distinguish Pending, In progress, Blocked (with reason), Needs recheck and Done (with evidence).
-
-The implementation owner updates affected steps and records the change in the active phase's progress log. The named peer reviewer checks technical and documentation consistency. Follow [Plan maintenance](PROJECT_PHASES.md#plan-maintenance); no separate change register is required.
+<details>
+<summary>Historical setup checklist and verification records — original evidence</summary>
 
 ## Historical setup checklist and verification records
 
@@ -276,3 +280,5 @@ Request and await Gabriel's review of [PR #1](https://github.com/AsierMarmol/wea
 - PHASE2_SCOPE.md uses the same ordered-checklist/finish-condition structure. It is a draft for ideation and project flexibility, including minimum scope, real-history planning, meaningful OOP, analytics/UI decisions, optional enrichment, and five-person responsibilities.
 - Asier is collecting the team confirmations. Phase 1 remains open until review/promotion and confirmations are complete; no weather feature is implemented by this documentation change.
 - Publication: [documentation commit a81d470](https://github.com/AsierMarmol/weather-insights/commit/a81d4708d3251f1d83b2ea9b6d1fbd8165f6c8dc) and [PR #1 into dev](https://github.com/AsierMarmol/weather-insights/pull/1). Gabriel's review and Step 17 confirmations remain pending. No credentials or instructor reference files are included in the publication.
+
+</details>

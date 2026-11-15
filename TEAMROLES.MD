@@ -1,6 +1,6 @@
 # Team roles
 
-> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> Current scoring: [SCORING.md](SCORING.md). Dated records retain the rules and results tested at that time.
 
 One owner builds each complete component, including its tests, documentation and fixes. Another member reviews it. Roles do not imply work or reviews have already happened. Phase 1 was completed by Asier and is not reassigned.
 
@@ -32,8 +32,6 @@ AsierMarmol implemented the experimental redesign with OpenAI Codex, including
 cross-component scoring, provider mapping and integration changes. Original
 component ownership remains; it does not reattribute these changes. Gabriel
 approved the integration in PR #21, now merged into dev. Earlier proposed
-specialist reviews are not claimed as completed. Alejandra's earlier P6.2
-report and Gabriel's final-code report retain their actual versions. The group
-accepts Gabriel's later coverage without a full Alejandra rerun. Christian
-approved Gabriel's report; his acknowledgement of Alejandra's report remains
-pending. See [current acceptance](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026). Asier owns P6.3 (Gabriel reviews). Current evidence/status is in [PROJECT_PHASES.md](PROJECT_PHASES.md).
+specialist reviews are not claimed as completed. Asier owns P6.3, reviewed by
+Gabriel; Christian reviews P6.2. The [Phase 6 acceptance record](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026)
+owns actual tested versions, the revised group decision and review status.

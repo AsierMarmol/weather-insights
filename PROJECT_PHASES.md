@@ -22,12 +22,9 @@ remains pending. [Phase 6](PHASE6_DELIVERY.md#p62-final-code-live-save-and-accep
 
 ## Next actions and owners
 
-1. **Christian:** acknowledge Alejandra's earlier report and the combined
-   [P6.2 evidence](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026); his PR #25 approval already covers Gabriel's report.
-2. **Asier:** review/commit the local live-check records and status updates,
-   obtain review/merge, then complete P6.3 with Gabriel reviewing. Confirm
-   instructor access/channel and team understanding; publish reviewed dev
-   to main and record the real submission. Main is still the starter version.
+1. **Christian:** acknowledge the combined [P6.2 evidence](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026).
+2. **Gabriel and Christian:** review the replacement `asier/feature` to `dev` pull request for the live-save evidence/data (`e46abec`) and consolidated delivery documentation. [PR #26](https://github.com/AsierMarmol/weather-insights/pull/26) was closed without merging; its commit and branch were preserved. Use the [open pull requests](https://github.com/AsierMarmol/weather-insights/pulls) for the current review.
+3. **Asier, reviewed by Gabriel:** finish [P6.3](PHASE6_DELIVERY.md#p63-final-publication---asier-reviewed-by-gabriel) after acceptance and the reviewed merge into dev; confirm instructor access/channel and team understanding, publish reviewed main and record the submission.
 
 ## Original baseline history
 
@@ -45,18 +42,48 @@ UI → Phase 5 integration → Phase 6 delivery. P2.5 verifies Phase 3's save pa
 it does not block constructing that path. One owner builds a complete component
 with tests/docs/fixes; another reviews it. [TEAMROLES.MD](TEAMROLES.MD) records roles.
 
-README owns installation/use; Phase 2 owns product/schema; SCORING owns exact
-calculation rules; WEATHER_API_CONTRACT owns provider/save rules; data READMEs
-own provenance; phases own progress/evidence. Link rather than duplicate rules.
+| Information | Authoritative document |
+| --- | --- |
+| Installation, use and verification commands | [README.md](README.md) |
+| Product scope, filters, shared objects and CSV schema | [Phase 2](PHASE2_SCOPE.md) |
+| Exact formulas, ranking and displayed metric definitions | [SCORING.md](SCORING.md) |
+| Provider identity, requests, pacing, cache and save/recovery | [API contract](WEATHER_API_CONTRACT.md) |
+| Catalogue/data provenance and licences | [Reference notes](data/reference/README.md), [weather notes](data/weather/README.md) |
+| Visual assets and attribution | [Asset credits](assets/README.md) |
+| Component ownership and attribution | [TEAMROLES.MD](TEAMROLES.MD) |
+| Implementation decisions and changes | Relevant phase's dated progress log |
+| Automated validation and its limits | [Phase 5](PHASE5_QUALITY_REVIEW.md) |
+| Acceptance, review and publication status | [Phase 6](PHASE6_DELIVERY.md) |
+| Actual AI requests, results and decisions | [PROMPTS.md](PROMPTS.md) |
+
+Link to the owning document instead of copying its complete rules. Short
+summaries may explain a phase's dependencies. Keep dated evidence unchanged;
+historical pending states and superseded formulas are not current instructions.
+The instructor's assignment remains authoritative; plans alone are not proof
+of completed functionality.
 
 ## Plan maintenance
 
 When decisions change, update the owning specification and affected phases,
 tests, documentation and acceptance gates together. Keep task IDs stable and
-dated evidence truthful. Mark Prepared, In progress, Awaiting review, Done or
-Needs recheck based on actual work, not intention. Keep Phase 1 history intact.
+dated evidence truthful. Use Pending/Prepared, In progress, Awaiting review,
+Blocked (with reason), Needs recheck or Done according to actual work. If a
+change invalidates a completed check, name its owner and retain the old evidence.
+Keep Phase 1 history intact; no separate change register is required.
 
 Record substantial AI work with actual requester/tool in [PROMPTS.md](PROMPTS.md).
 Assigned roles are not authorship evidence. Every member must make meaningful
 contributions and explain the application. Reviews and publication need their
 own evidence/authorization; automated tests are not instructor acceptance.
+
+## Shared task workflow
+
+Use the named task in its phase and the actual requester/tool. Read the task,
+shared specification and prerequisite files first. Complete the whole deliverable
+within its owned files using existing components. Keep secrets private and
+synthetic inputs separate from genuine data. Run relevant checks and record
+actual results, limitations and the next dependency in that phase. Update
+affected plans when rules change and record substantial AI assistance accurately.
+Do not invent teammate work or approval. Commit, push, review requests, merge
+and submission require the relevant authorization; the task template alone
+does not authorize publication.

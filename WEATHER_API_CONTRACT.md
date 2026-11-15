@@ -1,6 +1,6 @@
 # Weather API contract
 
-> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> Current scoring: [SCORING.md](SCORING.md). Dated records retain the rules and results tested at that time.
 
 P2.3 owner: Asier. Reviewer: Gabriel. Access checked on 11 November 2026; foundation reviewed by Gabriel in PR #3 on 12 November 2026. Production API/service accepted through P5.2 (PR #14). This document owns provider mapping and request rules. [Phase 2](PHASE2_SCOPE.md) owns product rules and the shared application schema; [SCORING.md](SCORING.md) owns the current formulas.
 
@@ -26,7 +26,7 @@ Missing metrics are None, never zero. Do not substitute rain volume, cloud cover
 - Read `OPENWEATHER_API_KEY` through `config.get_api_key()` and python-dotenv only when needed. Environment variables take precedence over the ignored file. Never print keys, full request URLs, raw request exceptions or error bodies.
 - Validate inputs before HTTP. Use timeouts, TLS verification and no unapproved redirects. Distinguish input, authentication, location, quota, network/server, invalid-data and storage errors.
 - Skip ordinary failed locations; stop a batch on authentication/access, quota or storage failure. A transient network/5xx error may have one paced retry in production.
-- Use one queue capped at 55 calls/minute including failures/retries; verify the actual account allowance before live use. Forecast cache: three hours; current cache: 30 minutes. Current provider age above two hours is also stale. Cache by product, actual parameters, units and language.
+- Follow the [request cap](#request-cap-update--14-november-2026) and [reuse rules](#current-reuse-and-scoring-boundary) below. Current cache: 30 minutes; current provider age above two hours is also stale. Cache by product, actual parameters, units and language.
 - Apply activity/size filters before fetching. Reuse raw forecasts for preferences/window changes, recomputing coverage at the common search time. A missing fifth-day period makes that choice unavailable; do not shorten it silently.
 - A cold 83-city forecast batch can take several minutes. Show progress and partial results. Fetch current conditions only when the app needs them rather than automatically doubling every search's requests.
 - Save each fresh successful request once before analytical use; then cache it. Surface storage failures and retain recoverable data. Cache reads never manufacture extra fetches. The client maps responses; the service owns the single save path.
@@ -73,10 +73,9 @@ Identity/name/country/proximity validation is unchanged. Restart a running app
 to recreate its client after updating location overrides.
 
 
-All 83 provider IDs were verified on 13 November 2026 against both current and
-forecast endpoints (166 successful responses, 3,403 saved records). See the
-[complete mapping evidence and maintenance rules](data/reference/README.md#complete-provider-city-id-mapping--13-november-2026).
-Earlier city-specific corrections above describe how this policy developed.
+The [complete mapping evidence and maintenance rules](data/reference/README.md#complete-provider-city-id-mapping--13-november-2026)
+record the subsequent all-83 verification. Earlier city-specific corrections
+above describe how this policy developed.
 
 ## Current reuse and scoring boundary
 
@@ -87,8 +86,9 @@ is valid only when every record matches the currently requested provider city ID
 This identity rule also applies to current-weather cache reuse. A changed mapping
 causes a fresh validated request rather than reuse of the old identity; earlier
 records stay unchanged. A failed replacement fetch returns an error, never the
-old identity as a fallback. Older or incomplete required coverage refreshes
-through the same path.
+old identity as a fallback. Older data refreshes through the same path. A cached forecast lacking the
+requested window may be refreshed once per search; repeated retries must not
+create an unbounded loop.
 There is no periodic background collector. Code reload replacement retries
 pending saves first and retains the old service if recovery fails. Process
 shutdown can lose unsaved in-memory batches; resolve storage guidance first.

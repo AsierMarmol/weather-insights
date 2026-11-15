@@ -3,7 +3,7 @@
 > **Current version:** P4.5's Canva-inspired interface and executive
 > analytics were approved by Gabriel and merged in [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21).
 > [SCORING.md](SCORING.md) defines the current formula;
-> [Phase 5 latest checks](PHASE5_QUALITY_REVIEW.md#final-pre-clone-validation--14-november-2026) records verification.
+> [Phase 5 validation index](PHASE5_QUALITY_REVIEW.md) records verification.
 > Earlier dated baseline records retain their historical status.
 
 
@@ -26,21 +26,17 @@ Deliver Searcher and Dashboard on the same data and calculations, then connect t
 
 Asier owns app.py/searcher.py and Searcher preferences/state. Selin owns dashboard.py/charts and its independent overview state. Both use the same analytical engine and service/save path; they evaluate their own windows and criteria. Searcher applies product_defaults.json on initial load or explicit reset and preserves manual edits. In P4.5, Dashboard takes seasonal criteria on first opening, window changes or manual Refresh, with its own selected day window. Build size/activity options from real catalog values and show All explicitly. Display units, valid dates and data age. Keep synthetic UI tests separate from real demonstrations. Use native Streamlit controls and headless AppTest for interaction checks.
 
-Read [Phase 2](PHASE2_SCOPE.md) for product rules, shared schema and the worked example; [API contract](WEATHER_API_CONTRACT.md) for provider behavior; [roles](TEAMROLES.MD) for ownership. Each owner includes tests/docs/fixes. Follow [plan maintenance](PROJECT_PHASES.md#plan-maintenance) when decisions change. The instructor README governs final acceptance; plans are not proof of completed functionality.
+Use the [document ownership and maintenance guide](PROJECT_PHASES.md#dependencies-and-document-ownership) for shared rules, roles and update requirements.
 
 ## Task prompt
 
 ```text
-Work on <task ID> in PHASE4_ANALYTICS_UI.md as <actual requester>.
-Read the task, shared specification and actual prerequisite files first.
-Complete the whole assigned deliverable within its owned files, using existing
-components rather than duplicating them. Keep secrets private and synthetic
-test inputs separate from genuine data. Run relevant checks and record actual
-results, limitations and the next dependency in this phase. Update affected
-plans when rules change. Record substantial AI assistance accurately in
-PROMPTS.md; do not invent teammate work or approval. Do not commit, push,
-request review, merge or submit without the relevant authorization.
+Complete <task ID> in PHASE4_ANALYTICS_UI.md as <actual requester>.
+Follow PROJECT_PHASES.md's Shared task workflow and this phase's acceptance criteria.
 ```
+
+See the [shared task workflow](PROJECT_PHASES.md#shared-task-workflow) for
+verification, documentation, attribution and publication boundaries.
 
 ## Phase progress log
 
@@ -52,8 +48,12 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-Complete the P4.5 review below. The following P4.1–P4.4 descriptions and counts record the earlier interface; their superseded formulas and pending-at-the-time statuses are not current requirements.
+P4.5 is reviewed and merged. Follow [Phase 6](PHASE6_DELIVERY.md) for acceptance
+and publication. The expandable baseline below preserves the earlier interface,
+including formulas and pending-at-the-time states superseded by P4.5.
 
+<details>
+<summary>P4.1–P4.4 historical implementation and validation</summary>
 
 ### P4.1 implementation and state contract
 
@@ -114,6 +114,8 @@ PR #15 was approved by Asier and merged into dev `1e43be3`. Local Windows revali
 
 Searcher and Dashboard now show shared safe storage guidance, the number of destinations skipped after the first storage failure, and collected records still waiting to save. Refresh retries retained saves before new requests. This is the P5.5 recovery follow-up, not a scoring or chart redesign; see Phase 5 for tests and pending review. Confirm the guidance on desktop/mobile before delivery.
 
+</details>
+
 ## P4.5 Canva-inspired executive redesign
 
 13–14 November 2026. Actual implementation: **AsierMarmol / OpenAI Codex**.
@@ -159,7 +161,7 @@ duplicated panels. The original OOP, API, safe persistence and package remain.
 | 3. Visual foundation | Theme, assets, navigation and season | Implemented; local assets, fallback fonts and responsive styling |
 | 4. Landing/Searcher | Product explanation, controls, compact results | Implemented; state, filters, reset, errors and score-consistency tests |
 | 5. Executive Dashboard | All-83 map/KPIs, top five, scatter, driving groups, sorted heatmap, catalogue and automatic loading | Implemented; shared score/rank, mean KPI and full-forecast reuse checks |
-| 6. Validate/document | Regression, failure/load simulations, visual review, aligned plans | Approved in PR #21; [latest checks and remaining gates](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026) |
+| 6. Validate/document | Regression, failure/load simulations, visual review, aligned plans | Approved in PR #21; [validation index](PHASE5_QUALITY_REVIEW.md) and [acceptance gates](PHASE6_DELIVERY.md) |
 
 ### Checkpoint 6 review changes
 
