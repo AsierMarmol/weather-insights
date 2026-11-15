@@ -1,0 +1,90 @@
+# Phase 3 - Core Application and Automatic Data Saving
+
+> Current scoring: [SCORING.md](SCORING.md). Dated records retain the rules and results tested at that time.
+
+Historical core baseline, 12 November 2026. **Core accepted for Phase 4:** P3.1, P3.2 and P3.3 reviewed and merged into dev (PR #4, PR #6, PR #5); P3.3 integration reviewed and merged in PR #7; P3.1 validation follow-up reviewed and merged in PR #8; P2.5 was approved by Gabriel and Christian and merged in PR #9. Final integrated acceptance remains Phase 5.
+
+## Purpose and dependencies
+
+Build models/storage, the reusable API/save service and the analytical engine. Reviewed P2.1-P2.4 are the start gate. Asier verifies P2.5 using P3.1/P3.2 after they are connected; require that check for Phase 3 acceptance, not before constructing the components.
+
+## Deliverables
+
+| Step | Whole deliverable | Owner | Reviewer | Depends on | Finish condition | Status |
+| --- | --- | --- | --- | --- | --- | --- |
+| P3.1 | Models, catalog loading and persistence | Alejandra | Christian | P2.4 | Validated models with useful special method/computed property; safe CSV append/reload, preserved genuine records and meaningful tests. | Approved by Christian and merged into dev in PR #4 (12 November 2026); validation follow-up approved by Christian and merged in [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8); P2.5 accepted in PR #9; optional historical JSONL import remains deferred |
+| P3.2 | Production API and request/save service | Gabriel | Alejandra | P2.4; integration after P3.1 | Generic/provider inheritance and deliberate encapsulation; safe credentials, normalization, partial failures, pacing/cache, single automatic save path and tests. | Approved by Alejandra and merged into dev in PR #6 (12 November 2026); P2.5 accepted in PR #9 |
+| P3.3 | Analytics and ranking engine | Christian | Selin | P2.4; real-data integration after P3.1 + P3.2 | Complete coverage/time/filter/scoring/tie rules, three analyses and independently checked tests on synthetic and genuine inputs. | Engine approved by Selin and merged in PR #5; service integration approved by Selin and merged in PR #7; P2.5 accepted in PR #9 |
+
+## Implementation and acceptance
+
+Use the shared objects, methods, CSV header and worked example in P2.4. Alejandra owns models.py/storage.py; Gabriel client.py/config.py/service.py; Christian analytics.py. Keep analytics pure and credential-free. Extend the existing lazy get_api_key helper rather than duplicating configuration. Retain valid dated records; new successes save automatically, cache reads do not. A failed save is not analytical success. No scheduler or second verification client/store.
+
+Use the [document ownership and maintenance guide](PROJECT_PHASES.md#dependencies-and-document-ownership) for shared rules, roles and update requirements.
+
+## Task prompt
+
+```text
+Complete <task ID> in PHASE3_CORE_DATA.md as <actual requester>.
+Follow PROJECT_PHASES.md's Shared task workflow and this phase's acceptance criteria.
+```
+
+See the [shared task workflow](PROJECT_PHASES.md#shared-task-workflow) for
+verification, documentation, attribution and publication boundaries.
+
+## Phase progress log
+
+| Date | Task | Actual result and evidence | Status |
+| --- | --- | --- | --- |
+| 12 November 2026 | P3.1 | Alejandra/Claude Code implemented `models.py` (validated frozen `Destination`, `SearchPreferences`, `WeatherRecord`; `drive_hours`, `horizon`, `lead_time`, `key` properties; `__str__`/`__repr__`, chronological `__lt__`; exact CSV round-trip) and `storage.py` (`load_destinations`, `WeatherStore.append/load/latest_forecast`, `CatalogError`, `StorageError`). Saves copy the existing file byte-for-byte to a temporary file, append, fsync and atomically replace; retries are idempotent on (fetch_id, city_id, kind, valid_at_utc); conflicting values raise `ValueError`; damaged files raise `StorageError` and are never appended to; writes are serialized per file within the process. `tests/test_models.py` and `tests/test_storage.py` add 82 offline tests using temporary files only; the full suite passes (107). The real catalog loads 83 rows (14/26/43 sizes, Lugo values unchanged). No `weather_records.csv` was created and no live request was made. | Approved by Christian; merged in PR #4 |
+| 12 November 2026 | P3.1 review | Christian approved PR #4 and merged it into dev (`7ac93c1`). This approval covers P3.1 only, not the separate P2.4/catalog review. | Reviewed; Phase 3 acceptance waits for P2.5 review |
+| 12 November 2026 | P3.1 limits | Importing the retained JSONL evidence is not done: it needs the provider-to-record mapping from P3.2 and must keep original retrieval times. Two records with the same key but different values in one batch are rejected rather than stored, so a provider duplicate surfaces as an invalid-data save error. Single writing process per clone, as specified. | Open; revisit with Gabriel at P3.2 integration |
+| 12 November 2026 | P3.3 | Christian/Claude Code implemented `analytics.py`: pure `analyse_destinations(destinations, forecasts_by_city, preferences, run_at_utc)` returning the full P2.4 result dictionaries in agreed order, plus helpers `expected_period_times`, `is_daytime`, `is_eligible` and `ranking_key`. Rolling window `run_at < valid_at <= run_at + 24*days h` on the native three-hour UTC grid, Europe/Madrid 09:00-18:00 daytime, inclusive thresholds, capped driving penalty, floor at zero, unrounded tie-breaks, ANY/AND filters, and unavailable reasons in the specified precedence. `tests/test_analytics.py` adds 30 offline tests with hand-written expected answers (worked example, comparison statistics, simultaneous suitability, bounds, five-day and clock-change coverage, staleness boundary, identity/mixed groups, duplicates, precedence, filters on the real 83-row catalog, ties, invalid inputs, no network); full suite passes (137). No live request or genuine-data run yet. | Approved by Selin; merged in PR #5 |
+| 12 November 2026 | P3.3 limits | Forecast records off the three-hour grid, outside the window or at night are ignored rather than rejected. For `invalid_data` rows `forecast_retrieved_at_utc` is None because no single consistent retrieval time exists. Real-data verification needs P3.2 records saved through `WeatherStore` and Asier's P2.5. | Open; run on genuine saved forecasts after P3.2/P2.5 |
+| 12 November 2026 | P3.2 | Gabriel/Claude Code implemented `client.py` (generic `JSONAPIClient` base: name-mangled key and parameter name, masked `__repr__`, context manager, `request_count` property, paced HTTPS GET with (5, 20) s timeouts, no redirects, one retry for timeouts/connection/5xx only, distinct `APIError` subclasses per code, errors raised `from None`; shared 40-calls/minute `RateLimiter`; `OpenWeatherClient` subclass: coordinate or Lugo city-ID parameters, `units=metric`, `lang=en`, location checks (ES, catalog name or approved alias, expected provider ID, within the 10 km tolerance used by P2.3), mapping to `WeatherRecord` with wind x 3.6, pop x 100, missing/malformed/out-of-range metrics as None, receipt time separate from valid time, one fetch_id per response, duplicate forecast times rejected; public `map_current`/`map_forecast` for deliberate replay/import), `service.py` (`WeatherService.current/forecast/forecast_many`: P2.4 result dictionaries, save-once-then-cache through `WeatherStore`, 30-minute current TTL plus 2-hour observation age, 3-hour forecast TTL with equality allowed, reuse of the newest fresh stored group after restart, storage failures reported as `storage` with no records and the batch kept for retry, conflicts as `invalid_data`, batches that skip ordinary failures and stop on authentication/quota/storage with explicit results for the rest, progress callback) and `config.py` (`load_product_defaults()`, `load_location_overrides()` with validation). Tests: `tests/test_client.py`, `tests/test_service.py`, new loader tests in `tests/test_config.py` and offline doubles in `tests/weather_fakes.py` (synthetic weather only; real `WeatherStore` on temporary files). The full suite passes (172; 65 new). A read-only replay maps all 168 retained genuine responses (82 cities: 84 current, 3,360 forecast periods) and passes every location check, with no HTTP. | Approved by Alejandra and merged into dev in PR #6 |
+| 12 November 2026 | P3.2 live check | With Gabriel's local key, `WeatherService.from_environment()` fetched Toledo current conditions and forecast at about 10:28 UTC: 2 HTTP requests, no errors, provider 2510409 Toledo, 1 current and 40 forecast records under one fetch_id, every period with a precipitation probability, retrieval time stored separately from valid time. `data/weather/weather_records.csv` was created with 41 genuine rows; `latest_forecast` read back the same 40 records. Repeat calls and a new service instance were served from cache/store with no further HTTP and no new rows. | Passed; P2.5 remains Asier's verification |
+| 12 November 2026 | P3.2 decisions and limits | Unit conversions are rounded to nine decimals to remove binary noise (0.3 x 100 is otherwise 30.000000000000004 and would fail a "<= 30 %" preference at its boundary); provider values have at most two decimals. A response that does not identify the requested destination is `invalid_data`, matching the analytics reason code. Stored fresh groups are reused by city_id after a restart; they were identity-checked when fetched. The in-memory cache is per service instance, so the app should create one shared service (P4.3). Importing the retained JSONL evidence into `weather_records.csv` is still not done; the mapping now exists, and whether to import is a team decision. | Open |
+| 12 November 2026 | P3.3 integration | Christian/Claude Code connected the engine to the merged P3.1/P3.2 components. `analytics.forecasts_from_service()` turns `WeatherService.forecast_many` results into `forecasts_by_city` (a city with a service error contributes no records and is reported `fetch_failed`; the service's message stays with the caller). `tests/test_analytics_integration.py` adds 5 tests: the real `WeatherService` with fake HTTP and a temporary `WeatherStore` feeding the engine (ranking by driving time, a failed city as `fetch_failed`, a rerun reusing cached forecasts with only the failed city requested again, no new rows and an identical analysis); saved-and-reloaded records giving the same analysis for 1, 3 and 5 days; adapter input validation; and a read-only replay of the genuine Toledo forecast saved by the P3.2 live check (fetch `4e96b491`) at its retrieval time. Hand check of that genuine one-day window (12 Nov 12:00 and 15:00 UTC, 13 Nov 09:00 UTC): temperature 2/3, precipitation 0/3, wind 1/3 passes, score 100/3 - 61/60, mean 16.4 C, max probability 100 %, max wind 28.512 km/h; five days give 15 complete periods; four hours later the same forecast is `stale_forecast`. Full suite passes (207). No live request was made and the genuine CSV was not modified. | Awaiting PR and Selin's review |
+| 12 November 2026 | P3.3 integration limits | Genuine data currently covers one city (Toledo), so cross-city ranking on genuine data is not yet demonstrated; it follows from P2.5 and normal app use. No new live fetch was made from Christian's machine because its system clock was about an hour off UTC and would have saved wrong retrieval times. | Open; recheck on multi-city genuine data after P2.5 |
+| 12 November 2026 | P3.1 validation follow-up | Alejandra/Claude Code corrected two P3.1 validation gaps. (1) `WeatherRecord` accepted `schema_version=1.0` (equal to 1), saved it as `"1.0"`, and later reads failed; it now requires a genuine integer 1, rejecting floats, booleans, strings and other versions before any write. (2) `WeatherStore` read saved rows without checking duplicate record keys, so `append()` could silently mask an inconsistent file; reading now raises `StorageError` naming both line numbers when one (fetch_id, city_id, kind, valid_at_utc) key has different values, so `load()`, `latest_forecast()`, `append()` and the P3.2 service (`storage` error, no HTTP) all stop. Rows that repeat an earlier row exactly are the same record: returned once, and the file is left byte-for-byte unchanged (reads never repair data). No CSV schema or public interface changed. 25 new regression tests (temporary files only); 8 of them fail on the previous code, confirming the defects. Full offline suite: 232 passed (baseline after sync with dev `aa1688c`: 207). The genuine `weather_records.csv` (41 rows, 41 unique keys) still loads; no live request was made. Commit ef74a86, [PR #8](https://github.com/AsierMarmol/weather-insights/pull/8). | Awaiting Christian's review |
+
+## Next action
+
+The core and P2.5 are accepted; P4.5 was reviewed and merged in PR #21.
+Continue with [current delivery actions](PROJECT_PHASES.md#next-actions-and-owners).
+Optional historical JSONL import remains deferred; the original evidence is
+retained separately. Earlier row counts and pending states are dated snapshots,
+not current coverage or instructions.
+
+## P4.5 integration boundary — 13 November 2026
+
+The redesign retains the reviewed OOP/client/service/store foundation. The
+shared analytics engine supplies daily_weather and full-window results;
+executive.py aggregates existing validated results without Streamlit, HTTP or
+storage dependencies. config.py owns the shared seasonal reference lookup.
+Presentation helpers format durations and safe HTML; they do not change source
+units or calculate alternative weather scores. These additions are tested with
+independent expected answers and UI integration checks in Phase 5. No Phase 3
+ownership or historical completion evidence is reassigned by this update.
+
+
+### P4.5 complete city-ID mapping — 13 November 2026
+
+All 83 destinations now use unique verified provider IDs, with no coordinate
+fallback for missing mappings. Live verification: 166/166 current/forecast
+responses passed; 3,403 genuine records saved through the existing paced
+service/store. Catalog/scoring/schema are unchanged. Duplicate/conflicting IDs
+are rejected; regression checks enforce full coverage and response identity.
+494 passed, 2 POSIX-only skips on Windows; Flake8 passed. See
+[reference evidence](data/reference/README.md#complete-provider-city-id-mapping--13-november-2026).
+Restart Streamlit before resuming searches. Testing only; no commit or push.
+
+## Current integration validation
+
+P4.5 also uses `scoring.py` as the single slot/aggregation formula source and
+`analytics.py` for validated whole-window/daily results. New mean rain/wind
+fields support executive averages without changing the raw CSV schema.
+Reload-safe service replacement preserves pending saves before replacing old
+Python instances. Checkpoint 6 adds temporary-data concurrency/history/cache
+simulations; see [Phase 5](PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).
+The process-local lock does not support multiple server processes writing one CSV.
