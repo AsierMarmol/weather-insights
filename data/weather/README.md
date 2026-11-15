@@ -49,6 +49,10 @@ At 17:35:30 UTC the CSV contained **6,604 records across all 83 destinations**, 
 
 ## Provider credit and delivery review - 12 November 2026
 
+This historical review's unconfirmed-plan item is superseded by the
+[dataset licence notice](#weather-dataset-license--14-november-2026) above.
+The original evidence below retains its date and scope.
+
 Weather data provided by [OpenWeather](https://openweathermap.org/). Its [attribution guidance](https://openweathermap.org/faq#license) specifies visible provider text, a website link and its logo for plans requiring attribution. The application now displays these in the shared sidebar using the unmodified master RGB logo from the [official archive](https://openweathermap.org/payload/api/files/file/logo_files.zip). The logo is stored at `assets/openweather-logo.jpg` in the repository.
 
 Public attribution guidance was checked during P6.1 preparation. The team's account-specific permission to store and redistribute the retained responses has not been independently confirmed; Asier and Gabriel must resolve that delivery gate before submission. Do not remove or fabricate the genuine dataset to bypass the instructor's requirement. Current and forecast records remain distinguishable, with retrieval timestamps separate from provider valid times.
@@ -70,7 +74,8 @@ The user confirmed concurrent normal app use. Further genuine records may be
 added; preserve them and validate the selected publication snapshot separately.
 No synthetic weather was written to this file.
 
-Current P4.5 implementation: [comfort-v2 scoring](../../SCORING.md) uses seasonal Dashboard comfort, preferred Searcher ranges and a driving penalty in both views. Raw sources/assets remain unchanged; no scores or synthetic weather are written to the genuine weather CSV.
+Scoring is defined in [SCORING.md](../../SCORING.md); source data is kept
+separate from computed scores and synthetic test fixtures.
 
 
 ## Checkpoint 6 frozen audit — 13 November 2026
@@ -83,7 +88,7 @@ SHA256: `d567fc974f589e1ec0f42096371b2f8e6e4416988f7767cae9d88c4569b83f82`.
 The active CSV was byte-identical after the VS Code preview checks; those
 loads reported saved-forecast reuse. Offline stress rows stayed in temporary
 files. This count describes a frozen checkpoint, not a permanent constraint.
-See [current validation](../../PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).
+See [validation for this checkpoint](../../PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).
 
 
 ## Feature integration snapshot — 14 November 2026

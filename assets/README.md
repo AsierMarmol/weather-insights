@@ -27,7 +27,8 @@ See the [tile usage policy](https://operations.osmfoundation.org/policies/tiles/
 The blue origin and fixed red-to-green/grey destination circles are generated from project
 coordinates and weather results, not from template example data.
 
-Current P4.5 implementation: [comfort-v2 scoring](../SCORING.md) uses seasonal Dashboard comfort, preferred Searcher ranges and a driving penalty in both views. Raw sources/assets remain unchanged; no scores or synthetic weather are written to the genuine weather CSV.
+Scoring and displayed metrics are defined in [SCORING.md](../SCORING.md);
+these assets provide presentation only.
 
 KPI columns adapt to available container width; recheck them inside VS Code
 as well as a standalone browser. Responsive styling does not change data.

@@ -119,63 +119,24 @@ final score descending, match descending, driving minutes ascending, city ID.
 | Searcher cards/full ranking | Trip score after driving |
 | Full Dashboard table | Destination score, penalty, source metrics, coverage, dates, freshness and unavailable reasons |
 
-Whole-window score need not equal the mean of daily scores because worst-quarter
-aggregation is nonlinear. A high score is not safety advice. Concise hovers
-contain relevant values only; diagnostic metadata remains in the catalogue.
-Duration display uses h:mm; source and internal driving values remain minutes.
-
-The existing internal result name `weather_match_pct` is retained for contract
-compatibility but now means an index out of 100, not a probability or fraction
-of checks. UI labels use Trip score /100 or Destination score /100.
-Pass counts and `all_preferences_pct` remain internal exact-target diagnostics.
-The Searcher table shows only Trip score /100. The Dashboard shows only
-Destination score /100. Before-driving components remain internal diagnostics.
-Weather CSV schema is unchanged; scores are recomputed, not stored in raw data.
-
-## Missing data, refresh and validation
-
-Required for both modes: temperature, rain probability, wind. Dashboard also
-requires cloud cover. Missing cloud is not assumed clear and weights are not
-redistributed. Searcher may still score those records because it does not use
-cloud cover. Unavailable destinations stay visible with no invented score.
-
-Forecasts are reusable up to and including three hours old when every record
-matches the currently requested provider city ID. Mapping changes trigger a new
-validated fetch without rewriting historical records. New searches,
-first Dashboard opening, window changes or Refresh recalculate from suitable
-saved data, fetching missing/stale groups as necessary. A cached group lacking
-the requested window can be refreshed once. There is no background three-hour
-timer. Every successful new fetch is saved with genuine timestamps. Data
-availability is not guaranteed; network/API/storage errors remain explicit.
-
-Acceptance uses independently calculated synthetic examples, frozen genuine
-CSV replays, season and interval boundaries, missing fields, travel caps,
-mode separation, request/cache/storage recovery and Streamlit integration.
-Teacher requirements remain: genuine accumulated data, OOP/API/package design,
-three analyses across comparison and derived metrics, two labelled charts,
-transparent AI records and actual team contributions. A passing test suite
-does not substitute for browser/Mac/clean-clone review or authorize publication.
-
-
-The Searcher table also omits daytime-slot counts. Completeness is still
-validated internally; incomplete forecasts remain unavailable with an explicit
-status/reason. Hiding these diagnostic columns does not change scoring or
-allow partial forecasts into the ranking.
-
-
-
-## Current displayed metrics and data refresh
-
 Only **Trip score /100** (Searcher) and **Destination score /100** (Dashboard)
-are displayed. Both use `final_score`; pre-driving match, exact pass percentage
-and slot counts remain internal diagnostics. The Searcher also omits its Status
-column; unavailable explanations remain visible when needed.
+are displayed, both from `final_score`. Every whole-window Dashboard visual
+uses the same loaded rows and `destination_ranks`; the scatter scale is 0–100.
+A one-day overview must equal its one-day heatmap score. Daily avg is the
+equal-weight mean of available daily scores, with missing days/partial counts
+labelled. It can differ from nonlinear whole-window aggregation and does not
+replace that score.
 
-Every whole-window Dashboard visual uses the same loaded rows and shared
-`destination_ranks`. A one-day overview must equal its one-day heatmap score.
-Daily avg is explicitly the equal-weight mean of available daily scores, with
-partial-day counts and missing days shown. It does not replace the whole-window
-score. The scatter's score scale is fixed at 0–100.
+`weather_match_pct` retains its internal name for compatibility but means an
+index out of 100, not a probability. Pre-driving match, pass counts and
+`all_preferences_pct` remain internal diagnostics. Searcher omits its Status
+and daytime-slot-count columns; unavailable explanations remain visible.
+Completeness is still validated: hidden diagnostics do not permit partial
+forecasts into rankings. Scores are recomputed, never stored in the raw CSV.
+
+Concise hovers show relevant values; diagnostic metadata stays in the catalogue.
+Duration display uses h:mm; source/internal driving values remain minutes.
+A high score is not safety advice.
 
 The map uses fixed bands: red [0,20), orange [20,40), yellow [40,60), light green
 [60,80), dark green [80,100], with a numeric legend. It never stretches the
@@ -189,10 +150,36 @@ cities. These are forecast averages, not rainfall totals, probability of rain
 anywhere in Spain, or maximum values. Catalogue rain/wind columns explicitly
 show slot maxima; temperature is the mean. Empty KPIs show an em dash.
 
+## Missing data, refresh and validation
+
+Required for both modes: temperature, rain probability, wind. Dashboard also
+requires cloud cover. Missing cloud is not assumed clear and weights are not
+redistributed. Searcher may still score those records because it does not use
+cloud cover. Unavailable destinations stay visible with no invented score.
+
+New searches, first Dashboard opening, window changes and Refresh recalculate
+from suitable saved data. The [API contract](WEATHER_API_CONTRACT.md#current-reuse-and-scoring-boundary)
+owns three-hour/provider-identity reuse, refresh and save/recovery rules.
+There is no background collector; availability is not guaranteed and errors
+remain explicit.
+
+Acceptance uses independently calculated synthetic examples, frozen genuine
+CSV replays, season and interval boundaries, missing fields, travel caps,
+mode separation, request/cache/storage recovery and Streamlit integration.
+Teacher requirements remain: genuine accumulated data, OOP/API/package design,
+three analyses across comparison and derived metrics, two labelled charts,
+transparent AI records and actual team contributions. A passing test suite
+does not substitute for browser/Mac/clean-clone review or authorize publication.
+
 `comfort-v2.2` identifies the current session-result contract, including the
 added mean fields. Reruns discard incompatible results. A stale service object
 after Python code reload is replaced only after its pending unsaved records
 have been recovered; failure keeps the old service and recovery guidance.
 This supports local editing, not lossless recovery after a process crash.
 
-Current verification and remaining gates: [Phase 5](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026).
+## Current displayed metrics and data refresh
+
+See the consolidated [visual contract](#visual-contract) and
+[missing-data/refresh rules](#missing-data-refresh-and-validation) above.
+Validation evidence is indexed in [Phase 5](PHASE5_QUALITY_REVIEW.md);
+[Phase 6](PHASE6_DELIVERY.md) owns acceptance and publication gates.

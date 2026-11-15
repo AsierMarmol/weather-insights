@@ -54,10 +54,11 @@ historical Barcelona records identify provider city **3128760**. A live explicit
 ID request verified Barcelona, Spain, at 41.3888, 2.159 and successfully saved
 40 forecast periods. The existing override file now requests that ID and checks
 both the ID and Barcelona name. Eixample is not accepted as an alias. Catalog
-coordinates, driving estimates, IDs and names are unchanged. This correction
-belongs to the experiment until reviewed and merged.
+coordinates, driving estimates, IDs and names are unchanged. This dated correction was incorporated in the reviewed P4.5 integration; see
+[Phase 4](../../PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign).
 
-Current P4.5 implementation: [comfort-v2 scoring](../../SCORING.md) uses seasonal Dashboard comfort, preferred Searcher ranges and a driving penalty in both views. Raw sources/assets remain unchanged; no scores or synthetic weather are written to the genuine weather CSV.
+Scoring is defined in [SCORING.md](../../SCORING.md); source data is kept
+separate from computed scores and synthetic test fixtures.
 
 
 ## Valladolid identity follow-up — 13 November 2026
@@ -115,4 +116,4 @@ The 83-row catalogue, product defaults and provider mapping are unchanged by
 this validation. All 83 destinations have unique expected provider IDs.
 The audit reused the existing live verification evidence; offline stress tests
 did not issue provider requests or rewrite catalogue coordinates.
-See [current validation](../../PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).
+See [validation for this checkpoint](../../PHASE5_QUALITY_REVIEW.md#checkpoint-6-validation--13-november-2026).

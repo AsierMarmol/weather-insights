@@ -1,12 +1,17 @@
 # Phase 2 - Scope and Data Preparation
 
-> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> Current scoring: [SCORING.md](SCORING.md). Dated records retain the rules and results tested at that time.
 
 Updated: 14 November 2026. P4.5 is merged; current local verification is recorded in Phase 5.
 
 ## Current checkpoint
 
-Phase 1 is complete. The Phase 2 foundation was approved by Gabriel and Christian in PR #3. Production models/storage, API/service and analytics are merged, including PR #7 integration and PR #8 validation fixes. P2.5 passed on a genuine three-city sample and was approved by Gabriel and Christian in merged PR #9. P4.1-P4.4 and P5.1-P5.4 are approved and merged. P5.5 was approved by Gabriel and merged in PR #19 (dev `2999dae`); P4.5/P6.1 was approved by Gabriel and merged in PR #21. The latest local typing and pre-clone checks are recorded in [Phase 5](PHASE5_QUALITY_REVIEW.md#final-pre-clone-validation--14-november-2026); these follow-up changes await their own commit and review. Catalog/source limitations remain documented in the reference notes.
+The Phase 2 foundation was approved by Gabriel and Christian in PR #3;
+P2.5 was accepted in PR #9 after the Phase 3 components existed. Deliverables
+and dated evidence below retain those outcomes. The P4.5 product changes are
+integrated; [Phase 4](PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign)
+records implementation and [Phase 6](PHASE6_DELIVERY.md) owns current acceptance.
+Catalogue/source limitations remain in the [reference notes](data/reference/README.md).
 
 ## Deliverables
 
@@ -30,12 +35,9 @@ Initial settings come from [product_defaults.json](data/reference/product_defaul
 
 Activities: Coast, Nature, History and heritage, Food and gastronomy, Urban experiences. Sizes: Large city, Medium city, Small city or town. Both selectors visibly default to **All** and derive available values from the catalog. Match ANY selected activity and ANY selected size; combine the two groups with AND. Empty internal selections mean All. These are eligibility filters, not score weights.
 
-For each required daytime slot, calculate the weighted gradual score from
-[SCORING.md](SCORING.md). Aggregate 80% mean plus 20% lowest-quarter mean;
-subtract min(2 * driving hours, 15) in both views, floored at zero. Exact
-target-match counts remain separate diagnostics, not the scoring formula.
-Searcher ranks by final score, match, driving time and city ID. Dashboard
-ties share competition rank on final score and use city ID for display order.
+Use [SCORING.md](SCORING.md) for slot formulas, aggregation, driving penalties,
+tie-breaks and internal diagnostics. Both views include driving time; Searcher
+uses personal preferences and Dashboard uses standard seasonal criteria.
 
 ## Views and analyses
 
@@ -127,8 +129,9 @@ approval or commit/push/merge without authorization.
 
 ## Next action
 
-The Phase 2 foundation is accepted historically. Review the P4.5 updates and their integration evidence in [current checkpoint](PROJECT_PHASES.md); do not repeat P2.5 or create a second save path.
-
+Phase 2 is accepted. Follow [current delivery actions](PROJECT_PHASES.md#next-actions-and-owners);
+do not repeat P2.5 or create a second save path. The following dated verification
+records preserve the original data, formulas and results.
 
 ### P2.5 verification - 12 November 2026
 
@@ -163,30 +166,14 @@ P2.5 pre-commit lint follow-up: the initial validation did not include Flake8. A
 
 ## P4.5 experiment: executive presentation rules — 13 November 2026
 
-The group selected Canva as visual direction only. Current formulas, categories,
-aggregation, missing-data handling and two-score terminology live in
-[SCORING.md](SCORING.md); do not duplicate or infer them from template values.
+P4.5 extended the product to Landing, the personal Searcher and an unfiltered
+all-83 executive Dashboard. The Canva template supplies visual direction only.
+The [Phase 4 scope](PHASE4_ANALYTICS_UI.md#consolidated-scope) records implemented
+panels and removals; [SCORING.md's visual contract](SCORING.md#visual-contract)
+defines their common scores, daily aggregation, colours, KPI meanings and units.
 
-- Landing derives the Madrid season from shared reference months.
-- Searcher keeps personal preferences, All filters, five compact cards and full
-  ranking. No duplicate top-ten list or extra displayed score is needed.
-- Dashboard is unfiltered across all 83 locations, with automatic initial and
-  window-change loads, manual retry and independent state. All whole-window
-  visuals consume the same saved snapshot and final score, including driving.
-- Executive KPIs show coverage, mean Destination score, leader, mean daytime
-  rain probability and mean wind speed with contributing count. No-data is not zero.
-- Map/leader/top-five/scatter/driving-band/catalogue values agree. The OSM blue
-  Madrid origin (40.4168, -3.7038) is context only and excluded from all counts.
-- Daily heatmap uses successive rolling 24-hour slices; sort by mean of
-  available daily final scores and mark partial coverage. These are forecasts,
-  not historical observations. The labelled daily mean can differ from the
-  nonlinear whole-window result.
-- Driving groups are [0,120), [120,240), [240,360), [360,infinity) minutes.
-  Formatting uses h:mm without altering numeric calculations or reference data.
-- The original comparison/all-preferences tabs are removed. Current analytical
-  views are compound rankings, score-versus-travel comparisons and daily
-  destination comparisons, covering comparison and derived-metric categories.
-
-`scoring.py` owns scoring; `analytics.py` validates/calculates; `executive.py`
-summarizes canonical results. UI code only formats/groups these results.
-Current implementation and validation are in [Phase 4](PHASE4_ANALYTICS_UI.md#p45-canva-inspired-executive-redesign).
+Driving groups are [0,120), [120,240), [240,360), [360,infinity) minutes.
+The OSM Madrid origin (40.4168, -3.7038) is context only and excluded from counts.
+`scoring.py` owns formulas, `analytics.py` validates/calculates and `executive.py`
+summarizes canonical results; UI code formats/groups them. The shared schema
+above remains authoritative.

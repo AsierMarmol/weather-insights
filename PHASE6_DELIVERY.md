@@ -1,28 +1,38 @@
 # Phase 6 - Documentation and Delivery
 
-Updated 14 November 2026. The original P6.1 preparation/publication history is
-retained below. P4.5/P6.1 was approved by Gabriel and merged in PR #21.
-The independent reviewed-version clean-clone gate remains P6.2.
+Status checked 15 November 2026. Current reviewed dev is `83cc7f9`.
+The live-save documentation/data follow-up is committed as `e46abec`.
+[PR #26](https://github.com/AsierMarmol/weather-insights/pull/26) was closed without
+merging; the commit and `asier/feature` branch were preserved. The replacement
+review includes that evidence and the consolidated delivery documentation.
+Use the [open pull requests](https://github.com/AsierMarmol/weather-insights/pulls)
+for its current review status; no approval or merge is inferred.
+PR #23 is approved by Alejandra and merged; PR #24 retains her earlier
+clean-clone evidence; PR #25 records Gabriel's final-code validation and
+Christian's approval. Historical reports below retain their actual scope.
 
-| Step | Deliverable | Owner | Reviewer | Dependency and current status |
+| Step | Deliverable | Owner | Reviewer | Current status |
 | --- | --- | --- | --- | --- |
-| P6.1 | Current README, delivery contents, real data/source/AI evidence | Asier | Gabriel | Approved by Gabriel; merged in PR #21 (dev `3444728`) |
-| P6.2 | Independent clean-clone verification by both testers | Gabriel and Alejandra | Christian | Alejandra's first run passed on dev `d1c3bdf` ([record](#p62-alejandra-clean-clone-run--14-november-2026)); PR #23 then changed the candidate to `f26e908`, so her re-run on the final version and Christian's review remain pending. Gabriel's [report](#p62-report---gabriel-14-november-2026) covers final dev `252e2cb` (automated and live checks passed; no live fresh save on this code because all forecasts were under three hours old) |
-| P6.3 | Reviewed publication and submission | Asier | Gabriel | After P6.2, source/access/channel confirmations and authorization; pending |
+| P6.1 | README, delivery contents, real data/source/AI evidence | Asier | Gabriel; Alejandra reviewed PR #23 | Implementation and typing/warning-marker changes reviewed and merged |
+| P6.2 | Clean-clone evidence and final-code fetch/save verification | Gabriel and Alejandra; Asier for the live-save follow-up | Christian | Gabriel's final-code report approved in PR #25; fresh-fetch/save check passed. Christian's acknowledgement of Alejandra's earlier report remains pending; see [current evidence](#p62-final-code-live-save-and-acceptance-status--14-november-2026) |
+| P6.3 | Reviewed publication and submission | Asier | Gabriel | Pending acceptance closure, final reviewed dev-to-main publication and submission |
 
 ## Next action
 
-The locally validated [typing and warning-marker follow-ups](PHASE5_QUALITY_REVIEW.md#delivery-readiness-recheck--14-november-2026) require Alejandra's review
-and merge into dev before the final P6.2 runs. Its automated checks do
-not replace either independent acceptance report.
+The group decision is to use Gabriel's final-code validation alongside
+Alejandra's earlier clean-clone report; a second complete Alejandra rerun is
+no longer required by the project plan. This changes the acceptance plan,
+not the versions that were actually tested. Christian approved Gabriel's
+PR #25; Alejandra's PR #24 was approved by Asier, not Christian.
 
-
-**Gabriel and Alejandra each perform P6.2, reviewed by Christian.** Gabriel approved [PR #21](https://github.com/AsierMarmol/weather-insights/pull/21)
-and it merged into dev as `3444728`. Clone reviewed dev into a new directory,
-record the exact commit and follow README only. [Post-commit validation](PHASE5_QUALITY_REVIEW.md#post-commit-validation--14-november-2026)
-passed against identical files but does not close this independent gate.
-Local Streamlit is the delivery target; hosting is optional. The full
-repository is needed: a wheel alone lacks app.py and external data/assets.
+Complete Christian's review acknowledgement and the Gabriel/Christian review
+of the replacement `asier/feature` to `dev` pull request. It includes the
+retained live-check evidence and genuine records plus documentation cleanup.
+PR #26 is closed and is no longer an active review request; after the
+replacement's reviewed merge into dev, follow P6.3. The final code
+matches Gabriel's tested `252e2cb`; later merges changed documentation/data.
+Local Streamlit remains the delivery target. Deliver the complete repository;
+a wheel alone does not contain app.py, external reference data or assets.
 
 ## Delivery contents and final checklist
 
@@ -54,17 +64,25 @@ Do not include real credential files, copied virtual environments, caches, tempo
 
 ### P6.2 clean-clone acceptance - Gabriel and Alejandra, reviewed by Christian
 
-P6.1 is reviewed and merged in PR #21. Run P6.2 at the end of preparation,
-after the final documentation cleanup and any fixes are reviewed and merged,
-before P6.3 publication/submission. Gabriel and Alejandra each test the same
-reviewed dev commit independently, using separate fresh directories, their
-own environments and personal API keys. Both reports are required; this
-assignment does not mark either run complete. Use only README instructions. Record `git rev-parse HEAD`, operating system, Python/uv versions and actual results. Do not copy another clone's environment or credentials.
+The original plan requested two complete runs on the same final dev commit.
+The [current acceptance decision](#p62-final-code-live-save-and-acceptance-status--14-november-2026) supersedes that repeat-run
+requirement: Alejandra's original report remains dated evidence; Gabriel's
+final-code run supplies the later coverage, supplemented by the live-save
+check below. Christian reviews the evidence without reattributing either run.
+The checks below remain the acceptance checklist; unobserved visual behavior
+is not converted into a pass by this planning change.
 
 1. Clone reviewed dev and run `uv sync --locked`, package import, `uv pip check`, the full offline test suite, Flake8 and `uv run --locked pyright` as documented in README. If using VS Code, select the new clone's `.venv` and check Pylance too. Keep the app stopped during tests. On macOS the two Unix permission tests should run, not be dismissed as Windows skips.
 2. Configure a personal key locally and start Streamlit. Check Landing and Dashboard before Searcher, automatic Dashboard loading, the all-83 map, hover, executive tables, Destination-score-versus-driving scatter and daily heatmap; verify 1/5-day selection, navigation and independent state. Check the agreed delivery viewport; this local audit excludes phone/Mac acceptance. Live loads create real saved records and count against the account quota.
 3. Exercise Searcher preferences, All selections, top-five/full-table consistency and unavailable states. When a top-five high-wind alert appears, verify that the affected cards carry the red dot and High wind label. Verify successful fresh fetches save genuine records and suitable cache reuse does not append duplicates. Use existing tests for simulated error paths; do not deliberately overload the provider.
-4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes the candidate, both reports must cover the final reviewed version before P6.2 is closed. Preserve new real records and inspect the diff before proposing them for commit.
+4. Each tester records their identity, exact commit, environment, commands/results, visual checks, limitations and any fixes/retests in this phase. Christian reviews both reports. If a fix changes runtime behavior, record a targeted retest of that change before closing P6.2. Preserve new real records and inspect the diff before proposing them for commit.
+
+The [P4.5 acceptance details](#p45-additions-to-clean-clone-acceptance) below
+extend this checklist. Run the README commands once per tested version; the
+additional checks do not require a duplicate installation or full test run.
+
+<details>
+<summary>Gabriel’s original clean-clone report — tested versions and limitations preserved</summary>
 
 ### P6.2 report - Gabriel, 14 November 2026
 
@@ -194,6 +212,8 @@ failure found. Not repeated on this code: a live fresh fetch and save (all
 forecasts were fresh). The cosmetic wording above is unchanged in `252e2cb`.
 P6.2 still needs Alejandra's final re-run and Christian's review.
 
+</details>
+
 ### P6.3 final publication - Asier, reviewed by Gabriel
 
 - [ ] All earlier review/check evidence applies to the selected delivery commit; each member can explain the complete app.
@@ -203,6 +223,9 @@ P6.2 still needs Alejandra's final re-run and Christian's review.
 - [ ] Confirm final main contains the verified delivery files. If code/data changes invalidate acceptance, repeat affected checks before submission.
 - [ ] Submit the repository URL through the confirmed channel and record the actual receipt. No submission or final grade is claimed here.
 
+
+<details>
+<summary>Historical P6.1 preparation and source-confirmation evidence</summary>
 
 ## P6.1 preparation — 14 November 2026
 
@@ -262,36 +285,38 @@ submission. No staging, commit, push, review request or merge was performed.
 
 Asier requested the next phase step; OpenAI Codex prepared the documentation and provider attribution. Existing local status edits and newly accumulated weather records were preserved. No live API request was made, and the weather dataset was not edited by this work. Verification: isolated `uv sync --locked` succeeded; 18 existing app-integration/final-acceptance tests passed in 19.91 seconds; Flake8 reported no findings. All 75 local Markdown links/anchors resolve and `git diff --check` passes. The official logo was visually inspected and copied without modification. A frozen CSV snapshot passed WeatherStore model/schema validation, catalog membership, unique keys and preservation of all 6,604 previously committed rows: 6,644 records across 83 destinations (4 current and 6,640 forecast), including 40 newly accumulated forecast rows. These counts are a dated snapshot. This targeted Windows run is not a full-suite rerun, a Mac test result or P6.2 clean-clone approval; no live desktop/mobile visual result is claimed. After preparation, Asier authorized a commit and push to `asier/feature` on 12 November 2026. Gabriel review, merging and submission remain pending.
 
-
+</details>
 
 ## P4.5 additions to clean-clone acceptance
 
-- Verify Landing / Trip Searcher / Dashboard, independent state and all five
-  windows; fetching uses full forecasts, reuse creates no duplicate history.
-- Check one Trip score in Searcher and one Destination score throughout the
-  Dashboard, including driving. Daily cells use daily windows and label their mean.
-- Check equal-city rain/wind averages, explicit catalogue maxima, all-83 map
-  and missing-data states; no illustrative Canva values or forced coverage.
-- Check responsive KPI cards, navigation, h:mm sorting, table scrolling,
-  chart hover/zoom/reset, OSM attribution/tiles and fallback fonts. A VS Code
-  preview pass is not a real-phone or Mac pass.
-- Run bounded offline stress tests and fault injection rather than overloading
-  OpenWeather or damaging the real CSV. One writer process per clone remains
-  the supported deployment; pending unsaved data must be recovered before closing.
-- Record actual commit, OS/Python/uv, commands/results and reviewer acceptance.
-  Recheck code/data changes after the tested version. Never infer contribution,
-  peer approval, source rights or a grade from test counts.
+Use these with the P6.2 checklist, not as a separate repeat run:
+
+- Verify the [visual metric contract](SCORING.md#visual-contract): one score
+  per view, daily cells/mean labelled separately, equal-city KPI averages,
+  catalogue maxima, all-83 map and explicit missing data. No Canva example values.
+- Check responsive KPI cards, h:mm sorting, table scrolling, hover/zoom/reset,
+  OSM attribution/tiles and fallback fonts at the agreed delivery viewport.
+  A VS Code preview is not proof of real-phone or Mac behavior.
+- Use [bounded offline simulations](PHASE5_QUALITY_REVIEW.md#bounded-offline-stress-simulations)
+  for load/failure cases, never live-provider stress or damaged genuine data.
+  Keep one writer process per clone and recover pending saves before closing.
+
+Record exact versions, environment, observed checks, limits and reviewer
+acceptance as required by P6.2. Automated results do not establish authorship,
+source rights, peer approval or a grade.
 
 ## Instructor reproduction requirement
 
-The final reviewed repository must be self-contained for an instructor as well
-as a teammate: locked install, source/theme/assets, reference files, real logged
-data and README commands. The reader supplies their own active API key after
-installing Git/uv; no personal environment or developer-home path is required.
-Keep the optional diagnostic and all setup files. Generated egg-info and caches
-are recreated locally. See [latest clean-copy evidence](PHASE5_QUALITY_REVIEW.md#provider-identity-and-diagnostic-follow-up--14-november-2026). This local
-evidence does not publish the preview or close P6.2 for a future reviewed commit.
+The instructor follows [README.md](README.md) with their own active API key.
+The [delivery inventory](#delivery-contents-and-final-checklist) supplies the
+source, locked setup, assets, references, genuine history and diagnostic; no
+personal environment or developer-home path is required. Generated metadata
+and caches are recreated locally. Independent reproduction evidence is in
+the dated P6.2 reports; the [current acceptance decision](#p62-final-code-live-save-and-acceptance-status--14-november-2026)
+defines their scope and remaining reviews.
 
+<details>
+<summary>Historical integration and Alejandra’s original report — superseded plans retain their dates</summary>
 
 ## P6.1 integration checkpoint — 14 November 2026
 
@@ -371,3 +396,76 @@ retrieved 14 November 2026 21:03:10–21:04:12 UTC, one fetch group per city).
 They were appended unchanged to the dev data after PR #23's 3,480 rows,
 using `WeatherStore.append`: 29,567 records, all keys unique, no existing row
 changed.
+
+</details>
+
+## P6.2 final-code live save and acceptance status — 14 November 2026
+
+**Group decision:** accept Gabriel's final-code validation together with
+Alejandra's earlier clean-clone evidence, rather than require her to repeat
+the complete run. Alejandra tested `d1c3bdf`; Gabriel retested `252e2cb`.
+The current `83cc7f9` has identical application code/tests/assets/configuration
+to Gabriel's tested version; subsequent merges added documentation and data.
+Christian approved [PR #25](https://github.com/AsierMarmol/weather-insights/pull/25).
+His review of Alejandra's [PR #24](https://github.com/AsierMarmol/weather-insights/pull/24)
+has not been recorded; its merged approval was from Asier. No approval is inferred.
+
+**Live verification by Asier with OpenAI Codex:** tested production code at
+`83cc7f9c79cbe1c59bbdfdeed0dfe92c83399234`. The requester stopped the app before preserving
+data. One real forecast request for Toledo (`ES-45168`) at
+`2026-11-14T22:36:05.745088+00:00` produced 40 validated forecast records,
+fetch ID `3860ffee-a708-484a-ba03-6790147d9402`. The production WeatherService and WeatherStore
+saved the response to a separate local CSV; a new WeatherStore read back
+the exact records. A repeated call and a restarted service reused the saved
+forecast with zero extra HTTP requests. Re-appending the same batch wrote
+zero rows and preserved the saved bytes. No fake response or frozen clock
+was used; credentials were never printed or copied into the repository.
+
+The genuine batch was then retained through WeatherStore.append in the
+project CSV: **30,407 -> 30,447 unique records**, with all earlier bytes
+preserved. The final-code fresh-fetch/save/readback/reuse gap is closed.
+This is a service/storage live check, not a new browser or Mac walkthrough.
+The visual limitations in the teammate reports remain disclosed; the
+requester's earlier preview review is separate evidence.
+
+**Follow-up checks:** 50 fetch/save/recovery and genuine-data acceptance
+tests passed, with two POSIX-only Windows skips, after retaining the live
+batch. All 156 local Markdown links resolved before adding the external
+review-request link. No application code changed; the prior full 525-pass
+Windows run remains the full-suite evidence for this code version.
+
+**Review request:** [Christian was asked on PR #24](https://github.com/AsierMarmol/weather-insights/pull/24#issuecomment-6885326286) to acknowledge
+Alejandra's earlier report alongside his approved Gabriel report and this
+live-save evidence. His response is pending; no approval is inferred.
+
+**Remaining:** Christian's review acknowledgement of Alejandra's earlier
+report and the combined acceptance scope; review/publication of this local
+documentation/data follow-up; P6.3 publication to main and actual submission.
+No commit, push, merge, reviewer approval or submission is performed by this
+record. This section supersedes older pending-rerun and pending-PR-23 wording.
+
+## Documentation consolidation and clone verification — 15 November 2026
+
+Asier / OpenAI Codex consolidated repeated current rules, corrected navigation
+and review status, and kept original reports in expandable historical sections.
+Existing heading anchors, unique evidence and scoring formulas are retained;
+PROMPTS.md is byte-for-byte unchanged. The [document ownership guide](PROJECT_PHASES.md#dependencies-and-document-ownership)
+identifies where each rule belongs.
+
+A fresh GitHub clone using the README's dev command was checked out to published
+feature commit `e46abec`, then the pending Markdown edits were applied. This is
+candidate validation, not a claim that these edits are published or merged.
+A new environment and empty uv cache passed the README's locked installation,
+dependency/import checks, **525 tests with 2 POSIX-only Windows skips**
+(132.92 seconds), Flake8 and Pyright (zero errors/warnings). Blank credential-file
+creation/preservation and ignore checks passed. Keyless Landing/Searcher/Dashboard
+checks and a disposable Streamlit server's root/health HTTP 200 checks passed;
+the test server was stopped. No credential or existing environment was copied.
+A temporary harness escaping error in the credential-copy command was corrected;
+that check then passed with the README command unchanged.
+
+Tests preserved the genuine dataset and all candidate files. Final editorial
+refinements and this result note were checked for links/anchors after the run;
+runtime files and README setup commands did not change. No live-weather request,
+new browser appearance check, Mac/phone acceptance, commit, push or merge is
+claimed. P6.2 review and P6.3 remain governed by the current acceptance record.

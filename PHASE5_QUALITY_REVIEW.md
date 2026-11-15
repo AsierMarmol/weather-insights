@@ -1,15 +1,29 @@
 # Phase 5 - Quality Review
 
-> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> Current scoring: [SCORING.md](SCORING.md). Dated records retain the rules and results tested at that time.
 
 Updated: 14 November 2026. **Current local candidate: 525 passed,
 two POSIX-only Windows skips; type checks and lint clean.**
 The [delivery-readiness recheck](#delivery-readiness-recheck--14-november-2026)
-records the latest run. Typing and warning-marker changes require Alejandra's review and merge into dev. Earlier semantic/cleanup/integration results retain their
+records the latest run. Typing and warning-marker changes were approved by Alejandra and merged in PR #23. Earlier semantic/cleanup/integration results retain their
 dated timings and datasets. Gabriel approved PR #21 and it is merged into dev.
-P6.2 independent clean-clone acceptance and P6.3 delivery remain open.
+Current [P6.2 live-save/review status](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026) supersedes the older pending-rerun notes; P6.3 delivery remains open.
 The original P5.1–P5.5 table and dated entries below are historical evidence.
-No new live API, browser, phone or Mac result is claimed.
+The earlier offline audits below remain scoped as recorded; Phase 6 now records a separate final-code live API/save check.
+
+## Validation reading guide
+
+- [Delivery readiness recheck](#delivery-readiness-recheck--14-november-2026):
+  525 passing Windows tests, two POSIX skips, type/lint and integrity evidence.
+- [Rubric and course-practice cross-check](#final-pre-clone-validation--14-november-2026):
+  requirement-to-implementation mapping; preserve its original tested version.
+- [Stress simulations](#bounded-offline-stress-simulations) and
+  [failure handling](#failure-simulations-and-handling): bounded offline scenarios.
+- [Phase 6](PHASE6_DELIVERY.md): independent clone reports, later live-save
+  evidence, review status and remaining delivery checks.
+
+Each dated run below retains its commit, platform, data snapshot, results and
+limits. Older counts or pending reviews do not override current acceptance.
 
 ## Purpose and dependencies
 
@@ -29,21 +43,17 @@ Verify the integrated app against the teacher rubric. Component tests already be
 
 Use the Phase 2 rubric mapping and actual implementation. OOP: reusable inheritance, deliberate visibility, special method and property. API: dotenv, validation, distinct errors, graceful batches. Data: every successful fresh fetch saved with timestamps, genuine accumulated dataset, three analyses across comparison/derived metrics. UI: two interactive views and two correct labeled charts. Repo/team: installable clean clone, accurate README/AI records/trailers and meaningful work from all five. Do not infer approval or understanding from a role label. Required stubs must be implemented by delivery; an empty __init__.py is valid. Include `uv run --locked flake8 src tests scripts app.py` alongside the relevant tests before accepting changes; the shared default line limit is 79 characters.
 
-Read [Phase 2](PHASE2_SCOPE.md) for product rules, shared schema and the worked example; [API contract](WEATHER_API_CONTRACT.md) for provider behavior; [roles](TEAMROLES.MD) for ownership. Each owner includes tests/docs/fixes. Follow [plan maintenance](PROJECT_PHASES.md#plan-maintenance) when decisions change. The instructor README governs final acceptance; plans are not proof of completed functionality.
+Use the [document ownership and maintenance guide](PROJECT_PHASES.md#dependencies-and-document-ownership) for shared rules, roles and update requirements.
 
 ## Task prompt
 
 ```text
-Work on <task ID> in PHASE5_QUALITY_REVIEW.md as <actual requester>.
-Read the task, shared specification and actual prerequisite files first.
-Complete the whole assigned deliverable within its owned files, using existing
-components rather than duplicating them. Keep secrets private and synthetic
-test inputs separate from genuine data. Run relevant checks and record actual
-results, limitations and the next dependency in this phase. Update affected
-plans when rules change. Record substantial AI assistance accurately in
-PROMPTS.md; do not invent teammate work or approval. Do not commit, push,
-request review, merge or submit without the relevant authorization.
+Complete <task ID> in PHASE5_QUALITY_REVIEW.md as <actual requester>.
+Follow PROJECT_PHASES.md's Shared task workflow and this phase's acceptance criteria.
 ```
+
+See the [shared task workflow](PROJECT_PHASES.md#shared-task-workflow) for
+verification, documentation, attribution and publication boundaries.
 
 ## Phase progress log
 
@@ -60,10 +70,14 @@ Dated entries describe their original submission state. The deliverable table an
 
 ## Next action
 
-Gabriel and Alejandra each perform P6.2 against the same final reviewed dev
-commit, with Christian reviewing both reports. See [Phase 6](PHASE6_DELIVERY.md#p62-clean-clone-acceptance---gabriel-and-alejandra-reviewed-by-christian).
-PR #21 closes Gabriel's integration review; it does not replace independent
-clean-clone acceptance.
+Use the [current P6.2 decision](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026)
+and [Phase 6 next action](PHASE6_DELIVERY.md#next-action). The group accepts
+Alejandra's earlier report alongside Gabriel's final-code run and the live-save
+check; this supersedes the earlier two-final-runs plan. Christian's combined
+acknowledgement remains pending. Review approval is distinct from test evidence.
+
+<details>
+<summary>Earlier validation evidence — original reports, results and limitations</summary>
 
 ### P5.1 model/storage acceptance - 12 November 2026
 
@@ -782,6 +796,7 @@ The four UI cases verify threshold boundaries and exclusion outside the top
 five. No genuine data was modified by these checks. Browser visual review
 and P6.2 acceptance on the final merged dev version remain separate checks.
 
+</details>
 
 ## Delivery readiness recheck — 14 November 2026
 

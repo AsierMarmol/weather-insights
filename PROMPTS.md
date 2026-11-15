@@ -2105,3 +2105,154 @@ Gabriel's report is still required.
 
 **Commit / PR:** Committed on `Alejandra/feature`, authorized by Alejandra;
 not pushed or merged.
+
+
+## Phase 6: final-code live-save check and current status (2026-11-14)
+
+**Requested by:** AsierMarmol. **AI collaborator:** OpenAI Codex.
+
+**Asked:** Accept Gabriel's later validation alongside Alejandra's earlier
+run, complete the final-code fresh-fetch/save check, and update stale
+review/merge status. Christian reviews Alejandra's report.
+
+**Got:** Verified PR #23 merged with Alejandra's approval and PR #25 merged
+with Christian's approval. Used production code at `83cc7f9` for one real
+Toledo forecast, saved and read back 40 records, then verified reuse through
+the same and a restarted service without extra requests or duplicate rows.
+Preserved the genuine records in the project CSV (30,447 rows). Updated
+active delivery status and linked the [evidence](PHASE6_DELIVERY.md#p62-final-code-live-save-and-acceptance-status--14-november-2026).
+
+**Checked:** Genuine timestamps and provider validation, identical readback,
+one HTTP request, no additional requests on reuse, idempotent append and
+preservation of all previous rows. Historical reports remain unchanged.
+
+**Kept / changed / rejected:** No application or scoring changes. The group
+accepts Gabriel's later coverage instead of another full Alejandra rerun;
+her old report is not relabelled as a final-code test. Christian's approval
+of Gabriel's report is not treated as approval of Alejandra's. No fabricated
+review, visual check or submission is recorded.
+
+**Human review / publication:** [Requested Christian's acknowledgement](https://github.com/AsierMarmol/weather-insights/pull/24#issuecomment-6885326286)
+on PR #24; his response is pending. Follow-up validation passed 50 tests with
+two POSIX-only Windows skips; local documentation links resolve and application
+code is unchanged. Documentation and genuine data are prepared locally; no
+commit/push/merge or P6.3 submission is performed in this step.
+
+
+## Phase 6: consolidate delivery documentation (2026-11-15)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Organize README around overview, requirements/setup, application use,
+data/scores/limitations, testing/troubleshooting, structure, team/workflow and
+sources. Review the other Markdown documents for repetition, retain unique
+information and working references, and preserve the existing PROMPTS.md.
+Consolidate explanations without removing the instructor's clean-clone steps.
+
+**Got:** Reorganized README into the eight agreed sections and reduced it from
+3,296 to 1,942 words. Consolidated current rules across the phase documents,
+PROJECT_PHASES.md, TEAMROLES.MD, SCORING.md, WEATHER_API_CONTRACT.md and the asset
+and data READMEs. Linked repeated instructions to their owning documents,
+corrected navigation and stale status wording, and placed lengthy historical
+reports in expandable sections without rewriting their evidence.
+
+**Checked:** All 176 local documentation links resolved at the cleanup
+checkpoint. Existing heading anchors, unique evidence, scoring formulas and
+historical reports were retained. File comparisons confirmed that application
+code, tests, configuration, dependencies, assets and genuine weather records
+were unchanged. PROMPTS.md remained byte-for-byte unchanged during that work;
+this new record is appended only after the requester's subsequent instruction.
+
+**Kept / changed / rejected:** Kept complete installation, credential handling,
+troubleshooting, attribution and data-source requirements. Centralized repeated
+rules without substituting new functionality or deleting historical evidence.
+The word-count reduction was an editorial outcome, not a requirement to remove
+necessary instructions.
+
+**Human review / publication:** Prepared 14 Markdown changes locally. No new
+commit, push or merge was performed for the documentation consolidation.
+
+
+## Phase 6: repeat clean-clone validation after documentation cleanup (2026-11-15)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Repeat the README clean-clone checks after consolidating the
+Markdown documents, preserving project information and reproducibility.
+
+**Got:** Created a fresh GitHub clone using the README dev-branch command,
+checked out published feature commit `e46abec`, and applied the pending
+Markdown candidate. Used a new environment and empty uv cache; did not copy
+credentials or an existing environment. Recorded the verification in Phase 6.
+
+**Checked:** Locked installation, dependency/import checks, Flake8 and Pyright
+passed; Pyright reported zero errors and warnings. The full suite passed
+525 tests with two expected POSIX-only Windows skips in 132.92 seconds.
+Blank credential-file creation/preservation and Git ignore checks passed.
+Keyless application checks covered Landing, Searcher and Dashboard, including
+clear missing-key handling. A disposable Streamlit server returned HTTP 200
+for its root and health endpoints and was stopped afterward. Genuine data and
+candidate files were preserved. A temporary test-harness escaping error was
+corrected before rerunning the credential-copy check successfully; the README
+command and application did not need a fix.
+
+**Kept / changed / rejected:** These results validate the local documentation
+candidate against published feature code, not an already merged final dev
+version. Final editorial refinements were checked for links and anchors after
+the suite; runtime code and setup commands were unchanged. No additional live
+weather request, browser appearance review or Mac/phone acceptance is claimed.
+The earlier real fetch/save evidence remains separate.
+
+**Human review / publication:** Validation completed locally. Outstanding team
+acceptance and dev-to-main delivery remain governed by Phase 6; this check does
+not invent reviewer approval or constitute submission.
+
+
+## Phase 6: close the previous review request (2026-11-15)
+
+**Requested by:** AsierMarmol.
+
+**AI collaborator:** OpenAI Codex.
+
+**Asked:** Cancel the previous publication request; clarified that the action
+was to remove the pull request, not discard the commit or local work.
+
+**Got / checked:** Closed
+[PR #26](https://github.com/AsierMarmol/weather-insights/pull/26), then verified
+GitHub reported it closed and unmerged. The existing commit `e46abec`,
+`asier/feature` branch and pending local documentation changes were preserved.
+No reset, branch deletion or history rewrite was performed.
+
+**Human review / publication:** PR #26 is closed, not merged. Earlier dated
+references to it being open describe the previous checkpoint. The pending
+Markdown consolidation and this appended AI record have not been committed
+or pushed by this step. Existing PROMPTS.md entries remain unchanged.
+
+
+## Phase 6: prepare the replacement documentation review (2026-11-15)
+
+**Requested by:** AsierMarmol. **AI collaborator:** OpenAI Codex.
+
+**Asked:** Correct current references that still call PR #26 open, preserve
+dated historical entries, then commit and push the pending documentation and
+open a replacement pull request into dev.
+
+**Got / checked:** Fetched origin and verified dev remains at `83cc7f9`,
+with the existing live-save commit `e46abec` retained on `asier/feature`.
+GitHub confirms PR #26 is closed and unmerged. Updated the active phase index
+and delivery instructions to direct review to the replacement request, while
+preserving dated reports and all earlier PROMPTS entries. The replacement
+scope includes the earlier live-save evidence/data and the documentation
+consolidation; no application, scoring, dependency or test changes are intended.
+
+**Validation / publication:** The earlier clean-clone result remains 525 passed
+and two expected Windows skips, with clean lint/type checks. This follow-up
+checks documentation links, preserved history and the staged diff; it does not
+claim a new runtime test run. Commit, push and replacement PR creation are
+authorized by the requester; GitHub records their actual outcome. Gabriel and
+Christian retain the review responsibilities documented in Phase 6. No merge,
+review approval or instructor submission is authorized or claimed here.

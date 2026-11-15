@@ -1,6 +1,6 @@
 # Phase 3 - Core Application and Automatic Data Saving
 
-> **Current specification:** [Scoring model comfort-v2.2](SCORING.md) defines the approved seasonal Dashboard, preferred-range Searcher, gradual scores and driving penalties. Earlier dated progress records describe historical behavior; they are not the current formula.
+> Current scoring: [SCORING.md](SCORING.md). Dated records retain the rules and results tested at that time.
 
 Historical core baseline, 12 November 2026. **Core accepted for Phase 4:** P3.1, P3.2 and P3.3 reviewed and merged into dev (PR #4, PR #6, PR #5); P3.3 integration reviewed and merged in PR #7; P3.1 validation follow-up reviewed and merged in PR #8; P2.5 was approved by Gabriel and Christian and merged in PR #9. Final integrated acceptance remains Phase 5.
 
@@ -20,21 +20,17 @@ Build models/storage, the reusable API/save service and the analytical engine. R
 
 Use the shared objects, methods, CSV header and worked example in P2.4. Alejandra owns models.py/storage.py; Gabriel client.py/config.py/service.py; Christian analytics.py. Keep analytics pure and credential-free. Extend the existing lazy get_api_key helper rather than duplicating configuration. Retain valid dated records; new successes save automatically, cache reads do not. A failed save is not analytical success. No scheduler or second verification client/store.
 
-Read [Phase 2](PHASE2_SCOPE.md) for product rules, shared schema and the worked example; [API contract](WEATHER_API_CONTRACT.md) for provider behavior; [roles](TEAMROLES.MD) for ownership. Each owner includes tests/docs/fixes. Follow [plan maintenance](PROJECT_PHASES.md#plan-maintenance) when decisions change. The instructor README governs final acceptance; plans are not proof of completed functionality.
+Use the [document ownership and maintenance guide](PROJECT_PHASES.md#dependencies-and-document-ownership) for shared rules, roles and update requirements.
 
 ## Task prompt
 
 ```text
-Work on <task ID> in PHASE3_CORE_DATA.md as <actual requester>.
-Read the task, shared specification and actual prerequisite files first.
-Complete the whole assigned deliverable within its owned files, using existing
-components rather than duplicating them. Keep secrets private and synthetic
-test inputs separate from genuine data. Run relevant checks and record actual
-results, limitations and the next dependency in this phase. Update affected
-plans when rules change. Record substantial AI assistance accurately in
-PROMPTS.md; do not invent teammate work or approval. Do not commit, push,
-request review, merge or submit without the relevant authorization.
+Complete <task ID> in PHASE3_CORE_DATA.md as <actual requester>.
+Follow PROJECT_PHASES.md's Shared task workflow and this phase's acceptance criteria.
 ```
+
+See the [shared task workflow](PROJECT_PHASES.md#shared-task-workflow) for
+verification, documentation, attribution and publication boundaries.
 
 ## Phase progress log
 
@@ -54,10 +50,11 @@ request review, merge or submit without the relevant authorization.
 
 ## Next action
 
-PR #7 and PR #8 are approved and merged. P2.5 passed on Toledo, Segovia and Seville; see [the evidence](PHASE2_SCOPE.md#p25-verification---12-november-2026). Gabriel and Christian approved P2.5 in merged PR #9, satisfying the Phase 4 dependency gate. P4 wiring uses `forecasts_from_service()` with one shared service. Christian's foundation approval is recorded in PR #3; historical pending entries above retain their original context.
-
-Current checkpoint: P2.5 and the original P5.5 integration review are complete. The P4.5 redesign is integrated into local asier/feature and remains uncommitted; its current validation and remaining review gates are in [Phase 5](PHASE5_QUALITY_REVIEW.md#cleanup-and-reproducibility-review--14-november-2026). The earlier 164-record and 3,324-record counts are historical snapshots, not current coverage. Optional historical JSONL import remains deferred; the original evidence is retained.
-
+The core and P2.5 are accepted; P4.5 was reviewed and merged in PR #21.
+Continue with [current delivery actions](PROJECT_PHASES.md#next-actions-and-owners).
+Optional historical JSONL import remains deferred; the original evidence is
+retained separately. Earlier row counts and pending states are dated snapshots,
+not current coverage or instructions.
 
 ## P4.5 integration boundary — 13 November 2026
 
